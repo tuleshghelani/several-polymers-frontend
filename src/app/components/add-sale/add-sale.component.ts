@@ -42,6 +42,7 @@ export class AddSaleComponent implements OnInit, OnDestroy {
   isLoadingProducts = false;
   isLoadingCustomers = false;
   isEdit = false;
+  private currentSaleId: number | null = null;
   private destroy$ = new Subject<void>();
   private productSubscriptions: Subscription[] = [];
 
@@ -67,15 +68,11 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     this.loadCustomers();
     
     const encryptedId = localStorage.getItem('saleId');
-    console.log('encryptedId : ' + encryptedId);
-    
     if (encryptedId) {
-      console.log('inside if encryptedId : ' + encryptedId);
       const saleId = this.encryptionService.decrypt(encryptedId);
       if (saleId) {
-        console.log('saleId : ' + saleId);
-        
-        this.fetchSaleDetails(Number(saleId));
+        this.currentSaleId = Number(saleId);
+        this.fetchSaleDetails(this.currentSaleId);
       }
     }
   }
@@ -273,6 +270,13 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     this.initForm();
   }
 
+  cancelEdit(): void {
+    localStorage.removeItem('saleId');
+    this.isEdit = false;
+    this.currentSaleId = null;
+    this.resetForm();
+  }
+
   onSubmit() {
     this.markFormGroupTouched(this.saleForm);
     
@@ -282,13 +286,19 @@ export class AddSaleComponent implements OnInit, OnDestroy {
       this.saleService.createSale(formData).subscribe({
         next: (response: any) => {
           if (response?.success) {
-            this.snackbar.success('Sale created successfully');
+            const isUpdate = Boolean(this.currentSaleId);
+            this.snackbar.success(isUpdate ? 'Sale updated successfully' : 'Sale created successfully');
+            if (isUpdate) {
+              localStorage.removeItem('saleId');
+              this.isEdit = false;
+              this.currentSaleId = null;
+            }
             this.resetForm();
           }
           this.loading = false;
         },
         error: (error) => {
-          this.snackbar.error(error?.error?.message || 'Failed to create sale');
+          this.snackbar.error(error?.error?.message || 'Failed to save sale');
           this.loading = false;
         }
       });
@@ -310,7 +320,8 @@ export class AddSaleComponent implements OnInit, OnDestroy {
         ...product,
         finalPrice: this.productsFormArray.at(formValue.products.indexOf(product)).get('finalPrice')?.value
       })),
-      isBlack: Boolean(formValue.isBlack)
+      isBlack: Boolean(formValue.isBlack),
+      ...(this.currentSaleId ? { id: this.currentSaleId } : {})
     };
   }
 
@@ -367,8 +378,10 @@ export class AddSaleComponent implements OnInit, OnDestroy {
       isBlack: data.isBlack
     });
 
-    // Clear existing products
+    // Clear existing products and subscriptions
     this.productsFormArray.clear();
+    this.productSubscriptions.forEach(sub => sub?.unsubscribe());
+    this.productSubscriptions = [];
 
     // Populate products
     data.items.forEach((item: any) => {
@@ -381,6 +394,10 @@ export class AddSaleComponent implements OnInit, OnDestroy {
         remarks: item.remarks
       });
       this.productsFormArray.push(productGroup);
+      // Ensure real-time calculation wiring for each populated product row
+      this.setupProductCalculations(productGroup, this.productsFormArray.length - 1);
+      // Also compute once to update totals
+      this.calculateProductPrice(this.productsFormArray.length - 1);
     });
     this.isEdit = true;
   }

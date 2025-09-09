@@ -43,6 +43,7 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
   isLoadingProducts = false;
   isLoadingCustomers = false;
   isEdit = false;
+  private currentPurchaseId: number | null = null;
   private destroy$ = new Subject<void>();
   private productSubscriptions: Subscription[] = [];
 
@@ -71,7 +72,8 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     if (encryptedId) {
       const purchaseId = this.encryptionService.decrypt(encryptedId);
       if (purchaseId) {
-        this.fetchPurchaseDetails(Number(purchaseId));
+        this.currentPurchaseId = Number(purchaseId);
+        this.fetchPurchaseDetails(this.currentPurchaseId);
       }
     }
   }
@@ -268,6 +270,13 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     this.initForm();
   }
 
+  cancelEdit(): void {
+    localStorage.removeItem('purchaseId');
+    this.isEdit = false;
+    this.currentPurchaseId = null;
+    this.resetForm();
+  }
+
   onSubmit() {
     this.markFormGroupTouched(this.purchaseForm);
     
@@ -277,13 +286,19 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
       this.purchaseService.createPurchase(formData).subscribe({
         next: (response: any) => {
           if (response?.success) {
-            this.snackbar.success('Purchase created successfully');
+            const isUpdate = Boolean(this.currentPurchaseId);
+            this.snackbar.success(isUpdate ? 'Purchase updated successfully' : 'Purchase created successfully');
+            if (isUpdate) {
+              localStorage.removeItem('purchaseId');
+              this.isEdit = false;
+              this.currentPurchaseId = null;
+            }
             this.resetForm();
           }
           this.loading = false;
         },
         error: (error) => {
-          this.snackbar.error(error?.error?.message || 'Failed to create purchase');
+          this.snackbar.error(error?.error?.message || 'Failed to save purchase');
           this.loading = false;
         }
       });
@@ -304,7 +319,8 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
       products: formValue.products.map((product: ProductForm) => ({
         ...product,
         finalPrice: this.productsFormArray.at(formValue.products.indexOf(product)).get('finalPrice')?.value
-      }))
+      })),
+      ...(this.currentPurchaseId ? { id: this.currentPurchaseId } : {})
     };
   }
 
@@ -360,8 +376,10 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
       invoiceNumber: data.invoiceNumber,
     });
 
-    // Clear existing products
+    // Clear existing products and subscriptions
     this.productsFormArray.clear();
+    this.productSubscriptions.forEach(sub => sub?.unsubscribe());
+    this.productSubscriptions = [];
 
     // Populate products
     data.items.forEach((item: any) => {
@@ -374,6 +392,10 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
         remarks: item.remarks
       });
       this.productsFormArray.push(productGroup);
+      // Ensure real-time calculation wiring for each populated product row
+      this.setupProductCalculations(productGroup, this.productsFormArray.length - 1);
+      // Also compute once to update totals
+      this.calculateProductPrice(this.productsFormArray.length - 1);
     });
     this.isEdit = true;
   }

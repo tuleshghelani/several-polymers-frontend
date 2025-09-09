@@ -238,6 +238,22 @@
             <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
             {{ loading ? 'Saving...' : 'Save Sale' }}
           </button>
+          <button *ngIf="isEdit"
+            type="button"
+            class="btn btn-sm btn-secondary"
+            (click)="cancelEdit()"
+            [disabled]="loading"
+          >
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button *ngIf="isEdit"
+            type="submit"
+            class="btn btn-sm btn-primary"
+            [disabled]="saleForm.invalid || loading"
+          >
+            <i class="fas" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+            {{ loading ? 'Updating...' : 'Update Sale' }}
+          </button>
         </div>
       </form>
     </div>
