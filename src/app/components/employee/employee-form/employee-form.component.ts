@@ -36,6 +36,7 @@ export class EmployeeFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.employeeId = Number(this.route.snapshot.paramMap.get('id'));
+    this.setupWageTypeEffects();
     if (this.employeeId) {
       this.isEditMode = true;
       this.loadEmployee();
@@ -46,12 +47,37 @@ export class EmployeeFormComponent implements OnInit {
     this.employeeForm = this.fb.group({
       name: [null, [Validators.required]],
       mobileNumber: [null, []],
+      aadharNumber: [null, [Validators.pattern('^[0-9]{12}$')]],
       email: [null, [Validators.email]],
       address: [null, []],
       designation: [null, []],
       department: [null, []],
-      status: ['A']
+      status: ['A'],
+      regularPay: [null, [Validators.required]],
+      overtimePay: [null, [Validators.required, Validators.min(0)]],
+      wageType: ['HOURLY', [Validators.required]],
+      regularHours: [8, [Validators.required, Validators.min(0)]],
+      startTime: ['07:00', [Validators.required, Validators.pattern('^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$')]]
     });
+  }
+
+  private setupWageTypeEffects(): void {
+    const wageTypeControl = this.employeeForm.get('wageType');
+    const overtimeControl = this.employeeForm.get('overtimePay');
+    if (!wageTypeControl || !overtimeControl) return;
+
+    const applyRules = (wageType: string | null) => {
+      if (wageType === 'FIXED') {
+        overtimeControl.clearValidators();
+        overtimeControl.setValue(null, { emitEvent: false });
+      } else {
+        overtimeControl.setValidators([Validators.required, Validators.min(0)]);
+      }
+      overtimeControl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    applyRules(wageTypeControl.value);
+    wageTypeControl.valueChanges.subscribe(value => applyRules(value));
   }
 
   private formatDateForApi(dateStr: string): string {
@@ -66,7 +92,6 @@ export class EmployeeFormComponent implements OnInit {
     if (this.employeeForm.valid) {
       this.isLoading = true;
       const formData = { ...this.employeeForm.value };
-
       const request = this.isEditMode
         ? this.employeeService.updateEmployee(this.employeeId!, formData)
         : this.employeeService.createEmployee(formData);
@@ -103,12 +128,28 @@ export class EmployeeFormComponent implements OnInit {
           this.employeeForm.patchValue({
             name: response.data.name,
             mobileNumber: response.data.mobileNumber,
+            aadharNumber: response.data.aadharNumber,
             email: response.data.email,
             address: response.data.address,
             designation: response.data.designation,
             department: response.data.department,
-            status: response.data.status
+            status: response.data.status,
+            regularPay: response.data.regularPay,
+            overtimePay: response.data.overtimePay,
+            wageType: response.data.wageType || 'HOURLY',
+            regularHours: response.data.regularHours || 8,
+            startTime: response.data.startTime || '07:00'
           });
+          // Re-apply validation rules after patching
+          const wageType = this.employeeForm.get('wageType')?.value;
+          const overtimeControl = this.employeeForm.get('overtimePay');
+          if (wageType === 'FIXED') {
+            overtimeControl?.clearValidators();
+            overtimeControl?.setValue(null, { emitEvent: false });
+          } else {
+            overtimeControl?.setValidators([Validators.required, Validators.min(0)]);
+          }
+          overtimeControl?.updateValueAndValidity({ emitEvent: false });
         }
         this.isLoading = false;
       },
@@ -129,7 +170,11 @@ export class EmployeeFormComponent implements OnInit {
     if (control?.errors && control.touched) {
       if (control.errors['required']) return `${fieldName} is required`;
       if (control.errors['email']) return 'Invalid email format';
-      if (control.errors['pattern']) return 'Invalid mobile number format';
+      if (control.errors['pattern']) {
+        if (fieldName === 'startTime') return 'Invalid time format (HH:mm)';
+        return 'Invalid format';
+      }
+      if (control.errors['min']) return `${fieldName} must be greater than 0`;
     }
     return '';
   }

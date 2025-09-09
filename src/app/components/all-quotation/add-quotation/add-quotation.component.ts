@@ -543,46 +543,49 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       this.isLoadingPrices = true;
       this.loadingPriceIndex = index;
       
-      this.priceService.getLatestPrices({
-        productId: selectedProduct.id,
-        customerId: customerId
-      })
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.isLoadingPrices = false;
-          this.loadingPriceIndex = null;
-          this.cdr.detectChanges();
-        })
-      )
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            const price = response.data.lastSalePrice || selectedProduct.sale_amount || 0;
+      itemGroup.patchValue({
+        unitPrice: selectedProduct.sale_amount || 0
+      }, { emitEvent: true });
+      // this.priceService.getLatestPrices({
+      //   productId: selectedProduct.id,
+      //   customerId: customerId
+      // })
+      // .pipe(
+      //   takeUntil(this.destroy$),
+      //   finalize(() => {
+      //     this.isLoadingPrices = false;
+      //     this.loadingPriceIndex = null;
+      //     this.cdr.detectChanges();
+      //   })
+      // )
+      // .subscribe({
+      //   next: (response) => {
+      //     if (response.success) {
+      //       const price = response.data.lastSalePrice || selectedProduct.sale_amount || 0;
             
-            this.productPriceCache.set(cacheKey, price);
+      //       this.productPriceCache.set(cacheKey, price);
             
-            itemGroup.patchValue({
-              unitPrice: price
-            }, { emitEvent: true });
-          } else {
-            itemGroup.patchValue({
-              unitPrice: selectedProduct.sale_amount || 0
-            }, { emitEvent: true });
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching latest price:', error);
-          this.snackbar.error('Failed to fetch latest prices');
+      //       itemGroup.patchValue({
+      //         unitPrice: price
+      //       }, { emitEvent: true });
+      //     } else {
+      //       itemGroup.patchValue({
+      //         unitPrice: selectedProduct.sale_amount || 0
+      //       }, { emitEvent: true });
+      //     }
+      //   },
+      //   error: (error) => {
+      //     console.error('Error fetching latest price:', error);
+      //     this.snackbar.error('Failed to fetch latest prices');
           
-          const price = selectedProduct.sale_amount || 0;
-          this.productPriceCache.set(cacheKey, price);
+      //     const price = selectedProduct.sale_amount || 0;
+      //     this.productPriceCache.set(cacheKey, price);
           
-          itemGroup.patchValue({
-            unitPrice: price
-          }, { emitEvent: true });
-        }
-      });
+      //     itemGroup.patchValue({
+      //       unitPrice: price
+      //     }, { emitEvent: true });
+      //   }
+      // });
     } else {
       itemGroup.patchValue({
         unitPrice: selectedProduct.sale_amount || 0

@@ -86,32 +86,24 @@ export class ProductComponent implements OnInit {
       description: [''],
       polyCarbonateType: [''],
       remainingQuantity: [0, [Validators.required]],
-      blockedQuantity: [0, [Validators.required, Validators.min(0)]],
-      totalRemainingQuantity: [{ value: 0, disabled: true }]
+      taxPercentage: [18, Validators.required]
     });
 
-    // Add value change subscriptions for automatic calculation
-    this.productForm.get('remainingQuantity')?.valueChanges.subscribe(() => {
-      this.calculateTotalRemainingQuantity();
-    });
-
-    this.productForm.get('blockedQuantity')?.valueChanges.subscribe(() => {
-      this.calculateTotalRemainingQuantity();
-    });
+    // Removed blocked/total remaining auto-calculation subscriptions
 
     // Update the name control listener
-    const editableDiv = document.querySelector('.editable-content');
-    if (editableDiv) {
-      editableDiv.addEventListener('input', () => {
-        const content = editableDiv.innerHTML;
-        if (content.trim()) {
-          this.productForm.patchValue({ name: content }, { emitEvent: true });
-          this.productForm.get('name')?.markAsTouched();
-        } else {
-          this.productForm.get('name')?.setErrors({ required: true });
-        }
-      });
-    }
+    // const editableDiv = document.querySelector('.editable-content');
+    // if (editableDiv) {
+    //   editableDiv.addEventListener('input', () => {
+    //     const content = editableDiv.innerHTML;
+    //     if (content.trim()) {
+    //       this.productForm.patchValue({ name: content }, { emitEvent: true });
+    //       this.productForm.get('name')?.markAsTouched();
+    //     } else {
+    //       this.productForm.get('name')?.setErrors({ required: true });
+    //     }
+    //   });
+    // }
 
     this.searchForm = this.fb.group({
       search: [''],
@@ -159,15 +151,6 @@ export class ProductComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const editableDiv = document.querySelector('.editable-content') as HTMLElement;
-    const productName = editableDiv?.innerHTML || '';
-
-    if (!productName.trim()) {
-      this.productForm.get('name')?.setErrors({ required: true });
-      this.productForm.get('name')?.markAsTouched();
-      return;
-    }
-
     if (this.productForm.invalid) {
       Object.keys(this.productForm.controls).forEach(key => {
         const control = this.productForm.get(key);
@@ -181,7 +164,6 @@ export class ProductComponent implements OnInit {
     this.isLoading = true;
     const productData = {
       ...this.productForm.value,
-      name: productName,
       polyCarbonateType: this.productForm.get('type')?.value === 'POLY_CARBONATE' 
         ? this.productForm.get('polyCarbonateType')?.value 
         : null
@@ -226,11 +208,7 @@ export class ProductComponent implements OnInit {
   editProduct(product: Product): void {
     this.isEditing = true;
     this.editingId = product.id;
-    
-    // Create a temporary div to decode HTML content
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = product.name;
-    
+
     this.productForm.patchValue({
       name: product.name,
       categoryId: product.categoryId,
@@ -242,20 +220,10 @@ export class ProductComponent implements OnInit {
       status: product.status,
       weight: product.weight,
       remainingQuantity: product.remainingQuantity,
-      blockedQuantity: product.blockedQuantity,
-      totalRemainingQuantity: product.totalRemainingQuantity,
+      taxPercentage: product.taxPercentage
     });
 
-    // Calculate total remaining quantity after setting values
-    this.calculateTotalRemainingQuantity();
-
-    // Set the content after a short delay to ensure the contenteditable is ready
-    setTimeout(() => {
-      const editableDiv = document.querySelector('.editable-content') as HTMLElement;
-      if (editableDiv) {
-        editableDiv.innerHTML = product.name || '';
-      }
-    }, 0);
+    // Removed total remaining calculation
 
     this.isDialogOpen = true;
   }
@@ -322,30 +290,12 @@ export class ProductComponent implements OnInit {
       measurement: 'kg',
       weight: 0,
       remainingQuantity: 0,
-      blockedQuantity: 0
+      taxPercentage: 18
     });
     
-    // Calculate initial total remaining quantity
-    this.calculateTotalRemainingQuantity();
-    
+    // Removed initial total remaining calculation
+
     this.isDialogOpen = true;
-    setTimeout(() => {
-      const editableDiv = document.querySelector('.editable-content') as HTMLElement;
-      if (editableDiv) {
-        editableDiv.innerHTML = '';
-        editableDiv.focus();
-        // Reinitialize the input listener
-        editableDiv.addEventListener('input', () => {
-          const content = editableDiv.innerHTML;
-          if (content.trim()) {
-            this.productForm.patchValue({ name: content }, { emitEvent: true });
-            this.productForm.get('name')?.markAsTouched();
-          } else {
-            this.productForm.get('name')?.setErrors({ required: true });
-          }
-        });
-      }
-    });
   }
 
   closeDialog(): void {
@@ -362,30 +312,9 @@ export class ProductComponent implements OnInit {
     return field ? field.invalid && (field.dirty || field.touched) : false;
   }
 
-  toggleBold(): void {
-    document.execCommand('bold', false);
-    const editableDiv = document.querySelector('.editable-content') as HTMLElement;
-    if (editableDiv) {
-      const content = editableDiv.innerHTML;
-      if (content.trim()) {
-        this.productForm.patchValue({ name: content }, { emitEvent: true });
-        this.productForm.get('name')?.markAsTouched();
-      } else {
-        this.productForm.get('name')?.setErrors({ required: true });
-      }
-    }
-  }
+  // Removed rich-text name editing; plain text input is used.
 
-  validateRemainingQuantity() {
-    const remainingQuantity = this.productForm.get('remainingQuantity')?.value;
-    const blockedAmount = this.productForm.get('blockedQuantity')?.value;
-
-    // if (remainingQuantity < blockedAmount) {
-    //   this.productForm.get('remainingQuantity')?.setErrors({ invalid: true });
-    // } else {
-    //   this.productForm.get('remainingQuantity')?.setErrors(null);
-    // }
-  }
+  // Removed blocked/total remaining validation
 
   // exportProducts(): void {
   //   const searchParams = { ...this.searchForm.value };
@@ -408,14 +337,5 @@ export class ProductComponent implements OnInit {
   //   });
   // }
 
-  // Add new method for calculation
-  private calculateTotalRemainingQuantity(): void {
-    const remainingQuantity = this.productForm.get('remainingQuantity')?.value ?? 0;
-    const blockedQuantity = this.productForm.get('blockedQuantity')?.value ?? 0;
-    const totalRemaining = remainingQuantity - blockedQuantity;
-    
-    this.productForm.patchValue({
-      totalRemainingQuantity: totalRemaining
-    }, { emitEvent: false });
-  }
+  // Removed total remaining calculation method
 }

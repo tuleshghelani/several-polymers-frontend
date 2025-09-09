@@ -54,8 +54,6 @@
             <th>Min Stock</th>
             <th>Status</th>
             <th>Remaining Quantity</th>
-            <th>Blocked Amount</th>
-            <th>Total Remaining Amount</th>
             <th>Purchase Amount</th>
             <th>Sale Amount</th>
             <th>Actions</th>
@@ -75,12 +73,6 @@
             </td>
             <td [ngClass]="{'negative-quantity': (product?.remainingQuantity ?? 0) < 0}">
               {{ product?.remainingQuantity ?? 0 }}
-            </td>
-            <td [ngClass]="{'negative-quantity': (product?.blockedQuantity ?? 0) < 0}">
-              {{ product?.blockedQuantity ?? 0 }}
-            </td>
-            <td [ngClass]="{'negative-quantity': (product?.totalRemainingQuantity ?? 0) < 0}">
-              {{ product?.totalRemainingQuantity ?? 0 }}
             </td>
             <td>{{ product.purchaseAmount }}</td>
             <td>{{ product.saleAmount }}</td>
@@ -127,18 +119,15 @@
         <label for="name">
           <i class="fas fa-tag"></i> Product Name <span class="required">*</span>
         </label>
-        <div class="input-with-button">
-          <button type="button" class="btn-format" (click)="toggleBold()" title="Bold">
-            B
-          </button>
-          <div 
-            contenteditable="true"
-            id="name"
-            class="editable-content"
-            [class.is-invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+          <input 
+            type="text" 
+            id="name" 
+            formControlName="name" 
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('name')"
             placeholder="Enter product name"
-          ></div>
-        </div>
+          >
+          
         <div class="invalid-feedback" *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
           Product name is required
         </div>
@@ -264,37 +253,22 @@
           formControlName="remainingQuantity" 
           class="form-control"
           [class.is-invalid]="productForm.get('remainingQuantity')?.invalid && productForm.get('remainingQuantity')?.touched"
-          (input)="validateRemainingQuantity()"
-        >
-        <!-- <div class="invalid-feedback" *ngIf="productForm.get('remainingQuantity')?.invalid && productForm.get('remainingQuantity')?.touched">
-          Remaining quantity must be equal to or greater than blocked amount
-        </div> -->
-      </div>
-
-      <div class="form-group">
-        <label for="blockedQuantity">
-          <i class="fas fa-ban"></i> Blocked Amount
-        </label>
-        <input 
-          type="number" 
-          id="blockedQuantity" 
-          formControlName="blockedQuantity" 
-          class="form-control"
         >
       </div>
 
       <div class="form-group">
-        <label for="totalRemainingQuantity">
-          <i class="fas fa-calculator"></i> Total Remaining Amount
+        <label for="taxPercentage">
+          <i class="fas fa-cubes"></i> Tax Percentage <span class="required">*</span>
         </label>
         <input 
           type="number" 
-          id="totalRemainingQuantity" 
-          formControlName="totalRemainingQuantity" 
+          id="taxPercentage" 
+          formControlName="taxPercentage" 
           class="form-control"
-          [disabled]="true"
+          [class.is-invalid]="productForm.get('taxPercentage')?.invalid && productForm.get('taxPercentage')?.touched"
         >
       </div>
+
       
       <div class="form-group full-width">
         <label for="description">

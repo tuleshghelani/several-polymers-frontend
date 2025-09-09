@@ -1,3 +1,4 @@
+@import '../../../_variables';
 .sale-modal {
     padding: 1.5rem;
     width: 100%;
@@ -22,7 +23,7 @@
         border: none;
         cursor: pointer;
         padding: 0.5rem;
-        color: var(--text-secondary);
+        color: $secondary;
         transition: all 0.3s ease;
         border-radius: 50%;
         width: 32px;
@@ -30,10 +31,14 @@
         display: flex;
         align-items: center;
         justify-content: center;
-  
+
         &:hover {
-          background-color: var(--background);
-          color: var(--text-primary);
+          background-color: rgba($primary, 0.12);
+          color: $primary;
+        }
+        &:focus-visible {
+          outline: 2px solid $primary;
+          outline-offset: 2px;
         }
       }
     }
@@ -118,6 +123,48 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     animation: slideIn 0.3s ease-out;
     padding: 40px;
+  }
+
+  /* Ensure header positions the close button correctly */
+  .modal-header {
+    position: relative;
+  }
+
+  /* Remove any default pseudo content that renders an 'x' */
+  .modal-header .btn-close::before {
+    content: none !important;
+  }
+
+  /* Apply close button styles regardless of wrapper class */
+  .modal-header .btn-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: $secondary;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-content: right;
+    text-align: right;
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .modal-header .btn-close:hover {
+    background-color: rgba($primary, 0.12);
+    color: $primary;
+  }
+
+  .modal-header .btn-close:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
   }
   
   @keyframes fadeIn {

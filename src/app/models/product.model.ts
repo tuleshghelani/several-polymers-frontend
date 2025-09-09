@@ -16,6 +16,7 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
   weight: number;
+  taxPercentage?: number;
 }
 
 export interface ProductSearchRequest {

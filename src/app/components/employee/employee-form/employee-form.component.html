@@ -42,6 +42,22 @@
             {{ getFieldError('mobileNumber') }}
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="aadharNumber">
+            <i class="fas fa-id-card"></i> Aadhar Number 
+          </label>
+          <input 
+            type="text" 
+            id="aadharNumber"
+            formControlName="aadharNumber"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('aadharNumber')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('aadharNumber')">
+            {{ getFieldError('aadharNumber') }}
+          </div>
+        </div>
       </div>
 
       <div class="form-row">
@@ -114,6 +130,93 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label for="wageType">
+            <i class="fas fa-money-bill"></i> Wage Type <span class="required">*</span>
+          </label>
+          <select 
+            id="wageType"
+            formControlName="wageType"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('wageType')"
+          >
+            <option value="HOURLY">Hourly</option>
+            <option value="FIXED">Fixed</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('wageType')">
+            {{ getFieldError('wageType') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regularHours">
+            <i class="fas fa-clock"></i> Regular Hours <span class="required">*</span>
+          </label>
+          <input 
+            type="number" 
+            id="regularHours"
+            formControlName="regularHours"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('regularHours')"
+            min="0"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('regularHours')">
+            {{ getFieldError('regularHours') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="startTime">
+            <i class="fas fa-hourglass-start"></i> Start Time <span class="required">*</span>
+          </label>
+          <input 
+            type="time" 
+            id="startTime"
+            formControlName="startTime"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('startTime')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('startTime')">
+            {{ getFieldError('startTime') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regularPay">
+            <i class="fa-solid fa-coins"></i> Regular Hours Price <span class="required">*</span>
+          </label>
+          <input 
+            type="number" 
+            id="regularPay"
+            formControlName="regularPay"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('regularPay')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('regularPay')">
+            {{ getFieldError('regularPay') }}
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="employeeForm.get('wageType')?.value !== 'FIXED'">
+          <label for="overtimePay">
+            <i class="fa-solid fa-coins"></i> Overtime Hours Price <span class="required">*</span>
+          </label>
+          <input 
+            type="number" 
+            id="overtimePay"
+            formControlName="overtimePay"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('overtimePay')"
+          >
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('overtimePay')">
+            {{ getFieldError('overtimePay') }}
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label for="address">
           <i class="fas fa-map-marker-alt"></i> Address 
@@ -131,12 +234,12 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" routerLink="/employee">
+        <button type="button" class="btn btn-sm btn-secondary" routerLink="/employee">
           <i class="fas fa-times"></i> Cancel
         </button>
         <button 
           type="submit" 
-          class="btn btn-primary"
+          class="btn btn-sm btn-primary"
           [disabled]="employeeForm.invalid || isLoading"
         >
           <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : (isEditMode ? 'fa-save' : 'fa-plus')"></i>
