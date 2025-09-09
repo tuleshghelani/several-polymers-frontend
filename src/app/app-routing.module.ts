@@ -12,8 +12,6 @@ import { CustomerComponent } from './components/customer/customer.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { PowderCoatingProcessComponent } from './components/powder-coating/powder-coating-process/powder-coating-process.component';
 import { AddPowderCoatingProcessComponent } from './components/powder-coating/add-powder-coating-process/add-powder-coating-process.component';
-import { TransportComponent } from './components/Transports/transport/transport.component';
-import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
 import { EmployeeListComponent } from './components/employee/employee-list/employee-list.component';
 import { EmployeeFormComponent } from './components/employee/employee-form/employee-form.component';
 import { EmployeeOrderListComponent } from './components/employee-order/employee-order-list/employee-order-list.component';
@@ -23,6 +21,8 @@ import { AddQuotationComponent } from './components/all-quotation/add-quotation/
 import { QuotationComponent } from './components/all-quotation/quotation/quotation.component';
 import { AddSaleComponent } from './components/add-sale/add-sale.component';
 import { RoleGuard } from './guards/role.guard';
+import { AddTransportComponent } from './components/Transports/add-transport/add-transport.component';
+import { TransportMasterListComponent } from './components/Transports/transport-master-list/transport-master-list.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -88,13 +88,13 @@ const routes: Routes = [
     title: 'Edit Powder Coating Process'
   },
   {
-    path: 'transport/create',
-    component: TransportComponent,
+    path: 'transport-master/create',
+    component: AddTransportComponent,
     canActivate: [AuthGuard]
   },
   {
-    path: 'transport',
-    component: TransportListComponent,
+    path: 'transport-master',
+    component: TransportMasterListComponent,
     canActivate: [AuthGuard]
   },
   {
@@ -108,8 +108,8 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'transport/edit/:id',
-    component: TransportComponent,
+    path: 'transport-master/edit',
+    component: AddTransportComponent,
     canActivate: [AuthGuard]
   },
   {
