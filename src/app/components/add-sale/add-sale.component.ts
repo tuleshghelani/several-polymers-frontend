@@ -17,7 +17,6 @@ import { EncryptionService } from '../../shared/services/encryption.service';
 interface ProductForm {
   productId: string;
   quantity: number;
-  coilNumber: string;
   unitPrice: number;
   finalPrice: number;
   remarks: string
@@ -104,7 +103,6 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     return this.fb.group({
       productId: ['', Validators.required],
       quantity: ['', [Validators.required, Validators.min(1)]],
-      coilNumber: ['', [this.noDoubleQuotesValidator()]],
       unitPrice: ['', [Validators.required, Validators.min(0.01)]],
       finalPrice: [{ value: 0, disabled: true }],
       remarks:[null, []]
@@ -161,6 +159,18 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     }, { emitEvent: false });
 
     this.calculateTotalAmount();
+  }
+
+  // Limit decimal digits for a product field
+  onProductInput(index: number, field: 'quantity' | 'unitPrice', maxDecimals: number): void {
+    const control = this.productsFormArray.at(index).get(field);
+    if (!control) return;
+    const raw = String(control.value ?? '');
+    if (!raw.includes('.')) return;
+    const [intPart, decPart] = raw.split('.');
+    if (decPart.length > maxDecimals) {
+      control.setValue(`${intPart}.${decPart.slice(0, maxDecimals)}`, { emitEvent: true });
+    }
   }
 
   getTotalAmount(): number {
@@ -368,7 +378,6 @@ export class AddSaleComponent implements OnInit, OnDestroy {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         finalPrice: item.finalPrice,
-        coilNumber: item.coilNumber,
         remarks: item.remarks
       });
       this.productsFormArray.push(productGroup);
