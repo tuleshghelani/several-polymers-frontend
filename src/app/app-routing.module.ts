@@ -7,7 +7,6 @@ import { AuthGuard } from './guards/auth.guard';
 import { PurchaseComponent } from './components/purchase/purchase.component';
 import { AddPurchaseComponent } from './components/add-purchase/add-purchase.component';
 import { SaleComponent } from './components/sale/sale.component';
-import { ProfitComponent } from './components/profit/profit.component';
 import { CustomerComponent } from './components/customer/customer.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { PowderCoatingProcessComponent } from './components/powder-coating/powder-coating-process/powder-coating-process.component';
@@ -16,7 +15,6 @@ import { EmployeeListComponent } from './components/employee/employee-list/emplo
 import { EmployeeFormComponent } from './components/employee/employee-form/employee-form.component';
 import { EmployeeOrderListComponent } from './components/employee-order/employee-order-list/employee-order-list.component';
 import { EmployeeOrderFormComponent } from './components/employee-order/employee-order-form/employee-order-form.component';
-import { DailyProfitComponent } from './components/all-profits/daily-profit/daily-profit.component';
 import { AddQuotationComponent } from './components/all-quotation/add-quotation/add-quotation.component';
 import { QuotationComponent } from './components/all-quotation/quotation/quotation.component';
 import { AddSaleComponent } from './components/add-sale/add-sale.component';
@@ -56,11 +54,6 @@ const routes: Routes = [
     component: AddSaleComponent,
     canActivate: [AuthGuard, RoleGuard],
     // data: { roles: ['ADMIN'] }
-  },
-  {
-    path: 'profit',
-    component: ProfitComponent,
-    canActivate: [AuthGuard]
   },
   {
     path: 'customer',
@@ -142,11 +135,6 @@ const routes: Routes = [
     component: EmployeeOrderFormComponent,
     canActivate: [AuthGuard]
   },
-  {
-    path: 'daily-profit',
-    component: DailyProfitComponent,
-    canActivate: [AuthGuard]
-  },  
   {
     path: '**',
     redirectTo: '/login',
