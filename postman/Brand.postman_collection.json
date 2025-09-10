@@ -1,0 +1,221 @@
+{
+  "info": {
+    "name": "Brand Controller",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "b3b7f5d6-7f2d-4f11-9d9a-0000brand0001"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Brand",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Acme\",\n  \"remarks\": \"Optional note\",\n  \"status\": \"A\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseURL}}/api/brands" }
+          },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brand created successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update Brand",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"name\": \"Acme Updated\",\n  \"remarks\": \"Optional note\",\n  \"status\": \"A\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "PUT", "url": { "raw": "{{baseURL}}/api/brands" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brand updated successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete Brand (body id)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "DELETE", "url": { "raw": "{{baseURL}}/api/brands" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brand deleted successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Brands (paged)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands/getBrands",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands", "getBrands"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"id\",\n  \"sortDir\": \"desc\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/brands/getBrands" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brands retrieved successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Acme\",\n      \"remarks\": \"Optional note\",\n      \"status\": \"A\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Search Brands",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands/search",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands", "search"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"search\": \"acme\",\n  \"page\": 0,\n  \"size\": 10\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/brands/search" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brands retrieved successfully\",\n  \"data\": {\n    \"content\": [\n      { \"id\": 1, \"name\": \"Acme\", \"status\": \"A\" }\n    ],\n    \"totalElements\": 1,\n    \"totalPages\": 1,\n    \"page\": 0,\n    \"size\": 10\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Details (body id)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/brands/details",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands", "details"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/brands/details" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brand details retrieved successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Acme\",\n    \"remarks\": \"Optional note\",\n    \"status\": \"A\",\n    \"clientId\": 10,\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": null,\n    \"createdById\": 1,\n    \"createdByName\": \"Admin User\",\n    \"updatedById\": null,\n    \"updatedByName\": null\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Details (path id)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/brands/:id",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "brands", ":id"],
+          "variable": [
+            { "key": "id", "value": "1" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "GET", "url": { "raw": "{{baseURL}}/api/brands/1" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Brand details retrieved successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Acme\",\n    \"remarks\": \"Optional note\",\n    \"status\": \"A\"\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
+
+

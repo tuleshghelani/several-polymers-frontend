@@ -1,0 +1,41 @@
+<div class="brand-form">
+  <app-loader [show]="isLoading"></app-loader>
+
+  <div class="card">
+    <h2>{{ isEditMode ? 'Edit Brand' : 'Add Brand' }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-group" [class.invalid]="isFieldInvalid('name')" [class.valid]="isFieldValid('name')">
+          <label for="name">Name</label>
+          <input id="name" type="text" class="form-control" formControlName="name" placeholder="Enter brand name" />
+          <div class="error" *ngIf="isFieldInvalid('name')">{{ getFieldError('name') }}</div>
+        </div>
+
+        <div class="form-group" [class.invalid]="isFieldInvalid('remarks')" [class.valid]="isFieldValid('remarks')">
+          <label for="remarks">Remarks</label>
+          <textarea id="remarks" class="form-control" formControlName="remarks" rows="3" placeholder="Optional remarks"></textarea>
+          <div class="error" *ngIf="isFieldInvalid('remarks')">{{ getFieldError('remarks') }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" class="form-control" formControlName="status">
+            <option value="A">Active</option>
+            <option value="I">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          <i class="fas" [class.fa-save]="!isEditMode" [class.fa-check]="isEditMode"></i>
+          {{ isEditMode ? 'Update' : 'Save' }}
+        </button>
+        <a routerLink="/brand" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+

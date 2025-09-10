@@ -21,6 +21,8 @@ import { AddSaleComponent } from './components/add-sale/add-sale.component';
 import { RoleGuard } from './guards/role.guard';
 import { AddTransportComponent } from './components/Transports/add-transport/add-transport.component';
 import { TransportMasterListComponent } from './components/Transports/transport-master-list/transport-master-list.component';
+import { BrandListComponent } from './components/brand/brand-list/brand-list.component';
+import { BrandFormComponent } from './components/brand/brand-form/brand-form.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -103,6 +105,21 @@ const routes: Routes = [
   {
     path: 'transport-master/edit',
     component: AddTransportComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'brand',
+    component: BrandListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'brand/create',
+    component: BrandFormComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'brand/edit',
+    component: BrandFormComponent,
     canActivate: [AuthGuard]
   },
   {

@@ -1,0 +1,80 @@
+<div class="brand-list">
+  <div class="search-section card">
+    <h2>Brands</h2>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="search-controls">
+        <input type="text" class="form-control" placeholder="Search by name" formControlName="search" />
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="reset()">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="action-buttons">
+    <a class="btn btn-sm btn-primary" (click)="goToCreateBrand()">
+      <i class="fas fa-plus"></i> Add Brand
+    </a>
+  </div>
+
+  <div class="card">
+    <app-loader [show]="isLoading"></app-loader>
+    <div class="table-responsive" [class.loading]="isLoading">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Remarks</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of brands; let i = index">
+            <td>{{ startIndex + i + 1 }}</td>
+            <td>{{ b.name }}</td>
+            <td>{{ b.remarks }}</td>
+            <td>
+              <span [class]="'status-badge ' + (b.status === 'A' ? 'active' : 'inactive')">
+                {{ b.status === 'A' ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button 
+                class="btn-icon edit" 
+                [routerLink]="['/brand/edit']"
+                (click)="$event.preventDefault(); onEdit(b.id)"
+                title="Edit Brand">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn-icon delete" (click)="delete(b.id)" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!isLoading && brands.length === 0">
+            <td colspan="5" class="text-center">No brands found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      *ngIf="totalPages > 0"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalElements]="totalElements"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+
