@@ -153,12 +153,12 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       productType: [initialData?.productType || ''],
       quantity: [initialData?.quantity || 1, [Validators.required, Validators.min(1)]],
       unitPrice: [initialData?.unitPrice || 0, [Validators.required, Validators.min(0.01)]],
-      brandId: [initialData?.brandId || null, Validators.required],
+      brandId: [initialData?.brandId || null],
       numberOfRoll: [initialData?.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
       weightPerRoll: [initialData?.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
       remarks: [initialData?.remarks || ''],
       price: [initialData?.price || 0],
-      taxPercentage: [{ value: initialData?.taxPercentage || 18 }],
+      taxPercentage: [{ value: initialData?.taxPercentage ?? 18 }],
       taxAmount: [{ value: initialData?.taxAmount || 0, disabled: true }],
       finalPrice: [{ value: initialData?.finalPrice || 0, disabled: true }],
       quotationDiscountAmount: [{ value: initialData?.quotationDiscountAmount || 0, disabled: true }],
@@ -232,7 +232,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       isQuantityManual: [false],
       remarks: [''],
       price: [0],
-      taxPercentage: [18],
+      taxPercentage: [0],
       taxAmount: [0],
       finalPrice: [0],
       quotationDiscountAmount: [0],
@@ -339,7 +339,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     const values = {
       quantity: Number(Number(group.get('quantity')?.value || 0).toFixed(3)),
       unitPrice: Number(Number(group.get('unitPrice')?.value || 0).toFixed(2)),
-      taxPercentage: Number(group.get('taxPercentage')?.value || 18)
+      taxPercentage: Number(group.get('taxPercentage')?.value ?? 18)
     };
 
     const quotationDiscountPercentage = Number(Number(this.quotationForm.get('quotationDiscountPercentage')?.value || 0).toFixed(2));
@@ -650,7 +650,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     const itemGroup = this.itemsFormArray.at(index);
     
     const taxPercentage = selectedProduct.tax_percentage !== undefined ? 
-                        selectedProduct.tax_percentage : 18;
+                        selectedProduct.tax_percentage : 0;
     
     console.log(`Setting tax percentage for ${selectedProduct.name}: ${taxPercentage}%`);
     
@@ -802,7 +802,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         const product = this.products.find(p => p.id === item.productId);
         const taxPercentage = product?.tax_percentage !== undefined 
           ? product.tax_percentage 
-          : (item.taxPercentage || 18);
+          : (item.taxPercentage ?? 18);
 
         console.log(`Loaded item ${item.productId} with tax percentage: ${taxPercentage}%`);
         
