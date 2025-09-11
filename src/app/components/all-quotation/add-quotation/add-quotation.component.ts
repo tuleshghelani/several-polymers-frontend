@@ -11,6 +11,8 @@ import { CustomerService } from '../../../services/customer.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { QuotationService } from '../../../services/quotation.service';
 import { PriceService } from '../../../services/price.service';
+import { BrandService, Brand } from '../../../services/brand.service';
+import { TransportMasterService, TransportMaster } from '../../../services/transport-master.service';
 import { SearchableSelectComponent } from "../../../shared/components/searchable-select/searchable-select.component";
 import { MatDialogModule } from '@angular/material/dialog';
 import { SaleModalComponent } from '../../sale-modal/sale-modal.component';
@@ -33,9 +35,13 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
   createQuotationForm!: FormGroup;
   products: any[] = [];
   customers: any[] = [];
+  brands: Brand[] = [];
+  transports: TransportMaster[] = [];
   loading = false;
   isLoadingProducts = false;
   isLoadingCustomers = false;
+  isLoadingBrands = false;
+  isLoadingTransports = false;
   minValidUntilDate: string;
   private destroy$ = new Subject<void>();
   isLoading = false;
@@ -64,6 +70,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     private quotationService: QuotationService,
     private productService: ProductService,
     private customerService: CustomerService,
+    private brandService: BrandService,
+    private transportService: TransportMasterService,
     private priceService: PriceService,
     private snackbar: SnackbarService,
     private encryptionService: EncryptionService,
@@ -79,6 +87,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadProducts();
     this.loadCustomers();
+    this.loadBrands();
+    this.loadTransports();
     this.setupCustomerNameSync();
     this.setupCustomerChangeListener();
     this.checkForEdit();
@@ -106,7 +116,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       termsConditions: [''],
       items: this.fb.array([]),
       address: [''],
-      quotationDiscountPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+      quotationDiscountPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      transportMasterId: [null, Validators.required],
+      caseNumber: [''],
+      packagingAndForwadingCharges: [0, [Validators.required, Validators.min(0)]]
     });
 
     this.addItem(true);
@@ -132,7 +145,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       productType: [initialData?.productType || ''],
       quantity: [initialData?.quantity || 1, [Validators.required, Validators.min(1)]],
       unitPrice: [initialData?.unitPrice || 0, [Validators.required, Validators.min(0.01)]],
-      discountPercentage: [initialData?.discountPercentage || 0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      brandId: [initialData?.brandId || null, Validators.required],
+      numberOfRoll: [initialData?.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
+      weightPerRoll: [initialData?.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
+      remarks: [initialData?.remarks || ''],
       price: [initialData?.price || 0],
       taxPercentage: [{ value: initialData?.taxPercentage || 18 }],
       taxAmount: [{ value: initialData?.taxAmount || 0, disabled: true }],
@@ -202,7 +218,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       productType: [''],
       quantity: [1, [Validators.required, Validators.min(1)]],
       unitPrice: [0, [Validators.required, Validators.min(0.01)]],
-      discountPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      brandId: [null, Validators.required],
+      numberOfRoll: [0, [Validators.required, Validators.min(0)]],
+      weightPerRoll: [0, [Validators.required, Validators.min(0)]],
+      remarks: [''],
       price: [0],
       taxPercentage: [18],
       taxAmount: [0],
@@ -267,40 +286,34 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     const values = {
       quantity: Number(Number(group.get('quantity')?.value || 0).toFixed(3)),
       unitPrice: Number(Number(group.get('unitPrice')?.value || 0).toFixed(2)),
-      discountPercentage: Number(Number(group.get('discountPercentage')?.value || 0).toFixed(2)),
       taxPercentage: Number(group.get('taxPercentage')?.value || 18)
     };
 
     const quotationDiscountPercentage = Number(Number(this.quotationForm.get('quotationDiscountPercentage')?.value || 0).toFixed(2));
 
     console.log(`Tax percentage used for calculation: ${values.taxPercentage}%`);
-    console.log(`Quotation discount percentage: ${quotationDiscountPercentage}%`);
+    console.log(`Quotation discount percentage on tax only: ${quotationDiscountPercentage}%`);
 
     const basePrice = Number((values.quantity * values.unitPrice).toFixed(2));
-    const itemDiscountAmount = Number(((basePrice * values.discountPercentage) / 100).toFixed(2));
-    const afterItemDiscount = Number((basePrice - itemDiscountAmount).toFixed(2));
-    
-    const quotationDiscountAmount = Number(((afterItemDiscount * quotationDiscountPercentage) / 100).toFixed(2));
-    const afterQuotationDiscount = Number((afterItemDiscount - quotationDiscountAmount).toFixed(2));
-    
-    const taxAmount = Number(((afterQuotationDiscount * values.taxPercentage) / 100).toFixed(2));
-    const finalPrice = Number((afterQuotationDiscount + taxAmount).toFixed(2));
+    // Tax is calculated on base price
+    const grossTaxAmount = Number(((basePrice * values.taxPercentage) / 100).toFixed(2));
+    // Quotation discount applies on tax only
+    const quotationDiscountAmount = Number(((grossTaxAmount * quotationDiscountPercentage) / 100).toFixed(2));
+    const netTaxAmount = Number((grossTaxAmount - quotationDiscountAmount).toFixed(2));
+    const finalPrice = Number((basePrice + netTaxAmount).toFixed(2));
 
     group.patchValue({
-      price: afterItemDiscount,
+      price: basePrice,
       quotationDiscountAmount: quotationDiscountAmount,
-      taxAmount: taxAmount,
+      taxAmount: netTaxAmount,
       finalPrice: finalPrice
     }, { emitEvent: false });
 
     console.log(`Item ${index} calculated:`, {
       basePrice,
-      itemDiscountAmount,
-      afterItemDiscount,
       quotationDiscountPercentage,
       quotationDiscountAmount,
-      afterQuotationDiscount,
-      taxAmount,
+      netTaxAmount,
       finalPrice
     });
 
@@ -328,6 +341,72 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.snackbar.error('Failed to load products');
         this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  private loadBrands(): void {
+    this.isLoadingBrands = true;
+    this.brandService.getBrands({}).subscribe({
+      next: (response) => {
+        if (response?.success !== false) {
+          this.brands = response.data || response.brands || [];
+        }
+        this.isLoadingBrands = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load brands');
+        this.isLoadingBrands = false;
+      }
+    });
+  }
+
+  refreshBrands(): void {
+    this.isLoadingBrands = true;
+    this.brandService.getBrands({}).subscribe({
+      next: (response) => {
+        if (response?.success !== false) {
+          this.brands = response.data || response.brands || [];
+          this.snackbar.success('Brands refreshed successfully');
+        }
+        this.isLoadingBrands = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh brands');
+        this.isLoadingBrands = false;
+      }
+    });
+  }
+
+  private loadTransports(): void {
+    this.isLoadingTransports = true;
+    this.transportService.getTransports({}).subscribe({
+      next: (response) => {
+        if (response?.success !== false) {
+          this.transports = response.data || response.transports || [];
+        }
+        this.isLoadingTransports = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load transports');
+        this.isLoadingTransports = false;
+      }
+    });
+  }
+
+  refreshTransports(): void {
+    this.isLoadingTransports = true;
+    this.transportService.getTransports({}).subscribe({
+      next: (response) => {
+        if (response?.success !== false) {
+          this.transports = response.data || response.transports || [];
+          this.snackbar.success('Transports refreshed successfully');
+        }
+        this.isLoadingTransports = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh transports');
+        this.isLoadingTransports = false;
       }
     });
   }
@@ -457,10 +536,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       const errors = control.errors;
       if (errors) {
         if (errors['required']) return true;
-        if (errors['min'] && fieldName === 'quantity') return true;
-        if (errors['min'] && fieldName === 'unitPrice') return true;
-        if ((errors['min'] || errors['max']) &&
-          (fieldName === 'discountPercentage')) return true;
+        if (errors['min'] && (fieldName === 'quantity' || fieldName === 'unitPrice' || fieldName === 'numberOfRoll' || fieldName === 'weightPerRoll')) return true;
       }
     }
 
@@ -659,7 +735,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       termsConditions: data.termsConditions || '',
       address: data.address,
       contactNumber: data.contactNumber,
-      quotationDiscountPercentage: data.quotationDiscountPercentage || data.quotationDiscount || 0
+      quotationDiscountPercentage: data.quotationDiscountPercentage || data.quotationDiscount || 0,
+      transportMasterId: data.transportMasterId || null,
+      caseNumber: data.caseNumber || '',
+      packagingAndForwadingCharges: data.packagingAndForwadingCharges ?? 0
     });
 
     if (data.items && Array.isArray(data.items)) {
@@ -676,7 +755,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
           productType: [item.productType || ''],
           quantity: [item.quantity || 1, [Validators.required, Validators.min(1)]],
           unitPrice: [item.unitPrice || 0, [Validators.required, Validators.min(0.01)]],
-          discountPercentage: [item.discountPercentage || 0, [Validators.required, Validators.min(0), Validators.max(100)]],
+          brandId: [item.brandId || null, Validators.required],
+          numberOfRoll: [item.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
+          weightPerRoll: [item.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
+          remarks: [item.remarks || ''],
           price: [item.price || 0],
           taxPercentage: [taxPercentage],
           taxAmount: [item.taxAmount || 0],
@@ -738,7 +820,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         productType: control.get('productType')?.value,
         quantity: control.get('quantity')?.value,
         unitPrice: control.get('unitPrice')?.value,
-        discountPercentage: control.get('discountPercentage')?.value,
+        brandId: control.get('brandId')?.value,
+        numberOfRoll: control.get('numberOfRoll')?.value,
+        weightPerRoll: control.get('weightPerRoll')?.value,
+        remarks: control.get('remarks')?.value,
         price: control.get('price')?.value,
         taxPercentage: control.get('taxPercentage')?.value,
         taxAmount: control.get('taxAmount')?.value,
@@ -758,6 +843,9 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       termsConditions: formValue.termsConditions,
       address: formValue.address,
       quotationDiscountPercentage: quotationDiscountPercentage,
+      transportMasterId: formValue.transportMasterId,
+      caseNumber: formValue.caseNumber,
+      packagingAndForwadingCharges: Number(formValue.packagingAndForwadingCharges || 0),
       items: items
     };
     

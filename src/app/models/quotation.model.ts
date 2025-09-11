@@ -14,9 +14,15 @@ export enum QuotationStatus {
     quantity: number;
     unitPrice: number;
     taxPercentage: number;
-    discountPercentage: number;
+    numberOfRoll?: number;
+    weightPerRoll?: number;
+    brandId?: number;
+    remarks?: string;
     finalPrice?: number;
     status?: string;
+    price?: number;
+    taxAmount?: number;
+    quotationDiscountAmount?: number;
   }
   
   export interface CreateQuotationRequest {
@@ -26,6 +32,12 @@ export enum QuotationStatus {
     validUntil: string;
     remarks?: string;
     termsConditions?: string;
+    transportMasterId?: number;
+    caseNumber?: string;
+    packagingAndForwadingCharges?: number;
+    address?: string;
+    contactNumber?: string;
+    quotationDiscountPercentage?: number;
     items: QuotationItem[];
   }
   

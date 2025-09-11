@@ -88,6 +88,29 @@
                   Valid until date is required and must be after quote date
                 </div>
               </div>
+
+              <!-- Transport Master -->
+              <div class="form-group">
+                <label>
+                  <i class="fas fa-truck"></i> Transport
+                </label>
+                <div class="select-group">
+                  <app-searchable-select formControlName="transportMasterId" [options]="transports" labelKey="name" valueKey="id"
+                    [placeholder]="'Select Transport'" [searchPlaceholder]="'Search transports...'"></app-searchable-select>
+                  <button type="button" class="btn btn-sm btn-primary refresh" style="margin-top: 3px;" (click)="refreshTransports()"
+                    [disabled]="isLoadingTransports" title="Refresh Transports">
+                    <i class="fas" [ngClass]="isLoadingTransports ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Case Number -->
+              <div class="form-group">
+                <label>
+                  <i class="fas fa-briefcase"></i> Case Number
+                </label>
+                <input type="text" formControlName="caseNumber" class="form-control" placeholder="Enter case number">
+              </div>
             </div>
           </div>
         </div>
@@ -130,9 +153,12 @@
               <thead>
                 <tr>
                   <th>Product</th>
+                  <th>Brand</th>
                   <th>Quantity</th>
                   <th>Unit Price</th>
-                  <th>Item Discount %</th>
+                  <th>Number of Roll</th>
+                  <th>Weight Per Roll</th>
+                  <th>Remarks</th>
                   <th>Item Price</th>
                   <th>Quotation Discount</th>
                   <th>Tax (18%)</th>
@@ -168,6 +194,32 @@
                       </div>
                     </div>
                   </td>
+
+                  <!-- Brand Selection -->
+                  <td>
+                    <div class="form-field-container">
+                      <div class="select-group">
+                        <app-searchable-select 
+                          [formControlName]="'brandId'" 
+                          [options]="brands" 
+                          [labelKey]="'name'"
+                          [valueKey]="'id'" 
+                          [placeholder]="'Select Brand'" 
+                          [searchPlaceholder]="'Search brands...'"
+                          [class.is-invalid]="isItemFieldInvalid(i, 'brandId')"
+                        ></app-searchable-select>
+                        <button 
+                          type="button" 
+                          class="btn btn-sm btn-primary refresh" 
+                          (click)="refreshBrands()"
+                          [disabled]="isLoadingBrands" 
+                          title="Refresh Brands"
+                        >
+                          <i class="fas" [ngClass]="isLoadingBrands ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </td>
   
                   <!-- Common fields -->
                   <td>
@@ -189,9 +241,20 @@
                   </td>
                   <td>
                     <div class="input-group">
-                      <input type="number" formControlName="discountPercentage" class="form-control"
-                        [class.is-invalid]="isItemFieldInvalid(i, 'discountPercentage')" min="0" max="100" step="0.01">
+                      <input type="number" formControlName="numberOfRoll" class="form-control"
+                        [class.is-invalid]="isItemFieldInvalid(i, 'numberOfRoll')" min="0" step="1">
                     </div>
+                  </td>
+                  <td>
+                    <div class="input-group">
+                      <input type="number" formControlName="weightPerRoll" class="form-control"
+                        [class.is-invalid]="isItemFieldInvalid(i, 'weightPerRoll')" min="0" step="0.01">
+                    </div>
+                  </td>
+                  
+                  <!-- Item Remarks -->
+                  <td>
+                    <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks">
                   </td>
                   <td>
                     <div class="input-group">
@@ -213,6 +276,9 @@
                       <input type="number" formControlName="finalPrice" class="form-control" readonly>
                     </div>
                   </td>
+                  
+                  <!-- Remarks -->
+                  
                   <td>
                     <button type="button" (click)="removeItem(i)" class="btn btn-sm btn-danger">
                       <i class="fa-solid fa-trash"></i>
@@ -222,7 +288,7 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                  <td colspan="6" class="text-end"><strong>Total:</strong></td>
                   <td>
                     <div class="input-group">
                       <span class="input-group-text">₹</span>
@@ -267,6 +333,16 @@
             </label>
             <textarea formControlName="termsConditions" class="form-control" rows="3"
               placeholder="Optional terms and conditions"></textarea>
+          </div>
+        </div>
+
+        <!-- Packaging & Forwarding Charges -->
+        <div class="d-flex mt-3">
+          <div class="form-group w-50">
+            <label>
+              <i class="fas fa-box"></i> Packaging & Forwarding Charges
+            </label>
+            <input type="number" formControlName="packagingAndForwadingCharges" class="form-control" min="0" step="0.01">
           </div>
         </div>
   
