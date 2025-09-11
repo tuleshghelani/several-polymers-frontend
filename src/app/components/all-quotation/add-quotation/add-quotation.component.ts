@@ -137,6 +137,14 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         this.calculateTotalAmount();
         this.cdr.detectChanges();
       });
+
+    // Recalculate totals when packagingAndForwadingCharges changes
+    this.quotationForm.get('packagingAndForwadingCharges')?.valueChanges
+      .pipe(takeUntil(this.destroy$), debounceTime(100))
+      .subscribe(() => {
+        this.calculateTotalAmount();
+        this.cdr.detectChanges();
+      });
   }
 
   private createItemFormGroup(initialData?: any): FormGroup {
@@ -216,11 +224,12 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     const itemGroup = this.fb.group({
       productId: ['', Validators.required],
       productType: [''],
-      quantity: [1, [Validators.required, Validators.min(1)]],
+      quantity: [0, [Validators.required, Validators.min(0)]],
       unitPrice: [0, [Validators.required, Validators.min(0.01)]],
       brandId: [null, Validators.required],
       numberOfRoll: [0, [Validators.required, Validators.min(0)]],
       weightPerRoll: [0, [Validators.required, Validators.min(0)]],
+      isQuantityManual: [false],
       remarks: [''],
       price: [0],
       taxPercentage: [18],
@@ -278,6 +287,50 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
           this.fetchProductPrice(index, selectedProduct);
         }
       });
+
+    // Auto-calculate quantity = numberOfRoll * weightPerRoll unless user manually edits quantity
+    group.get('numberOfRoll')?.valueChanges
+      .pipe(takeUntil(this.destroy$), debounceTime(50))
+      .subscribe(() => this.updateQuantityFromRolls(index));
+    group.get('weightPerRoll')?.valueChanges
+      .pipe(takeUntil(this.destroy$), debounceTime(50))
+      .subscribe(() => this.updateQuantityFromRolls(index));
+    group.get('quantity')?.valueChanges
+      .pipe(takeUntil(this.destroy$), debounceTime(50))
+      .subscribe(() => this.markQuantityManual(index));
+  }
+
+  private markQuantityManual(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    if (!group) return;
+    // If quantity was changed directly by user, mark manual
+    if (!group.get('isQuantityManual')?.value) {
+      group.patchValue({ isQuantityManual: true }, { emitEvent: false });
+    }
+  }
+
+  onQuantityEdit(index: number) {
+    this.markQuantityManual(index);
+    this.calculateItemPrice(index);
+  }
+
+  onRollWeightChange(index: number) {
+    this.updateQuantityFromRolls(index);
+  }
+
+  private updateQuantityFromRolls(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    if (!group) return;
+    const isManual = !!group.get('isQuantityManual')?.value;
+    if (isManual) {
+      // Do not auto-update quantity once user has manually edited it
+      return;
+    }
+    const rolls = Number(group.get('numberOfRoll')?.value || 0);
+    const weight = Number(group.get('weightPerRoll')?.value || 0);
+    const computedQty = Number((rolls * weight).toFixed(3));
+    group.patchValue({ quantity: computedQty }, { emitEvent: false });
+    this.calculateItemPrice(index);
   }
 
   private calculateItemPrice(index: number, skipChangeDetection = false): void {
@@ -325,8 +378,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
   }
 
   getTotalAmount(): number {
-    return Math.round(this.itemsFormArray.controls
-      .reduce((total, group: any) => total + (group.get('finalPrice').value || 0), 0));
+    const itemsTotal = this.itemsFormArray.controls
+      .reduce((total, group: any) => total + (Number(group.get('finalPrice').value) || 0), 0);
+    const packagingCharges = Number(this.quotationForm.get('packagingAndForwadingCharges')?.value || 0);
+    return Math.round(itemsTotal + packagingCharges);
   }
 
   private loadProducts(): void {
@@ -347,7 +402,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   private loadBrands(): void {
     this.isLoadingBrands = true;
-    this.brandService.getBrands({}).subscribe({
+    this.brandService.getBrands({ status: 'A' }).subscribe({
       next: (response) => {
         if (response?.success !== false) {
           this.brands = response.data || response.brands || [];
@@ -363,7 +418,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   refreshBrands(): void {
     this.isLoadingBrands = true;
-    this.brandService.getBrands({}).subscribe({
+    this.brandService.refreshBrands().subscribe({
       next: (response) => {
         if (response?.success !== false) {
           this.brands = response.data || response.brands || [];
@@ -380,7 +435,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   private loadTransports(): void {
     this.isLoadingTransports = true;
-    this.transportService.getTransports({}).subscribe({
+    this.transportService.getTransports({ status: 'A' }).subscribe({
       next: (response) => {
         if (response?.success !== false) {
           this.transports = response.data || response.transports || [];
@@ -396,7 +451,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   refreshTransports(): void {
     this.isLoadingTransports = true;
-    this.transportService.getTransports({}).subscribe({
+    this.transportService.refreshTransports().subscribe({
       next: (response) => {
         if (response?.success !== false) {
           this.transports = response.data || response.transports || [];
@@ -488,11 +543,12 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
     const quotationDiscountPercentage = Number(Number(this.quotationForm.get('quotationDiscountPercentage')?.value || 0).toFixed(2));
     const afterQuotationDiscount = Number((totals.price - totals.quotationDiscountAmount).toFixed(2));
+    const packagingCharges = Number(this.quotationForm.get('packagingAndForwadingCharges')?.value || 0);
 
     this.totals = {
-      price: totals.price,
+      price: Number((totals.price + packagingCharges).toFixed(2)),
       tax: totals.tax,
-      finalPrice: totals.finalPrice,
+      finalPrice: Number((totals.finalPrice + packagingCharges).toFixed(2)),
       taxPercentage: totals.taxPercentage,
       afterQuotationDiscount: afterQuotationDiscount,
       quotationDiscountAmount: totals.quotationDiscountAmount
