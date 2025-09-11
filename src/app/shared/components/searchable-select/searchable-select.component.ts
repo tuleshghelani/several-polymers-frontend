@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -45,6 +45,8 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   ngOnInit() {
     this.filteredOptions = this.options;
   }
+
+  constructor(private elementRef: ElementRef) {}
 
   writeValue(value: any): void {
     if (this.multiple) {
@@ -100,6 +102,19 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     }, 100);
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!this.elementRef.nativeElement.contains(target)) {
+      this.isOpen = false;
+      this.highlightedIndex = -1;
+      if (!this.multiple) {
+        const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+        this.searchText = selected ? selected[this.labelKey] : '';
+      }
+    }
+  }
+
   onSearch(event: Event) {
     this.searchText = (event.target as HTMLInputElement).value;
     this.filterOptions();
@@ -139,6 +154,26 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     return this.multiple 
       ? this.selectedValues.includes(value)
       : this.selectedValue === value;
+  }
+
+  hasSelection(): boolean {
+    return this.multiple ? this.selectedValues.length > 0 : !!this.selectedValue;
+  }
+
+  clearSelection(event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (this.multiple) {
+      this.selectedValues = [];
+      this.onChange(this.selectedValues);
+    } else {
+      this.selectedValue = '';
+      this.searchText = '';
+      this.onChange(this.selectedValue);
+    }
+    this.onTouch();
   }
 
   getSelectedLabel(): string {

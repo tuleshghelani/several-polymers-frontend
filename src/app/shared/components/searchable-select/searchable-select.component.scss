@@ -22,12 +22,36 @@
       }
     }
     
-    i {
+    .caret {
       position: absolute;
       right: 12px;
       color: var(--text-secondary);
       font-size: 0.8rem;
       pointer-events: none;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 28px;
+      border: none;
+      background: transparent;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: var(--text-primary);
+      }
+
+      i {
+        pointer-events: none;
+        font-size: 0.8rem;
+      }
     }
   }
 

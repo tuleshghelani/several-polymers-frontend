@@ -9,9 +9,10 @@
       (focus)="onFocus()"
       (keydown)="handleKeydown($event)"
     >
-    
-    <!-- (blur)="onBlur()" -->
-    <i class="fas" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
+    <button *ngIf="hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
+      <i class="fas fa-times"></i>
+    </button>
+    <i class="fas caret" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
   </div>
   
   <div class="select-dropdown" *ngIf="isOpen">
