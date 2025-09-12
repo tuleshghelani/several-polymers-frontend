@@ -116,7 +116,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       termsConditions: [''],
       items: this.fb.array([]),
       address: [''],
-      quotationDiscountPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      quotationDiscountPercentage: [100, [Validators.required, Validators.min(0), Validators.max(100)]],
       transportMasterId: [null, Validators.required],
       caseNumber: [''],
       packagingAndForwadingCharges: [0, [Validators.required, Validators.min(0)]]
@@ -226,7 +226,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       productType: [''],
       quantity: [0, [Validators.required, Validators.min(0)]],
       unitPrice: [0, [Validators.required, Validators.min(0.01)]],
-      brandId: [null, Validators.required],
+      brandId: [null],
       numberOfRoll: [0, [Validators.required, Validators.min(0)]],
       weightPerRoll: [0, [Validators.required, Validators.min(0)]],
       isQuantityManual: [false],
@@ -565,7 +565,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       validUntil: formatDate(validUntil, 'yyyy-MM-dd', 'en'),
       remarks: '',
       termsConditions: '',
-      quotationDiscountPercentage: 0
+      quotationDiscountPercentage: 100
     });
 
     while (this.itemsFormArray.length) {
@@ -791,7 +791,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       termsConditions: data.termsConditions || '',
       address: data.address,
       contactNumber: data.contactNumber,
-      quotationDiscountPercentage: data.quotationDiscountPercentage || data.quotationDiscount || 0,
+      quotationDiscountPercentage: data.quotationDiscountPercentage || data.quotationDiscount || 100,
       transportMasterId: data.transportMasterId || null,
       caseNumber: data.caseNumber || '',
       packagingAndForwadingCharges: data.packagingAndForwadingCharges ?? 0
@@ -811,7 +811,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
           productType: [item.productType || ''],
           quantity: [item.quantity || 1, [Validators.required, Validators.min(1)]],
           unitPrice: [item.unitPrice || 0, [Validators.required, Validators.min(0.01)]],
-          brandId: [item.brandId || null, Validators.required],
+          brandId: [item.brandId || null],
           numberOfRoll: [item.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
           weightPerRoll: [item.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
           remarks: [item.remarks || ''],
