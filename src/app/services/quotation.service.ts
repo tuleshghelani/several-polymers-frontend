@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 })
 export class QuotationService {
   private apiUrl = `${environment.apiUrl}/api/quotations`;
+  private quotationItemUrl = `${environment.apiUrl}/api/quotation-items`;
 
   constructor(private http: HttpClient) { }
 
@@ -78,5 +79,9 @@ export class QuotationService {
         };
       })
     );
+  }
+
+  updateQuotationItemProductionStatus(quotationItemId: number, isProduction: boolean): Observable<any> {
+    return this.http.put<any>(`${this.quotationItemUrl}/production`, { id: quotationItemId, isProduction });
   }
 }

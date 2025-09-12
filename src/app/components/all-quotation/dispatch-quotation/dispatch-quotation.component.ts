@@ -128,16 +128,19 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   addItem(isInitializing = false): void {
     const itemGroup = this.fb.group({
       productId: ['', Validators.required],
+      productName: [''],
       productType: [''],
       quantity: [0, [Validators.required, Validators.min(0)]],
       unitPrice: [0, [Validators.required, Validators.min(0.01)]],
       brandId: [null],
+      brandName: [''],
       numberOfRoll: [0, [Validators.required, Validators.min(0)]],
       weightPerRoll: [0, [Validators.required, Validators.min(0)]],
       isQuantityManual: [false],
       remarks: [''],
       // Dispatch-only additional fields
       isProduction: [false],
+      id: [null],
       quotationItemStatus: ['O', Validators.required],
       createdRoll: [0, [Validators.required, Validators.min(0)]],
       // Price-related fields retained for backend compatibility but hidden in UI
@@ -184,6 +187,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         if (selectedProduct) {
           group.patchValue({
             productType: selectedProduct.type,
+            productName: selectedProduct.name,
             taxPercentage: selectedProduct.tax_percentage ?? 0,
             quantity: selectedProduct.quantity || 1
           }, { emitEvent: false });
@@ -455,11 +459,14 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     if (data.items && Array.isArray(data.items)) {
       data.items.forEach((item: any) => {
         const itemGroup = this.fb.group({
+          id: [item.id || null],
           productId: [item.productId || '', Validators.required],
+          productName: [item.productName || item.product?.name || ''],
           productType: [item.productType || ''],
           quantity: [item.quantity || 1, [Validators.required, Validators.min(1)]],
           unitPrice: [item.unitPrice || 0, [Validators.required, Validators.min(0.01)]],
           brandId: [item.brandId || null],
+          brandName: [item.brandName || item.brand?.name || ''],
           numberOfRoll: [item.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
           weightPerRoll: [item.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
           remarks: [item.remarks || ''],
@@ -514,10 +521,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     const items = this.itemsFormArray.controls.map((control) => {
       return {
         productId: control.get('productId')?.value,
+        productName: control.get('productName')?.value,
         productType: control.get('productType')?.value,
         quantity: control.get('quantity')?.value,
         unitPrice: control.get('unitPrice')?.value,
         brandId: control.get('brandId')?.value,
+        brandName: control.get('brandName')?.value,
         numberOfRoll: control.get('numberOfRoll')?.value,
         weightPerRoll: control.get('weightPerRoll')?.value,
         remarks: control.get('remarks')?.value,
@@ -568,6 +577,29 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       this.calculateItemPrice(index);
     });
     this.itemSubscriptions[index] = subscription;
+  }
+
+  onProductionToggle(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const quotationItemId = group.get('id')?.value;
+    const isProduction = !!group.get('isProduction')?.value;
+    if (!quotationItemId) {
+      // Not yet persisted; just ignore API call
+      return;
+    }
+    this.quotationService.updateQuotationItemProductionStatus(quotationItemId, isProduction)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.snackbar.success('Production status updated');
+        },
+        error: () => {
+          this.snackbar.error('Failed to update production status');
+          // Revert toggle on error
+          group.patchValue({ isProduction: !isProduction }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
   }
 }
 
