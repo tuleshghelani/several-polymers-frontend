@@ -15,6 +15,15 @@ interface TokenResponse {
   };
 }
 
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  DISPATCH = 'DISPATCH',
+  SALES_AND_MARKETING = 'SALES_AND_MARKETING',
+  OPERATOR = 'OPERATOR',
+  HR = 'HR',
+  REPORTER = 'REPORTER'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -32,15 +41,25 @@ export class AuthService {
   login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${environment.apiUrl}/api/auth/login`, credentials).pipe(
       tap((response: any) => {
+        // Store token
         localStorage.setItem('token', response.accessToken);
+        
+        // Store user info
         localStorage.setItem('user', JSON.stringify({
           firstName: response.firstName,
           lastName: response.lastName,
-          email: response.email
+          email: response.email,
+          id: response.id
         }));
+        
+        // Encrypt and store roles
+        const encryptedRoles = this.encryptionService.encrypt(response.role);
+        localStorage.setItem('userRoles', encryptedRoles);
+        
         // Encrypt and store refresh token
         const encryptedRefreshToken = this.encryptionService.encrypt(response.refreshToken);
         localStorage.setItem('refreshToken', encryptedRefreshToken);
+        
         this.authStateSubject.next(true);
       })
     );
@@ -108,14 +127,13 @@ export class AuthService {
     const encryptedRoles = localStorage.getItem('userRoles');
     if (!encryptedRoles) return [];
     
-    const rolesString = this.encryptionService.decrypt(encryptedRoles);
-    // Handle the string format "[ADMIN, PRODUCT_MANAGER]"
-    console.log(rolesString);
-    return rolesString
-      .replace('[', '')
-      .replace(']', '')
-      .split(',')
-      .map((role: string) => role.trim());
+    try {
+      const roles = this.encryptionService.decrypt(encryptedRoles);
+      return Array.isArray(roles) ? roles : [];
+    } catch (error) {
+      console.error('Error decrypting roles:', error);
+      return [];
+    }
   }
 
   hasRole(role: string): boolean {
@@ -123,11 +141,79 @@ export class AuthService {
     return userRoles.includes(role);
   }
 
-  isAdmin(): boolean {
-    return this.hasRole('ADMIN');
+  hasAnyRole(roles: string[]): boolean {
+    const userRoles = this.getUserRoles();
+    return roles.some(role => userRoles.includes(role));
   }
 
-  isProductManager(): boolean {
-    return this.hasRole('PRODUCT_MANAGER');
+  // Role-specific methods
+  isAdmin(): boolean {
+    return this.hasRole(UserRole.ADMIN);
+  }
+
+  isSalesAndMarketing(): boolean {
+    return this.hasRole(UserRole.SALES_AND_MARKETING);
+  }
+
+  isHR(): boolean {
+    return this.hasRole(UserRole.HR);
+  }
+
+  isDispatch(): boolean {
+    return this.hasRole(UserRole.DISPATCH);
+  }
+
+  isOperator(): boolean {
+    return this.hasRole(UserRole.OPERATOR);
+  }
+
+  isReporter(): boolean {
+    return this.hasRole(UserRole.REPORTER);
+  }
+
+  // Permission methods
+  canAccessMasterMenu(): boolean {
+    return this.hasAnyRole([UserRole.ADMIN, UserRole.SALES_AND_MARKETING, UserRole.DISPATCH]);
+  }
+
+  canAccessTransactionMenu(): boolean {
+    return this.hasAnyRole([UserRole.ADMIN, UserRole.SALES_AND_MARKETING, UserRole.DISPATCH]);
+  }
+
+  canAccessEmployeeMenu(): boolean {
+    return this.hasAnyRole([UserRole.ADMIN, UserRole.HR]);
+  }
+
+  canAccessEmployeeOrder(): boolean {
+    return this.hasAnyRole([UserRole.ADMIN, UserRole.HR]);
+  }
+
+  canAccessQuotation(): boolean {
+    return this.hasAnyRole([UserRole.ADMIN, UserRole.SALES_AND_MARKETING, UserRole.DISPATCH]);
+  }
+
+  canCreateSale(): boolean {
+    return this.hasRole(UserRole.ADMIN);
+  }
+
+  getUserInfo(): any {
+    const userInfo = localStorage.getItem('user');
+    return userInfo ? JSON.parse(userInfo) : null;
+  }
+
+  getDefaultRoute(): string {
+    const userRoles = this.getUserRoles();
+    
+    if (userRoles.includes(UserRole.ADMIN)) {
+      return '/category';
+    } else if (userRoles.includes(UserRole.SALES_AND_MARKETING)) {
+      return '/category';
+    } else if (userRoles.includes(UserRole.HR)) {
+      return '/employee';
+    } else if (userRoles.includes(UserRole.DISPATCH)) {
+      return '/category';
+    } else {
+      return '/login'; // For OPERATOR and REPORTER who have no access yet
+    }
   }
 }

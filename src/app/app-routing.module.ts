@@ -23,135 +23,171 @@ import { AddTransportComponent } from './components/Transports/add-transport/add
 import { TransportMasterListComponent } from './components/Transports/transport-master-list/transport-master-list.component';
 import { BrandListComponent } from './components/brand/brand-list/brand-list.component';
 import { BrandFormComponent } from './components/brand/brand-form/brand-form.component';
+
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  
+  // Master Menu Routes
   { 
     path: 'category', 
     component: CategoryComponent, 
-    canActivate: [AuthGuard] 
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   { 
     path: 'product', 
     component: ProductComponent, 
-    canActivate: [AuthGuard] 
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
+  { 
+    path: 'customer', 
+    component: CustomerComponent, 
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'employee',
+    component: EmployeeListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
+  },
+  {
+    path: 'employee/create',
+    component: EmployeeFormComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
+  },  
+  {
+    path: 'employee/edit/:id',
+    component: EmployeeFormComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
+  },
+  {
+    path: 'transport-master',
+    component: TransportMasterListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'transport-master/create',
+    component: AddTransportComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'transport-master/edit',
+    component: AddTransportComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'brand',
+    component: BrandListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'brand/create',
+    component: BrandFormComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'brand/edit',
+    component: BrandFormComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  
+  // Transaction Menu Routes
   { 
     path: 'purchase', 
     component: PurchaseComponent, 
-    canActivate: [AuthGuard] 
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   {
     path: 'purchase/create',
     component: AddPurchaseComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   {
     path: 'sale',
     component: SaleComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   {
     path: 'sale/create',
     component: AddSaleComponent,
     canActivate: [AuthGuard, RoleGuard],
-    // data: { roles: ['ADMIN'] }
+    data: { roles: ['ADMIN'] } // Only ADMIN can create sales
   },
-  {
-    path: 'customer',
-    component: CustomerComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'combined-purchase-sale',
-    component: AddCombinedPurchaseSaleComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'powder-coating-process',
-    component: PowderCoatingProcessComponent,
-    canActivate: [AuthGuard]
-  },  
-  {
-    path: 'powder-coating-process/create',
-    component: AddPowderCoatingProcessComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'powder-coating-process/edit/:id',
-    component: AddPowderCoatingProcessComponent,
-    title: 'Edit Powder Coating Process'
-  },
-  {
-    path: 'transport-master/create',
-    component: AddTransportComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'transport-master',
-    component: TransportMasterListComponent,
-    canActivate: [AuthGuard]
-  },
+  
+  // Other Routes
   {
     path: 'quotation',
     component: QuotationComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   {
     path: 'quotation/create',
     component: AddQuotationComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'transport-master/edit',
-    component: AddTransportComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'brand',
-    component: BrandListComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'brand/create',
-    component: BrandFormComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'brand/edit',
-    component: BrandFormComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'employee',
-    component: EmployeeListComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'employee/create',
-    component: EmployeeFormComponent,
-    canActivate: [AuthGuard]
-  },  
-  {
-    path: 'employee/edit/:id',
-    component: EmployeeFormComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
   {
     path: 'employee-order',
     component: EmployeeOrderListComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
   },
   {
     path: 'employee-order/create',
     component: EmployeeOrderFormComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
   },  
   {
     path: 'employee-order/edit/:id',
     component: EmployeeOrderFormComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
   },
+  
+  // Legacy routes (keeping for backward compatibility)
+  {
+    path: 'combined-purchase-sale',
+    component: AddCombinedPurchaseSaleComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'powder-coating-process',
+    component: PowderCoatingProcessComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },  
+  {
+    path: 'powder-coating-process/create',
+    component: AddPowderCoatingProcessComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'powder-coating-process/edit/:id',
+    component: AddPowderCoatingProcessComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] },
+    title: 'Edit Powder Coating Process'
+  },
+  
+  // Catch-all redirect
   {
     path: '**',
     redirectTo: '/login',
