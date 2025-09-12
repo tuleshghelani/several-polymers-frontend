@@ -16,6 +16,7 @@ import { EmployeeFormComponent } from './components/employee/employee-form/emplo
 import { EmployeeOrderListComponent } from './components/employee-order/employee-order-list/employee-order-list.component';
 import { EmployeeOrderFormComponent } from './components/employee-order/employee-order-form/employee-order-form.component';
 import { AddQuotationComponent } from './components/all-quotation/add-quotation/add-quotation.component';
+import { DispatchQuotationComponent } from './components/all-quotation/dispatch-quotation/dispatch-quotation.component';
 import { QuotationComponent } from './components/all-quotation/quotation/quotation.component';
 import { AddSaleComponent } from './components/add-sale/add-sale.component';
 import { RoleGuard } from './guards/role.guard';
@@ -140,6 +141,12 @@ const routes: Routes = [
     component: AddQuotationComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'quotation/dispatch',
+    component: DispatchQuotationComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'DISPATCH'] }
   },
   {
     path: 'employee-order',

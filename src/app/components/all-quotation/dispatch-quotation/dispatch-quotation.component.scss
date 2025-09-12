@@ -1,0 +1,12 @@
+@import '../add-quotation/add-quotation.component.scss';
+
+// Dispatch-specific tweaks
+.card-header {
+  background-image: linear-gradient(135deg, var(--primary) 0%, #1d976c 100%);
+}
+
+.products-table th {
+  white-space: nowrap;
+}
+
+
