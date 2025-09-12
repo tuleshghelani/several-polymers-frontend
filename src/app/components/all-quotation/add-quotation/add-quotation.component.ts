@@ -109,6 +109,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     this.quotationForm = this.fb.group({
       customerId: [''],
       customerName: ['', Validators.required],
+      referenceName: [''],
       contactNumber: ['', Validators.required],
       quoteDate: [formatDate(today, 'yyyy-MM-dd', 'en')],
       validUntil: [formatDate(validUntil, 'yyyy-MM-dd', 'en'), [Validators.required]],
@@ -215,6 +216,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
             this.quotationForm.patchValue({ customerName: selectedCustomer.name });
             this.quotationForm.patchValue({ address: selectedCustomer.address });
             this.quotationForm.patchValue({ contactNumber: selectedCustomer.mobile });
+            this.quotationForm.patchValue({ referenceName: selectedCustomer.referenceName });
           }
         }
       });
@@ -785,6 +787,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     this.quotationForm.patchValue({
       customerName: data.customerName,
       customerId: data.customerId,
+      referenceName: data.referenceName || '',
       quoteDate: data.quoteDate,
       validUntil: data.validUntil,
       remarks: data.remarks || '',
@@ -892,6 +895,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     const finalFormData = {
       customerId: formValue.customerId,
       customerName: formValue.customerName,
+      referenceName: formValue.referenceName,
       contactNumber: formValue.contactNumber,
       quoteDate: formatDate(formValue.quoteDate, 'yyyy-MM-dd', 'en'),
       validUntil: formatDate(formValue.validUntil, 'yyyy-MM-dd', 'en'),

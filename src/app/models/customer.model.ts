@@ -1,6 +1,7 @@
 export interface Customer {
   id: number;
   name: string;
+  referenceName?: string;
   mobile: string;
   email: string;
   gst: string;

@@ -59,6 +59,7 @@ export class CustomerModalComponent implements OnInit {
 
     this.customerForm = this.fb.group({
       name: ['', [Validators.required]],
+      referenceName: [''],
       mobile: [''],
       email: [''],
       gst: ['', [Validators.pattern('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$')]],
@@ -88,6 +89,7 @@ export class CustomerModalComponent implements OnInit {
 
       this.customerForm.patchValue({
         name: customer.name || '',
+        referenceName: customer.referenceName || '',
         mobile: customer.mobile || '',
         email: customer.email || '',
         gst: customer.gst || '',
