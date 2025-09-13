@@ -38,7 +38,7 @@ export class AuthService {
     private router: Router
   ) {}
 
-  login(credentials: { email: string; password: string }): Observable<any> {
+  login(credentials: { phoneNumber: string; password: string }): Observable<any> {
     return this.http.post(`${environment.apiUrl}/api/auth/login`, credentials).pipe(
       tap((response: any) => {
         // Store token

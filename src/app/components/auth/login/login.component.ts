@@ -20,28 +20,45 @@ export class LoginComponent {
     private snackbar: SnackbarService
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', [Validators.required]],
       password: ['', Validators.required]
     });
   }
 
   onSubmit() {
+    
     if (this.loginForm.valid) {
       this.isLoading = true;
+      console.log('Calling auth service with:', this.loginForm.value);
+      
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
           localStorage.setItem('token', response.accessToken);
           localStorage.setItem('user', JSON.stringify(response.user));
           this.snackbar.success('Login successful');
           this.router.navigate(['/category']);
+          this.isLoading = false;
         },
         error: (error) => {
+          console.error('Login error:', error);
           this.snackbar.error(error?.error?.message || 'Login failed');
           this.isLoading = false;
         }
       });
     } else {
+      console.log('Form is invalid, showing warning');
       this.snackbar.warning('Please fill in all required fields correctly');
     }
+  }
+
+  private getFormErrors(): any {
+    const errors: any = {};
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
   }
 }

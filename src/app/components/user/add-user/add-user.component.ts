@@ -34,13 +34,14 @@ export class AddUserComponent implements OnInit {
     private route: ActivatedRoute,
     private snackbar: SnackbarService
   ) {
-    this.initializeForm();
     this.loadOptions();
   }
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
     this.isEditMode = !!this.userId;
+    
+    this.initializeForm();
     
     if (this.isEditMode) {
       this.loadUser();
@@ -50,13 +51,13 @@ export class AddUserComponent implements OnInit {
   private initializeForm(): void {
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', []],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', this.isEditMode ? [] : [Validators.required]],
+      email: ['', [Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(4)]],
+      confirmPassword: ['', [Validators.required]],
       status: ['A', Validators.required],
-      roles: [[], Validators.required]
+      roles: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -71,6 +72,7 @@ export class AddUserComponent implements OnInit {
     
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
     } else if (confirmPassword && confirmPassword.hasError('passwordMismatch')) {
       confirmPassword.setErrors(null);
     }
@@ -79,6 +81,11 @@ export class AddUserComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log('Form submitted!');
+    console.log('Form valid:', this.userForm.valid);
+    console.log('Form value:', this.userForm.value);
+    console.log('Form errors:', this.getFormErrors());
+    
     if (this.userForm.valid) {
       this.isLoading = true;
       const formData = { ...this.userForm.value };
@@ -93,7 +100,7 @@ export class AddUserComponent implements OnInit {
           phoneNumber: formData.phoneNumber,
           email: formData.email,
           status: formData.status,
-          roles: formData.roles
+          roles: [formData.roles]
         };
         
         this.userService.updateUser(updateData).subscribe({
@@ -117,7 +124,7 @@ export class AddUserComponent implements OnInit {
           email: formData.email,
           password: formData.password,
           status: formData.status,
-          roles: formData.roles,
+          roles: [formData.roles],
           clientId: 1
         };
         
@@ -136,12 +143,15 @@ export class AddUserComponent implements OnInit {
         });
       }
     } else {
+      console.log('Form is invalid, marking all fields as touched');
       Object.keys(this.userForm.controls).forEach(key => {
         const control = this.userForm.get(key);
         if (control?.invalid) {
           control.markAsTouched();
+          console.log(`Field ${key} is invalid:`, control.errors);
         }
       });
+      this.snackbar.error('Please fill in all required fields correctly');
     }
   }
 
@@ -158,7 +168,7 @@ export class AddUserComponent implements OnInit {
             phoneNumber: user.phoneNumber,
             email: user.email,
             status: user.status,
-            roles: user.roles
+            roles: Array.isArray(user.roles) && user.roles.length > 0 ? user.roles[0] : ''
           });
         }
       },
@@ -211,22 +221,51 @@ export class AddUserComponent implements OnInit {
   }
 
   onRoleChange(role: string, event: any): void {
-    const roles = this.userForm.get('roles')?.value || [];
+    // Get the roles control from the form
+    const rolesControl = this.userForm.get('roles');
+    
     if (event.target.checked) {
-      if (!roles.includes(role)) {
-        roles.push(role);
-      }
-    } else {
-      const index = roles.indexOf(role);
-      if (index > -1) {
-        roles.splice(index, 1);
-      }
+      // Set the selected role as a single string value
+      rolesControl?.setValue(role);
+      rolesControl?.markAsTouched();
+      rolesControl?.markAsDirty();
     }
-    this.userForm.get('roles')?.setValue(roles);
+  }
+
+  selectRole(role: string): void {
+    // Get the roles control from the form
+    const rolesControl = this.userForm.get('roles');
+    
+    // Set the selected role as a single string value
+    rolesControl?.setValue(role);
+    rolesControl?.markAsTouched();
+    rolesControl?.markAsDirty();
   }
 
   isRoleSelected(role: string): boolean {
-    const roles = this.userForm.get('roles')?.value || [];
-    return roles.includes(role);
+    const selectedRole = this.userForm.get('roles')?.value;
+    // Check if the current role matches the selected role
+    return selectedRole === role;
+  }
+
+  private getFormErrors(): any {
+    const errors: any = {};
+    Object.keys(this.userForm.controls).forEach(key => {
+      const control = this.userForm.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
+  }
+
+  // Debug method to check form status
+  checkFormStatus(): void {
+    console.log('Form Status Check:');
+    console.log('Form exists:', !!this.userForm);
+    console.log('Form valid:', this.userForm?.valid);
+    console.log('Form value:', this.userForm?.value);
+    console.log('Available roles:', this.availableRoles);
+    console.log('Is edit mode:', this.isEditMode);
   }
 }
