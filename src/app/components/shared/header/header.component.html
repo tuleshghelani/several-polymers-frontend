@@ -1,4 +1,4 @@
-<header class="header">
+﻿<header class="header">
   <nav class="nav-container">
     <div class="nav-top">
       <div class="logo">
@@ -52,6 +52,11 @@
             <li *ngIf="permissions.canViewBrand">
               <a routerLink="/brand" routerLinkActive="active">
                 <i class="fas fa-certificate"></i> Brand
+              </a>
+            </li>
+            <li *ngIf="permissions.canViewUser">
+              <a routerLink="/user" routerLinkActive="active">
+                <i class="fas fa-user-cog"></i> Users
               </a>
             </li>
           </ul>

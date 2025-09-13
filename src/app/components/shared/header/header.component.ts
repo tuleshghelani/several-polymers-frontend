@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { RoleService } from '../../../services/role.service';
@@ -18,6 +18,7 @@ interface MenuPermissions {
   canViewPurchase: boolean;
   canViewSale: boolean;
   canCreateSale: boolean;
+  canViewUser: boolean;
 }
 
 @Component({
@@ -82,11 +83,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewCustomer: false,
       canViewPurchase: false,
       canViewSale: false,
-      canCreateSale: false
+      canCreateSale: false,
+      canViewUser: false
     };
   }
 
-  @HostListener('document:click', ['$event'])
+  @HostListener('document:click', [''])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown') && !target.closest('.mobile-menu-toggle')) {
@@ -118,7 +120,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isMasterActive(): boolean {
     const currentUrl = this.router.url;
-    return ['/category', '/product', '/customer', '/employee', '/transport-master', '/brand'].some(path => 
+    return ['/category', '/product', '/customer', '/employee', '/transport-master', '/brand', '/user'].some(path => 
       currentUrl.includes(path)
     );
   }
@@ -136,7 +138,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
            this.permissions.canViewCustomer || 
            this.permissions.canViewEmployee || 
            this.permissions.canViewTransport || 
-           this.permissions.canViewBrand;
+           this.permissions.canViewBrand ||
+           this.permissions.canViewUser;
   }
 
   hasTransactionMenuItems(): boolean {

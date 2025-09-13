@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/Transports/add-transport/add-transport.component.scss"],
+  "sourcesContent": [".transport-master-form-container {\r\n  .card {\r\n    padding: 16px;\r\n  }\r\n  .form-grid {\r\n    display: grid;\r\n    grid-template-columns: repeat(2, 1fr);\r\n    gap: 12px;\r\n  }\r\n  .form-group {\r\n    display: flex;\r\n    flex-direction: column;\r\n  }\r\n  .span-2 {\r\n    grid-column: span 2;\r\n  }\r\n  .actions {\r\n    display: flex;\r\n    gap: 8px;\r\n    margin-top: 12px;\r\n  }\r\n}\r\n\r\n@media (max-width: 768px) {\r\n  .transport-master-form-container {\r\n    .form-grid {\r\n      grid-template-columns: 1fr;\r\n    }\r\n    .span-2 {\r\n      grid-column: span 1;\r\n    }\r\n  }\r\n}\r\n\r\n\r\n"],
+  "mappings": ";AACE,CAAA,gCAAA,CAAA;AACE,WAAA;;AAEF,CAHA,gCAGA,CAAA;AACE,WAAA;AACA,yBAAA,OAAA,CAAA,EAAA;AACA,OAAA;;AAEF,CARA,gCAQA,CAAA;AACE,WAAA;AACA,kBAAA;;AAEF,CAZA,gCAYA,CAAA;AACE,eAAA,KAAA;;AAEF,CAfA,gCAeA,CAAA;AACE,WAAA;AACA,OAAA;AACA,cAAA;;AAIJ,OAAA,CAAA,SAAA,EAAA;AAEI,GAxBF,gCAwBE,CArBF;AAsBI,2BAAA;;AAEF,GA3BF,gCA2BE,CAfF;AAgBI,iBAAA,KAAA;;;",
+  "names": []
+}

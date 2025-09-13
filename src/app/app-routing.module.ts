@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+﻿import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { CategoryComponent } from './components/category/category.component';
@@ -24,6 +24,8 @@ import { AddTransportComponent } from './components/Transports/add-transport/add
 import { TransportMasterListComponent } from './components/Transports/transport-master-list/transport-master-list.component';
 import { BrandListComponent } from './components/brand/brand-list/brand-list.component';
 import { BrandFormComponent } from './components/brand/brand-form/brand-form.component';
+import { UserListComponent } from './components/user/user-list/user-list.component';
+import { AddUserComponent } from './components/user/add-user/add-user.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -101,6 +103,24 @@ const routes: Routes = [
     component: BrandFormComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'user',
+    component: UserListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'user/create',
+    component: AddUserComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'user/edit/:id',
+    component: AddUserComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
   },
   
   // Transaction Menu Routes
