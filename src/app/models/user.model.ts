@@ -25,7 +25,7 @@ export interface UserResponse {
   success: boolean;
   message: string;
   data: {
-    users: User[];
+    content: User[];
     totalElements: number;
     totalPages: number;
     currentPage: number;

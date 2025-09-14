@@ -69,15 +69,22 @@ export class UserListComponent implements OnInit {
 
     this.userService.searchUsers(params).subscribe({
       next: (response) => {
+        console.log('API Response:', response);
         if (response.success) {
-          this.users = response.data.users;
+          // Map the API response to match our User model
+          this.users = response.data.content.map((user: any) => ({
+            ...user,
+            roles: this.parseRoles(user.roles)
+          }));
           this.totalPages = response.data.totalPages;
           this.totalElements = response.data.totalElements;
           this.updatePaginationIndexes();
+          console.log('Mapped users:', this.users);
         }
         this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading users:', error);
         this.snackbar.error('Failed to load users');
         this.isLoading = false;
       }
@@ -141,6 +148,25 @@ export class UserListComponent implements OnInit {
   
   getStatusLabel(status: string): string {
     return status === 'A' ? 'Active' : 'Inactive';
+  }
+
+  private parseRoles(roles: string | string[]): string[] {
+    if (Array.isArray(roles)) {
+      return roles;
+    }
+    
+    if (typeof roles === 'string') {
+      try {
+        // Parse the JSON string
+        const parsed = JSON.parse(roles);
+        return Array.isArray(parsed) ? parsed : [parsed];
+      } catch (error) {
+        console.error('Error parsing roles:', error);
+        return [roles]; // Return as single item array if parsing fails
+      }
+    }
+    
+    return [];
   }
 
 }
