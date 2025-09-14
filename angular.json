@@ -42,8 +42,8 @@
             ],
             "scripts": [
             ]
-            // ,"baseHref": "https://admin.jkindustriesrajkot.com/",
-            // "deployUrl": "https://admin.jkindustriesrajkot.com/"
+            ,"baseHref": "https://admin.severalpolymers.in/",
+            "deployUrl": "https://admin.severalpolymers.in/"
           },
           "configurations": {
             "production": {
