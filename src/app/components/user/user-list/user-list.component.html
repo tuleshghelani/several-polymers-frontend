@@ -1,33 +1,35 @@
 ﻿<div class="user-container">
   <div class="search-section card">
-    <h2>Search Users</h2>
-    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-      <div class="search-controls">
-        <div class="form-group">
-          <input 
-            type="text" 
-            formControlName="searchTerm" 
-            class="form-control" 
-            placeholder="Search users by name, email, or phone..."
-          >
+    <h2><i class="fas fa-search"></i> Search Users</h2>
+    <div class="card-content">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="search-controls">
+          <div class="form-group">
+            <input 
+              type="text" 
+              formControlName="searchTerm" 
+              class="form-control" 
+              placeholder="Search users by name, email, or phone..."
+            >
+          </div>
+          <div class="form-group">
+            <select formControlName="status" class="form-control">
+              <option value="">All Status</option>
+              <option value="A">Active</option>
+              <option value="I">Inactive</option>
+            </select>
+          </div>
+          <div class="button-group">
+            <button type="submit" class="search-btn btn btn-sm btn-primary">
+              <i class="fas fa-search"></i> Search
+            </button>
+            <button type="button" class="search-btn btn btn-sm btn-secondary" (click)="resetForm()">
+              <i class="fas fa-undo"></i> Reset
+            </button>
+          </div>
         </div>
-        <div class="form-group">
-          <select formControlName="status" class="form-control">
-            <option value="">All Status</option>
-            <option value="A">Active</option>
-            <option value="I">Inactive</option>
-          </select>
-        </div>
-        <div class="button-group">
-          <button type="submit" class="search-btn btn btn-sm btn-primary">
-            <i class="fas fa-search"></i> Search
-          </button>
-          <button type="button" class="search-btn btn btn-sm btn-secondary" (click)="resetForm()">
-            <i class="fas fa-undo"></i> Reset
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 
   <div class="action-buttons">
@@ -37,7 +39,7 @@
   </div>
 
   <div class="users-list card">
-    <h2>Users</h2>
+    <h2><i class="fas fa-users"></i> Users</h2>
     <div class="table-wrapper">
       <div class="table-container">
         <app-loader [show]="isLoading"></app-loader>
@@ -46,12 +48,12 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th><i class="fas fa-user"></i> Name</th>
+                <th><i class="fas fa-phone"></i> Phone</th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-user-tag"></i> Roles</th>
+                <th><i class="fas fa-toggle-on"></i> Status</th>
+                <th><i class="fas fa-cogs"></i> Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -89,7 +91,10 @@
                 </td>
               </tr>
               <tr *ngIf="!users?.length">
-                <td colspan="6" class="text-center">No users found</td>
+                <td colspan="6" class="text-center" style="padding: 40px; color: var(--text-secondary); font-style: italic;">
+                  <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                  No users found
+                </td>
               </tr>
             </tbody>
           </table>
@@ -97,14 +102,15 @@
       </div>
     </div>
 
-    <app-pagination
-      *ngIf="totalPages > 0"
-      [currentPage]="currentPage"
-      [pageSize]="pageSize"
-      [totalElements]="totalElements"
-      [pageSizeOptions]="pageSizeOptions"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)"
-    ></app-pagination>
+    <div class="card-content" *ngIf="totalPages > 0">
+      <app-pagination
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalElements]="totalElements"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
+    </div>
   </div>
 </div>

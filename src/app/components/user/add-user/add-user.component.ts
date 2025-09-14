@@ -49,16 +49,25 @@ export class AddUserComponent implements OnInit {
   }
 
   private initializeForm(): void {
+    // Password validators only required for new users, not for editing
+    const passwordValidators = this.isEditMode ? [] : [Validators.required, Validators.minLength(4)];
+    const confirmPasswordValidators = this.isEditMode ? [] : [Validators.required];
+    
     this.userForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', []],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
       email: ['', [Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(4)]],
-      confirmPassword: ['', [Validators.required]],
+      password: ['', passwordValidators],
+      confirmPassword: ['', confirmPasswordValidators],
       status: ['A', Validators.required],
       roles: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
+    
+    // Add dynamic validation for edit mode
+    if (this.isEditMode) {
+      this.setupEditModeValidation();
+    }
   }
 
   private loadOptions(): void {
@@ -66,13 +75,37 @@ export class AddUserComponent implements OnInit {
     this.statusOptions = this.userService.getStatusOptions();
   }
 
+  private setupEditModeValidation(): void {
+    // In edit mode, if password is provided, confirm password becomes required
+    const passwordControl = this.userForm.get('password');
+    const confirmPasswordControl = this.userForm.get('confirmPassword');
+    
+    if (passwordControl && confirmPasswordControl) {
+      passwordControl.valueChanges.subscribe(password => {
+        if (password && password.trim() !== '') {
+          // Password is provided, make confirm password required
+          confirmPasswordControl.setValidators([Validators.required]);
+        } else {
+          // Password is empty, remove confirm password requirement
+          confirmPasswordControl.setValidators([]);
+        }
+        confirmPasswordControl.updateValueAndValidity();
+      });
+    }
+  }
+
   private passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
     
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
+    // Only validate password match if both fields have values
+    if (password && confirmPassword && password.value && confirmPassword.value) {
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.setErrors({ passwordMismatch: true });
+        return { passwordMismatch: true };
+      } else if (confirmPassword.hasError('passwordMismatch')) {
+        confirmPassword.setErrors(null);
+      }
     } else if (confirmPassword && confirmPassword.hasError('passwordMismatch')) {
       confirmPassword.setErrors(null);
     }
@@ -97,11 +130,17 @@ export class AddUserComponent implements OnInit {
           id: this.userId!,
           firstName: formData.firstName,
           lastName: formData.lastName,
+          password: formData.password,
           phoneNumber: formData.phoneNumber,
           email: formData.email,
           status: formData.status,
           roles: [formData.roles]
         };
+        
+        // Only include password if it's provided (not empty)
+        if (formData.password && formData.password.trim() !== '') {
+          updateData.password = formData.password;
+        }
         
         this.userService.updateUser(updateData).subscribe({
           next: (response) => {
@@ -165,6 +204,7 @@ export class AddUserComponent implements OnInit {
           this.userForm.patchValue({
             firstName: user.firstName,
             lastName: user.lastName,
+            password: '',
             phoneNumber: user.phoneNumber,
             email: user.email,
             status: user.status,
