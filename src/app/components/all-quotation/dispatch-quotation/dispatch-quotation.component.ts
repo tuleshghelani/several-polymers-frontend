@@ -44,6 +44,8 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   isEdit = false;
   quotationId?: number;
   private itemSubscriptions: Subscription[] = [];
+  private lastStatusByIndex: { [index: number]: string } = {};
+  private lastCreatedRollByIndex: { [index: number]: number } = {};
 
   get itemsFormArray() {
     return this.quotationForm.get('items') as FormArray;
@@ -600,7 +602,26 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     }
     const target = event.target as HTMLSelectElement;
     const newStatus = target.value;
-    const previousStatus = group.get('quotationItemStatus')?.value;
+    const previousStatus = this.lastStatusByIndex[index] ?? group.get('quotationItemStatus')?.value;
+
+    // If no change, do nothing
+    if (previousStatus === newStatus) {
+      return;
+    }
+
+    // Enforce forward-only transitions
+    const isInvalidTransition =
+      (previousStatus === 'I' && newStatus === 'O') ||
+      (previousStatus === 'C' && (newStatus === 'O' || newStatus === 'I')) ||
+      (previousStatus === 'B' && (newStatus === 'O' || newStatus === 'I' || newStatus === 'C'));
+
+    if (isInvalidTransition) {
+      this.snackbar.error('Invalid transition. Status can only move forward.');
+      // revert UI selection
+      group.patchValue({ quotationItemStatus: previousStatus }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.quotationService.updateQuotationItemStatus(id, newStatus)
       .pipe(takeUntil(this.destroy$))
@@ -608,6 +629,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         next: (res) => {
           if (res?.success) {
             this.snackbar.success('Status updated successfully');
+            this.lastStatusByIndex[index] = newStatus;
           } else {
             this.snackbar.error(res?.message || 'Failed to update status');
             group.patchValue({ quotationItemStatus: previousStatus }, { emitEvent: false });
@@ -617,6 +639,58 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.snackbar.error(err?.error?.message || 'Failed to update status');
           group.patchValue({ quotationItemStatus: previousStatus }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  onStatusFocus(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const current = group.get('quotationItemStatus')?.value;
+    this.lastStatusByIndex[index] = current;
+  }
+
+  onCreatedRollFocus(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const current = Number(group.get('createdRoll')?.value || 0);
+    this.lastCreatedRollByIndex[index] = current;
+  }
+
+  onCreatedRollChange(index: number, event: Event) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const id = group.get('id')?.value;
+    if (!id) return;
+    const target = event.target as HTMLInputElement;
+    const newValue = Number(target.value);
+    const prevValue = this.lastCreatedRollByIndex[index] ?? Number(group.get('createdRoll')?.value || 0);
+
+    if (Number.isNaN(newValue) || newValue < 0) {
+      this.snackbar.error('Invalid value for Created Roll');
+      group.patchValue({ createdRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (newValue === prevValue) {
+      return;
+    }
+
+    this.quotationService.updateQuotationItemCreatedRoll(id, newValue)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res?.status === 'success' || res?.success) {
+            this.snackbar.success('Created roll updated successfully');
+            this.lastCreatedRollByIndex[index] = newValue;
+          } else {
+            this.snackbar.error(res?.message || 'Failed to update created roll');
+            group.patchValue({ createdRoll: prevValue }, { emitEvent: false });
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to update created roll');
+          group.patchValue({ createdRoll: prevValue }, { emitEvent: false });
           this.cdr.detectChanges();
         }
       });

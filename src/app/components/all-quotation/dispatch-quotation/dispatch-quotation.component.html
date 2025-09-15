@@ -147,7 +147,7 @@
                 </td>
                 <td>
                   <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true">
-                    <select class="form-control" formControlName="quotationItemStatus" (change)="onStatusChange(i, $event)">
+                    <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)">
                       <option value="O">Open</option>
                       <option value="I">In progress</option>
                       <option value="C">Completed</option>
@@ -156,7 +156,7 @@
                   </ng-container>
                 </td>
                 <td>
-                  <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1">
+                  <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1" (focus)="onCreatedRollFocus(i)" (change)="onCreatedRollChange(i, $event)">
                 </td>
 
                 <!-- <td>
