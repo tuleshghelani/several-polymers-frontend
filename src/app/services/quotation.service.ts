@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { QuotationResponse } from '../models/quotation.model';
 import { CreateQuotationRequest } from '../models/quotation.model';
+import { QuotationItemSearchApiResponse, QuotationItemSearchRequest } from '../models/quotation.model';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -26,6 +27,10 @@ export class QuotationService {
 
   searchQuotations(params: any): Observable<QuotationResponse> {
     return this.http.post<QuotationResponse>(`${this.apiUrl}/search`, params);
+  }
+
+  searchQuotationItems(payload: QuotationItemSearchRequest): Observable<QuotationItemSearchApiResponse> {
+    return this.http.post<QuotationItemSearchApiResponse>(`${this.quotationItemUrl}/search`, payload);
   }
 
   deleteQuotation(id: number): Observable<any> {

@@ -5,20 +5,20 @@ import { RoleService } from '../../../services/role.service';
 import { Subscription } from 'rxjs';
 
 interface MenuPermissions {
-  canViewMaster: boolean;
-  canViewTransaction: boolean;
-  canViewEmployee: boolean;
-  canViewEmployeeOrder: boolean;
-  canViewQuotation: boolean;
-  canViewTransport: boolean;
-  canViewBrand: boolean;
-  canViewCategory: boolean;
-  canViewProduct: boolean;
-  canViewCustomer: boolean;
-  canViewPurchase: boolean;
-  canViewSale: boolean;
-  canCreateSale: boolean;
-  canViewUser: boolean;
+  canViewMaster?: boolean;
+  canViewTransaction?: boolean;
+  canViewEmployee?: boolean;
+  canViewEmployeeOrder?: boolean;
+  canViewQuotation?: boolean;
+  canViewTransport?: boolean;
+  canViewBrand?: boolean;
+  canViewCategory?: boolean;
+  canViewProduct?: boolean;
+  canViewCustomer?: boolean;
+  canViewPurchase?: boolean;
+  canViewSale?: boolean;
+  canCreateSale?: boolean;
+  canViewUser?: boolean;
 }
 
 @Component({
@@ -139,11 +139,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
            this.permissions.canViewEmployee || 
            this.permissions.canViewTransport || 
            this.permissions.canViewBrand ||
-           this.permissions.canViewUser;
+           this.permissions.canViewUser || false;
   }
 
   hasTransactionMenuItems(): boolean {
-    return this.permissions.canViewPurchase || this.permissions.canViewSale;
+    return this.permissions.canViewPurchase || this.permissions.canViewSale || false;
   }
 
   logout(): void {

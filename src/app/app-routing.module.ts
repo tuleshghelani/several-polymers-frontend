@@ -172,7 +172,7 @@ const routes: Routes = [
     path: 'employee-order',
     component: EmployeeOrderListComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['ADMIN', 'HR'] }
+    data: { roles: ['ADMIN', 'HR', 'OPERATOR', 'DISPATCH'] }
   },
   {
     path: 'employee-order/create',

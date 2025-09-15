@@ -52,3 +52,51 @@ export enum QuotationStatus {
     value: string;
     disabled: boolean;
   }
+
+  // Quotation Item search request/response models
+  export interface QuotationItemSearchRequest {
+    isProduction?: boolean;
+    quotationItemStatus?: string;
+    brandId?: number;
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+  }
+
+  export interface QuotationItemSearchResultItem {
+    id: number;
+    quotationId: number;
+    productId: number;
+    quantity: number;
+    unitPrice: number;
+    discountPrice?: number;
+    quotationDiscountPercentage?: number;
+    quotationDiscountAmount?: number;
+    quotationDiscountPrice?: number;
+    taxPercentage?: number;
+    taxAmount?: number;
+    finalPrice?: number;
+    clientId?: number;
+    brandId?: number;
+    numberOfRoll?: number;
+    createdRoll?: number;
+    weightPerRoll?: number;
+    remarks?: string;
+    isProduction?: boolean;
+    quotationItemStatus?: string;
+    productName?: string;
+    brandName?: string;
+  }
+
+  export interface QuotationItemSearchResponseData {
+    content: QuotationItemSearchResultItem[];
+    totalElements: number;
+    totalPages: number;
+  }
+
+  export interface QuotationItemSearchApiResponse {
+    status: string;
+    message: string;
+    data: QuotationItemSearchResponseData;
+  }

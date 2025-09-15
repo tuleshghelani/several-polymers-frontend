@@ -1,41 +1,33 @@
 <div class="employee-order-container">
   
   <div class="search-section card">
-    <h2>Search Employee Orders</h2>
+    <h2>Search Quotation Items</h2>
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
       <div class="search-controls">
         <div class="form-group">
-          <input 
-            type="text" 
-            formControlName="search" 
-            class="form-control" 
-            placeholder="Search by product name or remarks..."
-          >
+          <app-searchable-select 
+            formControlName="quotationItemStatus"
+            [options]="quotationItemStatuses"
+            labelKey="name"
+            valueKey="id"
+            [placeholder]="'All Status'"
+            [searchPlaceholder]="'Search status...'">
+          </app-searchable-select>
         </div>
-        <div class="form-group">
-          <select formControlName="status" class="form-control">
-            <option value="">All Status</option>
-            <option value="O">Open</option>
-            <option value="I">In Progress</option>
-            <option value="C">Completed</option>
-          </select>
+        <div class="form-group input-with-refresh">
+          <app-searchable-select 
+            formControlName="brandId"
+            [options]="brands"
+            labelKey="name"
+            valueKey="id"
+            [placeholder]="'All Brands'"
+            [searchPlaceholder]="'Search brands...'">
+          </app-searchable-select>
+          <button type="button" class="btn btn-secondary" (click)="refreshBrands()" [disabled]="isLoadingBrands">
+            <i class="fas fa-sync" [ngClass]="{ spinning: isLoadingBrands }"></i>
+          </button>
         </div>
-        <div class="form-group">
-          <input 
-            type="date" 
-            formControlName="startDate" 
-            class="form-control" 
-            placeholder="Start Date"
-          >
-        </div>
-        <div class="form-group">
-          <input 
-            type="date" 
-            formControlName="endDate" 
-            class="form-control" 
-            placeholder="End Date"
-          >
-        </div>
+        
         <div class="button-group">
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-search"></i> Search
@@ -48,74 +40,66 @@
     </form>
   </div>
 
-  <div class="action-buttons">
-    <button routerLink="/employee-order/create" class="btn btn-primary">
-      <i class="fas fa-plus"></i> Create Employee Order
-    </button>
-  </div>
-
-  <div class="employee-orders-list card">
-    <h2>Employee Orders</h2>
+  <div class="employee-orders-list card" style="margin-top:16px;">
+    <h2>Quotation Items</h2>
     <div class="table-responsive">
-      <app-loader [show]="isLoading"></app-loader>
+      <app-loader [show]="isLoadingQuotationItems"></app-loader>
       <table class="table">
         <thead>
           <tr>
+            <th>No</th>
             <th>Product</th>
-            <th>Employees</th>
+            <th>Brand</th>
             <th>Quantity</th>
+            <th>Weight/Roll</th>
+            <th>No. of Roll</th>
+            <th>Created Roll</th>
             <th>Remarks</th>
             <th>Status</th>
-            <th>Created At</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let order of employeeOrders">
-            <td>{{ order.productName }}</td>
-            <td>{{ order.employeeIds.length || 0 }} assigned</td>
-            <td>{{ order.quantity }}</td>
-            <td>{{ order.remarks }}</td>
+          <tr *ngFor="let item of quotationItems; let i = index">
+            <td>{{ (qiCurrentPage * qiPageSize) + i + 1 }}</td>
+            <td>{{ item.productName }}</td>
+            <td>{{ item.brandName }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.weightPerRoll }}</td>
+            <td>{{ item.numberOfRoll }}</td>
+            <td>{{ item.createdRoll }}</td>
+            <td>{{ item.remarks }}</td>
             <td>
-              <span [ngClass]="'status-' + order.status.toLowerCase()">
-                {{ order.status === 'O' ? 'Open' : 
-                   order.status === 'I' ? 'In Progress' : 
-                   order.status === 'C' ? 'Completed' : 'Unknown' }}
-              </span>
-            </td>
-            <td>{{ order.createdAt | date:'medium' }}</td>
-            <td class="actions">
-              <button 
-                class="btn-icon edit" 
-                [routerLink]="['/employee-order/edit', order.id]"
-                title="Edit Order"
-              >
-                <i class="fas fa-edit"></i>
-              </button>
-              <button 
-                class="btn-icon delete" 
-                (click)="deleteEmployeeOrder(order.id ?? 0)"
-                title="Delete Order"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
+              <ng-container *ngIf="!isOperator; else readOnlyStatus">
+                <app-searchable-select
+                  [options]="quotationItemStatuses"
+                  labelKey="name"
+                  valueKey="id"
+                  [placeholder]="'Select status'"
+                  [searchPlaceholder]="'Search status...'"
+                  [allowClear]="false"
+                  (focus)="onStatusFocus(i)"
+                  (ngModelChange)="onStatusChange(i, $event)"
+                  [(ngModel)]="item.quotationItemStatus">
+                </app-searchable-select>
+              </ng-container>
+              <ng-template #readOnlyStatus>{{ item.quotationItemStatus }}</ng-template>
             </td>
           </tr>
-          <tr *ngIf="!employeeOrders?.length">
-            <td colspan="7" class="text-center">No employee orders found</td>
+          <tr *ngIf="!quotationItems?.length && !isLoadingQuotationItems">
+            <td colspan="9" class="text-center">No quotation items found</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="table-controls">
       <app-pagination
-        *ngIf="totalPages > 0"
-        [currentPage]="currentPage"
-        [pageSize]="pageSize"
-        [totalElements]="totalElements"
+        *ngIf="qiTotalPages > 0"
+        [currentPage]="qiCurrentPage"
+        [pageSize]="qiPageSize"
+        [totalElements]="qiTotalElements"
         [pageSizeOptions]="pageSizeOptions"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
+        (pageChange)="onQiPageChange($event)"
+        (pageSizeChange)="onQiPageSizeChange($event)"
       ></app-pagination>
     </div>
   </div>

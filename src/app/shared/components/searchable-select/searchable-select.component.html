@@ -9,7 +9,7 @@
       (focus)="onFocus()"
       (keydown)="handleKeydown($event)"
     >
-    <button *ngIf="hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
+    <button *ngIf="allowClear && hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
       <i class="fas fa-times"></i>
     </button>
     <i class="fas caret" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>

@@ -27,6 +27,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   @Input() defaultOption: { label: string; value: any } | null = null;
   @Input() searchPlaceholder: string = 'Search...';
   @Input() multiple = false;
+  @Input() allowClear = true;
 
   searchText: string = '';
   isOpen: boolean = false;
