@@ -143,15 +143,17 @@
                 </td>
 
                 <td>
-                  <input type="checkbox" formControlName="isProduction" (change)="onProductionToggle(i)">
+                  <input type="checkbox" formControlName="isProduction" (click)="onProductionClick(i, $event)" (change)="onProductionToggle(i)" title="Allowed only when status is Open">
                 </td>
                 <td>
-                  <select class="form-control" formControlName="quotationItemStatus">
-                    <option value="O">Open</option>
-                    <option value="I">In progress</option>
-                    <option value="C">Completed</option>
-                    <option value="B">Billed</option>
-                  </select>
+                  <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true">
+                    <select class="form-control" formControlName="quotationItemStatus" (change)="onStatusChange(i, $event)">
+                      <option value="O">Open</option>
+                      <option value="I">In progress</option>
+                      <option value="C">Completed</option>
+                      <option value="B">Billed</option>
+                    </select>
+                  </ng-container>
                 </td>
                 <td>
                   <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1">

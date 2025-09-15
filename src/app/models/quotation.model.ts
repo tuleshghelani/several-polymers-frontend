@@ -28,6 +28,7 @@ export enum QuotationStatus {
   export interface CreateQuotationRequest {
     customerId?: number;
     customerName: string;
+    referenceName?: string;
     quoteDate: string;
     validUntil: string;
     remarks?: string;

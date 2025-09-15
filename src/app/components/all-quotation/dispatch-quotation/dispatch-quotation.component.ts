@@ -99,6 +99,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       termsConditions: [''],
       items: this.fb.array([]),
       address: [''],
+      isProduction: [false],
       transportMasterId: [null, Validators.required],
       caseNumber: [''],
       packagingAndForwadingCharges: [0, [Validators.required, Validators.min(0)]]
@@ -443,6 +444,9 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   async populateForm(data: any) {
     if (!data) return;
+    // Clear existing item subscriptions to avoid duplicate subscriptions
+    this.itemSubscriptions.forEach(sub => sub?.unsubscribe());
+    this.itemSubscriptions = [];
     while (this.itemsFormArray.length) {
       this.itemsFormArray.removeAt(0);
     }
@@ -461,7 +465,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       packagingAndForwadingCharges: data.packagingAndForwadingCharges ?? 0
     });
     if (data.items && Array.isArray(data.items)) {
-      data.items.forEach((item: any) => {
+      data.items.forEach((item: any, idx: number) => {
         const itemGroup = this.fb.group({
           id: [item.id || null],
           productId: [item.productId || '', Validators.required],
@@ -488,6 +492,8 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         });
         this.setupItemCalculations(itemGroup, this.itemsFormArray.length);
         this.itemsFormArray.push(itemGroup);
+        // Ensure item change subscriptions are active for updated items
+        this.subscribeToItemChanges(itemGroup, this.itemsFormArray.length - 1);
       });
     }
     this.itemsFormArray.controls.forEach((_, index) => {
@@ -582,10 +588,60 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       this.calculateItemPrice(index);
     });
     this.itemSubscriptions[index] = subscription;
+
+    // We now handle status updates via explicit (change) handler to control revert UX
+  }
+
+  onStatusChange(index: number, event: Event) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const id = group.get('id')?.value;
+    if (!id) {
+      return;
+    }
+    const target = event.target as HTMLSelectElement;
+    const newStatus = target.value;
+    const previousStatus = group.get('quotationItemStatus')?.value;
+
+    this.quotationService.updateQuotationItemStatus(id, newStatus)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.snackbar.success('Status updated successfully');
+          } else {
+            this.snackbar.error(res?.message || 'Failed to update status');
+            group.patchValue({ quotationItemStatus: previousStatus }, { emitEvent: false });
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to update status');
+          group.patchValue({ quotationItemStatus: previousStatus }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  onProductionClick(index: number, event: Event) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const status = group.get('quotationItemStatus')?.value;
+    if (status === undefined || status === null || status === '' || status !== 'O') {
+      event.preventDefault();
+      event.stopPropagation();
+      this.snackbar.error('Allowed only when status is Open');
+      return false as unknown as void;
+    }
   }
 
   onProductionToggle(index: number) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    const status = group.get('quotationItemStatus')?.value;
+    if (status === undefined || status === null || status === '' || status !== 'O') {
+      // Disallow changes when not Open; revert UI change just in case
+      const current = !!group.get('isProduction')?.value;
+      group.patchValue({ isProduction: !current }, { emitEvent: false });
+      return;
+    }
     const quotationItemId = group.get('id')?.value;
     const isProduction = !!group.get('isProduction')?.value;
     if (!quotationItemId) {

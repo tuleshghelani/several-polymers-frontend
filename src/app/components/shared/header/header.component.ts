@@ -88,7 +88,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     };
   }
 
-  @HostListener('document:click', [''])
+  @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     if (!target.closest('.dropdown') && !target.closest('.mobile-menu-toggle')) {

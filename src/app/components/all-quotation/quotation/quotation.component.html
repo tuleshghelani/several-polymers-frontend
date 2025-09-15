@@ -130,23 +130,29 @@
                 </div>
               </td>
               <td class="actions">                
-                <button 
+                <!-- <button 
                   class="btn-icon edit" 
                   (click)="generateDispatchPdf(quotation.id!, quotation)"
                   title="Generate Dispatch"
                   [disabled]="quotation.isPrinting"
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : ' fa-file-pdf'"></i>
-                </button>
-                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C'
-                || quotation.status == 'PC'"
+                </button> -->
+                <button *ngIf="canEditQuotation() && (quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C' || quotation.status == 'PC')"
                   class="btn-icon edit" 
                   (click)="editQuotation(quotation.id!)"
                   title="Edit quotation"
                 >
                   <i class="fas fa-edit"></i>
                 </button>
-                <button 
+                <button *ngIf="canDispatchQuotation()"
+                  class="btn-icon edit" 
+                  (click)="dispatchQuotation(quotation.id!)"
+                  title="Dispatch quotation"
+                >
+                  <i class="fas fa-truck-loading"></i>
+                </button>
+                <button *ngIf="canEditQuotation()"
                   class="btn-icon print" 
                   (click)="generatePdf(quotation.id!, quotation)"
                   title="Print quotation"
@@ -154,8 +160,7 @@
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : 'fa-print'"></i>
                 </button>
-                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C'
-                || quotation.status == 'PC'"
+                <button *ngIf="canEditQuotation() && (quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C' || quotation.status == 'PC')"
                   class="btn-icon delete" 
                   (click)="deleteQuotation(quotation.id!)"
                   title="Delete quotation"

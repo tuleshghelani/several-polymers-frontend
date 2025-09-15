@@ -13,6 +13,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { QuotationStatus, StatusOption } from '../../../models/quotation.model';
 import { EncryptionService } from '../../../shared/services/encryption.service';
+import { AuthService } from '../../../services/auth.service';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
@@ -62,7 +63,8 @@ export class QuotationComponent implements OnInit {
     private modalService: ModalService,
     private dateUtils: DateUtils,
     private encryptionService: EncryptionService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ){
     this.initializeForm();
     this.statusOptions = Object.entries(QuotationStatus).map(([key, value]) => ({ label: value, value: key }));
@@ -343,6 +345,21 @@ export class QuotationComponent implements OnInit {
   addQuotation(): void {
     localStorage.removeItem('editQuotationId');
     this.router.navigate(['/quotation/create']);
+  }
+
+  // Role helpers for template
+  canEditQuotation(): boolean {
+    return this.authService.isAdmin() || this.authService.isSalesAndMarketing();
+  }
+
+  canDispatchQuotation(): boolean {
+    return this.authService.isDispatch();
+  }
+
+  dispatchQuotation(id: number): void {
+    if (!id) return;
+    localStorage.setItem('editQuotationId', this.encryptionService.encrypt(id.toString()));
+    this.router.navigate(['/quotation/dispatch']);
   }
 }
 
