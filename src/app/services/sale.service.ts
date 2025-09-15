@@ -31,4 +31,8 @@ export class SaleService {
   getSaleDetails(id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/detail`, { id });
   }
+
+  createFromQuotationItems(quotationItemIds: number[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/createFromQuotationItems`, { quotationItemIds });
+  }
 }

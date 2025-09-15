@@ -496,7 +496,7 @@
   
       &:first-child {
         .form-control {
-          min-width: 200px;
+          // min-width: 200px;
         }
       }
     }
@@ -641,7 +641,7 @@
     
     .quotation-discount-group {
       margin-bottom: 0;
-      min-width: 200px;
+      // min-width: 200px;
       
       label {
         font-size: 0.9rem;
@@ -713,7 +713,7 @@
         min-width: 100px;
         
         &:nth-child(1) {
-          min-width: 200px;
+          // min-width: 200px;
         }
       }
     }
@@ -755,7 +755,7 @@
     padding: 0.5rem;
     
     &:first-child {
-      min-width: 200px;
+      // min-width: 200px;
     }
   }
 }

@@ -132,4 +132,19 @@ export class EmployeeListComponent implements OnInit {
     this.startIndex = this.currentPage * this.pageSize;
     this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
+
+  openWhatsApp(rawNumber: string | number | null | undefined): void {
+    const digits = String(rawNumber ?? '').replace(/\D/g, '');
+    if (!digits) {
+      return;
+    }
+    const normalized = digits.length === 10 ? `91${digits}` : digits;
+    const url = `whatsapp://send?phone=${normalized}`;
+    try {
+      // Attempt to open native WhatsApp app via custom protocol
+      window.location.href = url;
+    } catch {
+      // Swallow errors; native handlers may block exceptions
+    }
+  }
 } 

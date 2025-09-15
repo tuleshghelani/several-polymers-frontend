@@ -59,7 +59,10 @@
             <tbody>
               <tr *ngFor="let user of users" class="user-row">
                 <td class="user-name">{{user.firstName}} {{user.lastName}}</td>
-                <td>{{user.phoneNumber}}</td>
+                <td>{{user.phoneNumber}}
+                  <button class="btn-icon whatsapp" title="Open WhatsApp" (click)="openWhatsApp(user.phoneNumber)">
+                    <i class="fab fa-whatsapp"></i>
+                  </button></td>
                 <td>{{user.email}}</td>
                 <td>
                   <div class="roles-container">

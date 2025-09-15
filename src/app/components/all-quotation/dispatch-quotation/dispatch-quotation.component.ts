@@ -6,6 +6,7 @@ import { Subject, takeUntil, debounceTime, filter, distinctUntilChanged, Subscri
 import { formatDate } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { EncryptionService } from '../../../shared/services/encryption.service';
+import { SaleService } from '../../../services/sale.service';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
@@ -46,6 +47,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private itemSubscriptions: Subscription[] = [];
   private lastStatusByIndex: { [index: number]: string } = {};
   private lastCreatedRollByIndex: { [index: number]: number } = {};
+  private selectedQuotationItemIds = new Set<number>();
 
   get itemsFormArray() {
     return this.quotationForm.get('items') as FormArray;
@@ -62,7 +64,8 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     private encryptionService: EncryptionService,
     private router: Router,
     private dialog: Dialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private saleService: SaleService
   ) {
     const today = new Date();
     this.minValidUntilDate = formatDate(today, 'yyyy-MM-dd', 'en');
@@ -163,6 +166,14 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     this.setupItemCalculations(itemGroup, newIndex);
     this.subscribeToItemChanges(this.itemsFormArray.at(newIndex), newIndex);
     this.calculateItemPrice(newIndex, isInitializing);
+    
+    this.loadProducts();
+    this.loadCustomers();
+    this.loadBrands();
+    this.loadTransports();
+    this.setupCustomerNameSync();
+    this.checkForEdit();
+    this.setupItemSubscriptions();
   }
 
   removeItem(index: number): void {
@@ -732,6 +743,69 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           this.snackbar.error('Failed to update production status');
           // Revert toggle on error
           group.patchValue({ isProduction: !isProduction }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  // Selection helpers for creating sale
+  private getQuotationItemIdByIndex(index: number): number | null {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const id = group?.get('id')?.value;
+    return typeof id === 'number' ? id : null;
+  }
+
+  isSelectable(index: number): boolean {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const status = group?.get('quotationItemStatus')?.value;
+    const id = this.getQuotationItemIdByIndex(index);
+    return !!id && status !== 'B';
+  }
+
+  isSelected(index: number): boolean {
+    const id = this.getQuotationItemIdByIndex(index);
+    if (!id) return false;
+    return this.selectedQuotationItemIds.has(id);
+  }
+
+  toggleSelection(index: number, event: Event): void {
+    const id = this.getQuotationItemIdByIndex(index);
+    if (!id) return;
+    const input = event.target as HTMLInputElement;
+    if (input.checked) {
+      this.selectedQuotationItemIds.add(id);
+    } else {
+      this.selectedQuotationItemIds.delete(id);
+    }
+  }
+
+  hasSelection(): boolean {
+    return this.selectedQuotationItemIds.size > 0;
+  }
+
+  createSaleFromSelected(): void {
+    const ids = Array.from(this.selectedQuotationItemIds);
+    if (!ids.length) {
+      this.snackbar.error('Please select at least one item');
+      return;
+    }
+    this.isLoading = true;
+    this.saleService.createFromQuotationItems(ids)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.success) {
+            this.snackbar.success(res?.message || 'Sale created successfully');
+            this.selectedQuotationItemIds.clear();
+          } else {
+            this.snackbar.error(res?.message || 'Failed to create sale');
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to create sale');
+          this.isLoading = false;
           this.cdr.detectChanges();
         }
       });

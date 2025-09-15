@@ -79,15 +79,21 @@
       <div class="products-section" formArrayName="items">
         <div class="products-header">
           <h3><i class="fas fa-boxes"></i> Products</h3>
-          <button type="button" class="btn btn-sm btn-primary" (click)="addItem()">
-            <i class="fas fa-plus"></i> Add Product
-          </button>
+          <div>
+            <button type="button" class="btn btn-success me-2" *ngIf="hasSelection()" (click)="createSaleFromSelected()">
+              <i class="fa-solid fa-cart-plus"></i> Create Sale
+            </button>
+            <!-- <button type="button" class="btn btn-sm btn-primary" (click)="addItem()">
+              <i class="fas fa-plus"></i> Add Product
+            </button> -->
+          </div>
         </div>
 
         <div class="table-responsive">
           <table class="table products-table">
             <thead>
               <tr>
+                <th></th>
                 <th>Product</th>
                 <th>Brand</th>
                 <th>Number of Roll</th>
@@ -102,6 +108,15 @@
             </thead>
             <tbody>
               <tr *ngFor="let item of itemsFormArray.controls; let i=index" [formGroupName]="i">
+                <td>
+                  <ng-container *ngIf="itemsFormArray.at(i).get('quotationItemStatus')?.value != 'B'">
+                  <input type="checkbox"
+                         [disabled]="!isSelectable(i)"
+                         [checked]="isSelected(i)"
+                         (change)="toggleSelection(i, $event)"
+                         title="Select for sale creation">
+                  </ng-container>
+                </td>
                 <td>
                   <div class="form-field-container">
                     <input type="text" formControlName="productName" class="form-control" placeholder="Product Name" readonly>
@@ -146,7 +161,7 @@
                   <input type="checkbox" formControlName="isProduction" (click)="onProductionClick(i, $event)" (change)="onProductionToggle(i)" title="Allowed only when status is Open">
                 </td>
                 <td>
-                  <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true">
+                  <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true || itemsFormArray.at(i).get('quotationItemStatus')?.value === 'B'">
                     <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)">
                       <option value="O">Open</option>
                       <option value="I">In progress</option>
@@ -170,7 +185,7 @@
         </div>
       </div>
 
-      <div class="d-flex mt-3">
+      <div class="d-flex mt-3 align-items-end justify-content-between">
         <div class="form-group w-50">
           <label><i class="fas fa-comment"></i> Remarks</label>
           <textarea formControlName="remarks" class="form-control" rows="3" placeholder="Optional remarks"></textarea>

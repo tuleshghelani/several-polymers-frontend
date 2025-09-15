@@ -353,7 +353,7 @@ export class QuotationComponent implements OnInit {
   }
 
   canDispatchQuotation(): boolean {
-    return this.authService.isDispatch();
+    return this.authService.isDispatch() || this.authService.isAdmin();
   }
 
   dispatchQuotation(id: number): void {

@@ -57,7 +57,6 @@ export class UserListComponent implements OnInit {
       status: ['']
     });
   }
-
   loadUsers(): void {
     this.isLoading = true;
     const params: UserSearchRequest = {
@@ -167,6 +166,23 @@ export class UserListComponent implements OnInit {
     }
     
     return [];
+  }
+
+  
+
+  openWhatsApp(rawNumber: string | number | null | undefined): void {
+    const digits = String(rawNumber ?? '').replace(/\D/g, '');
+    if (!digits) {
+      return;
+    }
+    const normalized = digits.length === 10 ? `91${digits}` : digits;
+    const url = `whatsapp://send?phone=${normalized}`;
+    try {
+      // Attempt to open native WhatsApp app via custom protocol
+      window.location.href = url;
+    } catch {
+      // Swallow errors; native handlers may block exceptions
+    }
   }
 
 }

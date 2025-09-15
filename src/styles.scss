@@ -217,3 +217,30 @@ body {
     }
   }
 }
+
+.whatsapp {
+  color: #25D366;
+  background-color: rgba(37, 211, 102, 0.12);
+  padding: 6px;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background-color: #25D366;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
