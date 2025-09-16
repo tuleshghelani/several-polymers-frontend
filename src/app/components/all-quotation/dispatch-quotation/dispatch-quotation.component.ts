@@ -47,6 +47,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private itemSubscriptions: Subscription[] = [];
   private lastStatusByIndex: { [index: number]: string } = {};
   private lastCreatedRollByIndex: { [index: number]: number } = {};
+  private lastNumberOfRollByIndex: { [index: number]: number } = {};
   private selectedQuotationItemIds = new Set<number>();
   private selectedDispatchItemIds = new Set<number>();
 
@@ -79,7 +80,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     this.loadBrands();
     this.loadTransports();
     this.setupCustomerNameSync();
-    this.checkForEdit();
+    // this.checkForEdit();
     this.setupItemSubscriptions();
   }
 
@@ -214,12 +215,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         }
       });
 
-    group.get('numberOfRoll')?.valueChanges
-      .pipe(takeUntil(this.destroy$), debounceTime(50))
-      .subscribe(() => this.updateQuantityFromRolls(index));
-    group.get('weightPerRoll')?.valueChanges
-      .pipe(takeUntil(this.destroy$), debounceTime(50))
-      .subscribe(() => this.updateQuantityFromRolls(index));
+    // group.get('numberOfRoll')?.valueChanges
+    //   .pipe(takeUntil(this.destroy$), debounceTime(50))
+    //   .subscribe(() => this.updateQuantityFromRolls(index));
+    // group.get('weightPerRoll')?.valueChanges
+    //   .pipe(takeUntil(this.destroy$), debounceTime(50))
+    //   .subscribe(() => this.updateQuantityFromRolls(index));
     group.get('quantity')?.valueChanges
       .pipe(takeUntil(this.destroy$), debounceTime(50))
       .subscribe(() => this.markQuantityManual(index));
@@ -239,7 +240,66 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   }
 
   onRollWeightChange(index: number) {
-    this.updateQuantityFromRolls(index);
+    // this.updateQuantityFromRolls(index);
+  }
+
+  onNumberOfRollFocus(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const current = Number(group.get('numberOfRoll')?.value || 0);
+    this.lastNumberOfRollByIndex[index] = current;
+  }
+
+  onNumberOfRollChange(index: number, event: Event) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const id = group.get('id')?.value;
+    const status = group.get('quotationItemStatus')?.value;
+    const input = event.target as HTMLInputElement;
+    const newValue = Number(input.value);
+    const prevValue = this.lastNumberOfRollByIndex[index] ?? Number(group.get('numberOfRoll')?.value || 0);
+
+    if (Number.isNaN(newValue) || newValue < 0) {
+      this.snackbar.error('Invalid value for Number of Roll');
+      group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Do not allow update when billed
+    if (status === 'B') {
+      group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // If not persisted yet, just keep local change
+    if (!id) {
+      this.lastNumberOfRollByIndex[index] = newValue;
+      return;
+    }
+
+    if (newValue === prevValue) {
+      return;
+    }
+
+    this.quotationService.updateQuotationItemNumberOfRoll(id, newValue)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.snackbar.success('Number of roll updated successfully');
+            this.lastNumberOfRollByIndex[index] = newValue;
+          } else {
+            this.snackbar.error(res?.message || 'Failed to update number of roll');
+            group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to update number of roll');
+          group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   private updateQuantityFromRolls(index: number) {

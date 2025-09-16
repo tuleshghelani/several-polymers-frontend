@@ -157,7 +157,15 @@
 
                 <td>
                   <div class="input-group">
-                    <input type="number" formControlName="numberOfRoll" class="form-control" min="0" step="1" (input)="onRollWeightChange(i)" readonly>
+                    <input type="number"
+                           formControlName="numberOfRoll"
+                           class="form-control"
+                           min="0"
+                           step="1"
+                           (focus)="onNumberOfRollFocus(i)"
+                           (change)="onNumberOfRollChange(i, $event)"
+                           (input)="onRollWeightChange(i)"
+                           [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B'">
                   </div>
                 </td>
                 <td>

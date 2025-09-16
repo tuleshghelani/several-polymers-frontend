@@ -97,4 +97,8 @@ export class QuotationService {
   updateQuotationItemCreatedRoll(quotationItemId: number, createdRoll: number): Observable<any> {
     return this.http.put<any>(`${this.quotationItemUrl}/created-roll`, { id: quotationItemId, createdRoll });
   }
+
+  updateQuotationItemNumberOfRoll(quotationItemId: number, numberOfRoll: number): Observable<any> {
+    return this.http.put<any>(`${this.quotationItemUrl}/number-of-roll`, { id: quotationItemId, numberOfRoll });
+  }
 }
