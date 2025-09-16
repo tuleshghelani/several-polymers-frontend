@@ -174,7 +174,15 @@
                   </div>
                 </td>
                 <td>
-                  <input type="number" formControlName="quantity" class="form-control" min="0" step="0.001" (input)="onQuantityEdit(i)" readonly>
+                  <input type="number"
+                         formControlName="quantity"
+                         class="form-control"
+                         min="0"
+                         step="0.001"
+                         (focus)="onQuantityFocus(i)"
+                         (change)="onQuantityChange(i, $event)"
+                         (input)="onQuantityEdit(i)"
+                         [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B'">
                 </td>
                 <td>
                   <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks" readonly>

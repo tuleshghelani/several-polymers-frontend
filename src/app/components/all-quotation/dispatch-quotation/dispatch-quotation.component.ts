@@ -48,6 +48,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private lastStatusByIndex: { [index: number]: string } = {};
   private lastCreatedRollByIndex: { [index: number]: number } = {};
   private lastNumberOfRollByIndex: { [index: number]: number } = {};
+  private lastQuantityByIndex: { [index: number]: number } = {};
   private selectedQuotationItemIds = new Set<number>();
   private selectedDispatchItemIds = new Set<number>();
 
@@ -237,6 +238,67 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   onQuantityEdit(index: number) {
     this.markQuantityManual(index);
     this.calculateItemPrice(index);
+  }
+
+  onQuantityFocus(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const current = Number(group.get('quantity')?.value || 0);
+    this.lastQuantityByIndex[index] = current;
+  }
+
+  onQuantityChange(index: number, event: Event) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const id = group.get('id')?.value;
+    const status = group.get('quotationItemStatus')?.value;
+    const input = event.target as HTMLInputElement;
+    const newValue = Number(Number(input.value).toFixed(3));
+    const prevValue = this.lastQuantityByIndex[index] ?? Number(group.get('quantity')?.value || 0);
+
+    // Disallow update when billed
+    if (status === 'B') {
+      group.patchValue({ quantity: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (Number.isNaN(newValue) || newValue < 0) {
+      this.snackbar.error('Invalid value for Quantity');
+      group.patchValue({ quantity: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!id) {
+      // Not yet persisted; only local recalculation
+      this.lastQuantityByIndex[index] = newValue;
+      this.onQuantityEdit(index);
+      return;
+    }
+
+    if (newValue === prevValue) {
+      return;
+    }
+
+    this.quotationService.updateQuotationItemQuantity(id, newValue)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res?.success) {
+            this.snackbar.success(res?.message || 'Quantity updated successfully');
+            this.lastQuantityByIndex[index] = newValue;
+            this.onQuantityEdit(index);
+          } else {
+            this.snackbar.error(res?.message || 'Failed to update quantity');
+            group.patchValue({ quantity: prevValue }, { emitEvent: false });
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to update quantity');
+          group.patchValue({ quantity: prevValue }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   onRollWeightChange(index: number) {
