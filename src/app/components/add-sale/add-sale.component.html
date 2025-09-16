@@ -30,7 +30,8 @@
                 ></app-searchable-select>
                 <button 
                   type="button" 
-                  class="btn btn-sm btn-primary refresh mt-2" 
+                  class="btn btn-sm btn-primary refresh" 
+                  style="margin-top: 3px;"
                   (click)="refreshCustomers()" 
                   [disabled]="isLoadingCustomers"
                   title="Refresh Customers"
@@ -73,6 +74,34 @@
               <div class="invalid-feedback" *ngIf="isFieldInvalid('invoiceNumber')">
                 Invoice number is required
               </div>
+            </div>
+            
+            <div class="form-group">
+              <label>
+                <i class="fas fa-id-card"></i> Reference Name
+              </label>
+              <input type="text" formControlName="referenceName" class="form-control" placeholder="Optional reference name">
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-truck"></i> Transport
+              </label>
+              <div class="select-group">
+                <app-searchable-select formControlName="transportMasterId" [options]="transports" labelKey="name" valueKey="id"
+                  [placeholder]="'Select Transport'" [searchPlaceholder]="'Search transports...'"></app-searchable-select>
+                <button type="button" class="btn btn-sm btn-primary refresh" style="margin-top: 3px;" (click)="refreshTransports()"
+                  [disabled]="isLoadingTransports" title="Refresh Transports">
+                  <i class="fas" [ngClass]="isLoadingTransports ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-briefcase"></i> Case Number
+              </label>
+              <input type="text" formControlName="caseNumber" class="form-control" placeholder="Enter case number">
             </div>
             
             <div class="form-group">

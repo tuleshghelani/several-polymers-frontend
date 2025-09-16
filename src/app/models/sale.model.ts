@@ -10,6 +10,9 @@ export interface Sale {
   saleDate: string;
   isBlack: boolean;
   invoiceNumber?: string;
+  referenceName?: string;
+  caseNumber?: string;
+  transportMasterId?: number;
   customerName?: string;
   totalSaleAmount?: number;
   totalProducts?: number;
@@ -17,6 +20,7 @@ export interface Sale {
   salesDate?: string;
   otherExpenses?: number;
   totalAmount?: number;
+  items?: any[];
 }
 
 export interface SaleSearchRequest {

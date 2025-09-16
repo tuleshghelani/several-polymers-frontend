@@ -13,6 +13,7 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 import { EncryptionService } from '../../shared/services/encryption.service';
+import { TransportMasterService } from '../../services/transport-master.service';
 
 interface ProductForm {
   productId: string;
@@ -40,9 +41,11 @@ export class AddSaleComponent implements OnInit, OnDestroy {
   saleForm!: FormGroup;
   products: any[] = [];
   customers: any[] = [];
+  transports: any[] = [];
   loading = false;
   isLoadingProducts = false;
   isLoadingCustomers = false;
+  isLoadingTransports = false;
   isEdit = false;
   private currentSaleId: number | null = null;
   private destroy$ = new Subject<void>();
@@ -60,7 +63,8 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     private snackbar: SnackbarService,
     private http: HttpClient,
     private router: Router,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
+    private transportMasterService: TransportMasterService
   ) {
     this.initForm();
   }
@@ -68,6 +72,7 @@ export class AddSaleComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadProducts();
     this.loadCustomers();
+    this.loadTransports();
     
     const encryptedId = localStorage.getItem('saleId');
     if (encryptedId) {
@@ -90,6 +95,9 @@ export class AddSaleComponent implements OnInit, OnDestroy {
       customerId: ['', Validators.required],
       saleDate: [formatDate(new Date(), 'yyyy-MM-dd', 'en'), Validators.required],
       invoiceNumber: ['', Validators.required],
+      referenceName: [''],
+      caseNumber: [''],
+      transportMasterId: [null],
       products: this.fb.array([]),
       isBlack: [false, Validators.required]
     });
@@ -228,6 +236,39 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadTransports(): void {
+    this.isLoadingTransports = true;
+    this.transportMasterService.getTransports({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.transports = response.data;
+        }
+        this.isLoadingTransports = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load transports');
+        this.isLoadingTransports = false;
+      }
+    });
+  }
+
+  refreshTransports(): void {
+    this.isLoadingTransports = true;
+    this.transportMasterService.refreshTransports().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.transports = response.data;
+          this.snackbar.success('Transports refreshed successfully');
+        }
+        this.isLoadingTransports = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh transports');
+        this.isLoadingTransports = false;
+      }
+    });
+  }
+
   refreshCustomers(): void {
     this.isLoadingCustomers = true;
     this.customerService.refreshCustomers().subscribe({
@@ -320,7 +361,7 @@ export class AddSaleComponent implements OnInit, OnDestroy {
     return {
       ...formValue,
       saleDate: formatDate(formValue.saleDate, 'dd-MM-yyyy', 'en'),
-      products: formValue.products.map((product: ProductForm) => ({
+      items: formValue.products.map((product: ProductForm) => ({
         ...product,
         finalPrice: this.productsFormArray.at(formValue.products.indexOf(product)).get('finalPrice')?.value
       })),
@@ -379,7 +420,10 @@ export class AddSaleComponent implements OnInit, OnDestroy {
       customerId: data.customerId,
       saleDate: formatDate(new Date(data.saleDate), 'yyyy-MM-dd', 'en'),
       invoiceNumber: data.invoiceNumber,
-      isBlack: data.isBlack
+      isBlack: data.isBlack,
+      referenceName: data.referenceName || '',
+      caseNumber: data.caseNumber || '',
+      transportMasterId: data.transportMasterId || null
     });
 
     // Clear existing products and subscriptions
