@@ -94,6 +94,14 @@
                 <i class="fas fa-eye"></i>
               </button>
               <button 
+                class="btn-icon edit" 
+                (click)="downloadSale(sale.id!, sale)"
+                [disabled]="isGeneratingPdfById[sale.id!]"
+                title="Download Sale PDF"
+              >
+                <i class="fas" [ngClass]="isGeneratingPdfById[sale.id!] ? 'fa-spinner fa-spin' : 'fa-download'"></i>
+              </button>
+              <button 
                 class="btn-icon delete" 
                 (click)="deleteSale(sale.id!)"
                 title="Delete Sale"

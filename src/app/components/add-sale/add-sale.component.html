@@ -105,6 +105,8 @@
               <thead>
                 <tr>
                   <th>Product Name</th>
+                  <th>No. of Roll</th>
+                  <th>Weight/Roll</th>
                   <th>Quantity</th>
                   <th>Sale Rate</th>
                   <th>Final Price</th>
@@ -128,6 +130,35 @@
                       <div class="invalid-feedback" *ngIf="isProductFieldInvalid(i, 'productId')">
                         Please select a product
                       </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-field-container">
+                      <input 
+                        type="number" 
+                        formControlName="numberOfRoll" 
+                        class="form-control"
+                        [class.is-invalid]="isProductFieldInvalid(i, 'numberOfRoll')"
+                        placeholder="Rolls"
+                        min="0"
+                        step="1"
+                        inputmode="numeric"
+                      >
+                    </div>
+                  </td>
+                  <td>
+                    <div class="form-field-container">
+                      <input 
+                        type="number" 
+                        formControlName="weightPerRoll" 
+                        class="form-control"
+                        [class.is-invalid]="isProductFieldInvalid(i, 'weightPerRoll')"
+                        placeholder="Weight/Roll"
+                        min="0"
+                        step="0.001"
+                        inputmode="decimal"
+                        (input)="onProductInput(i, 'weightPerRoll', 3)"
+                      >
                     </div>
                   </td>
                   <td>

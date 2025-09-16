@@ -40,6 +40,7 @@ export class SaleComponent implements OnInit {
   sales: Sale[] = [];
   searchForm!: FormGroup;
   isLoading = false;
+  isGeneratingPdfById: { [key: number]: boolean } = {};
   
    // Pagination properties
    currentPage = 0;
@@ -170,6 +171,26 @@ export class SaleComponent implements OnInit {
         }
       });
     }
+  }
+
+  downloadSale(id: number, sale: Sale): void {
+    if (!id) return;
+    this.isGeneratingPdfById[id] = true;
+    this.saleService.generatePdf(id).subscribe({
+      next: (response) => {
+        const url = window.URL.createObjectURL(response.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.filename || `sale-${sale?.invoiceNumber || id}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isGeneratingPdfById[id] = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to generate PDF');
+        this.isGeneratingPdfById[id] = false;
+      }
+    });
   }
 
   formatDate(date: string): string {

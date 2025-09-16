@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Sale, SaleResponse, SaleSearchRequest } from '../models/sale.model';
 
@@ -34,5 +34,19 @@ export class SaleService {
 
   createFromQuotationItems(quotationItemIds: number[]): Observable<any> {
     return this.http.post(`${this.apiUrl}/createFromQuotationItems`, { quotationItemIds });
+  }
+
+  generatePdf(id: number): Observable<{ blob: Blob; filename: string }> {
+    return this.http.post(`${this.apiUrl}/generate-pdf`, { id }, {
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || 'sale.pdf';
+        const blob = new Blob([response.body!], { type: 'application/pdf' });
+        return { blob, filename };
+      })
+    );
   }
 }

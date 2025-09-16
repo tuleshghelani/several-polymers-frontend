@@ -19,6 +19,8 @@ interface ProductForm {
   quantity: number;
   unitPrice: number;
   finalPrice: number;
+  numberOfRoll: number;
+  weightPerRoll: number;
   remarks: string
 }
 @Component({
@@ -102,6 +104,8 @@ export class AddSaleComponent implements OnInit, OnDestroy {
       quantity: ['', [Validators.required, Validators.min(1)]],
       unitPrice: ['', [Validators.required, Validators.min(0.01)]],
       finalPrice: [{ value: 0, disabled: true }],
+      numberOfRoll: [0, [Validators.min(0)]],
+      weightPerRoll: [0, [Validators.min(0)]],
       remarks:[null, []]
     });
   }
@@ -159,7 +163,7 @@ export class AddSaleComponent implements OnInit, OnDestroy {
   }
 
   // Limit decimal digits for a product field
-  onProductInput(index: number, field: 'quantity' | 'unitPrice', maxDecimals: number): void {
+  onProductInput(index: number, field: 'quantity' | 'unitPrice' | 'weightPerRoll', maxDecimals: number): void {
     const control = this.productsFormArray.at(index).get(field);
     if (!control) return;
     const raw = String(control.value ?? '');
@@ -391,6 +395,8 @@ export class AddSaleComponent implements OnInit, OnDestroy {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         finalPrice: item.finalPrice,
+        numberOfRoll: item.numberOfRoll ?? 0,
+        weightPerRoll: item.weightPerRoll ?? 0,
         remarks: item.remarks
       });
       this.productsFormArray.push(productGroup);
