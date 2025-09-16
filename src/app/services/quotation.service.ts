@@ -51,8 +51,8 @@ export class QuotationService {
     );
   }
 
-  generateDispatchPdf(id: number): Observable<{ blob: Blob; filename: string }> {
-    return this.http.post(`${this.apiUrl}/generate-dispatch-slip`, { id }, {
+  generateDispatchPdf(id: number, quotationItemIds: any): Observable<{ blob: Blob; filename: string }> {
+    return this.http.post(`${this.apiUrl}/generate-dispatch-slip`, { id, quotationItemIds }, {
       responseType: 'blob',
       observe: 'response'
     }).pipe(

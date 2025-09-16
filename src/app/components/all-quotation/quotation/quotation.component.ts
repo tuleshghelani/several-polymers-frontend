@@ -236,7 +236,7 @@ export class QuotationComponent implements OnInit {
     if (!quotation) return;
 
     quotation.isPrinting = true;
-    this.quotationService.generateDispatchPdf(id).subscribe({
+    this.quotationService.generateDispatchPdf(id, null).subscribe({
       next: (response) => {
         const url = window.URL.createObjectURL(response.blob);
         const link = document.createElement('a');

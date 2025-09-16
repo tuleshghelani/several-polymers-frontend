@@ -48,6 +48,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private lastStatusByIndex: { [index: number]: string } = {};
   private lastCreatedRollByIndex: { [index: number]: number } = {};
   private selectedQuotationItemIds = new Set<number>();
+  private selectedDispatchItemIds = new Set<number>();
 
   get itemsFormArray() {
     return this.quotationForm.get('items') as FormArray;
@@ -781,6 +782,58 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   hasSelection(): boolean {
     return this.selectedQuotationItemIds.size > 0;
+  }
+
+  hasDispatchSelection(): boolean {
+    return this.selectedDispatchItemIds.size > 0;
+  }
+
+  isDispatchSelected(index: number): boolean {
+    const id = this.getQuotationItemIdByIndex(index);
+    if (!id) return false;
+    return this.selectedDispatchItemIds.has(id);
+  }
+
+  toggleDispatchSelection(index: number, event: Event): void {
+    const id = this.getQuotationItemIdByIndex(index);
+    if (!id) return;
+    const input = event.target as HTMLInputElement;
+    if (input.checked) {
+      this.selectedDispatchItemIds.add(id);
+    } else {
+      this.selectedDispatchItemIds.delete(id);
+    }
+  }
+
+  createDispatchSlip(): void {
+    const ids = Array.from(this.selectedDispatchItemIds);
+    if (!ids.length) {
+      this.snackbar.error('Please select at least one item for dispatch');
+      return;
+    }
+    if (!this.quotationId) {
+      this.snackbar.error('Quotation ID not found');
+      return;
+    }
+    this.isLoading = true;
+    this.quotationService.generateDispatchPdf(this.quotationId, ids)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: { blob: Blob; filename: string }) => {
+          const url = window.URL.createObjectURL(response.blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = response.filename;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          this.snackbar.success('Dispatch slip generated successfully');
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.snackbar.error(err?.error?.message || 'Failed to generate dispatch slip');
+          this.isLoading = false;
+        }
+      });
   }
 
   createSaleFromSelected(): void {
