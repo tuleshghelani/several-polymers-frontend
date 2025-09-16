@@ -130,14 +130,14 @@
                 </div>
               </td>
               <td class="actions">                
-                <!-- <button 
+                <button 
                   class="btn-icon edit" 
                   (click)="generateDispatchPdf(quotation.id!, quotation)"
                   title="Generate Dispatch"
                   [disabled]="quotation.isPrinting"
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : ' fa-file-pdf'"></i>
-                </button> -->
+                </button>
                 <button *ngIf="canEditQuotation() && (quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C' || quotation.status == 'PC')"
                   class="btn-icon edit" 
                   (click)="editQuotation(quotation.id!)"
