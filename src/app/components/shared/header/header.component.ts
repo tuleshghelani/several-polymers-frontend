@@ -10,6 +10,7 @@ interface MenuPermissions {
   canViewEmployee?: boolean;
   canViewEmployeeOrder?: boolean;
   canViewQuotation?: boolean;
+  canViewDispatchQuotation?: boolean;
   canViewTransport?: boolean;
   canViewBrand?: boolean;
   canViewCategory?: boolean;
@@ -30,6 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated: boolean = false;
   showMasterMenu: boolean = false;
   showTransactionMenu: boolean = false;
+  showDispatchQuotationMenu: boolean = false;
   isMobileMenuOpen: boolean = false;
   permissions: MenuPermissions;
   userInfo: any;
@@ -76,6 +78,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewEmployee: false,
       canViewEmployeeOrder: false,
       canViewQuotation: false,
+      canViewDispatchQuotation: false,
       canViewTransport: false,
       canViewBrand: false,
       canViewCategory: false,
@@ -132,6 +135,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     );
   }
 
+  isDispatchQuotationActive(): boolean {
+    const currentUrl = this.router.url;
+    return ['/quotation', '/quotation/dispatch-list'].some(path => 
+      currentUrl.includes(path)
+    );
+  }
+
   hasMasterMenuItems(): boolean {
     return this.permissions.canViewCategory || 
            this.permissions.canViewProduct || 
@@ -143,7 +153,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   hasTransactionMenuItems(): boolean {
-    return this.permissions.canViewPurchase || this.permissions.canViewSale || false;
+    return this.permissions.canViewPurchase || this.permissions.canViewSale || this.permissions.canViewDispatchQuotation || false;
   }
 
   logout(): void {
@@ -163,5 +173,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   getUserRoles(): string {
     const roles = this.authService.getUserRoles();
     return roles.join(', ');
+  }
+
+  toggleDispatchQuotationMenu(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDispatchQuotationMenu = !this.showDispatchQuotationMenu;
+    this.showTransactionMenu = false;
   }
 }

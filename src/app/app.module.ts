@@ -16,7 +16,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
-    
 
 
 @NgModule({

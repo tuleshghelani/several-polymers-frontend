@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { QuotationService } from '../../../services/quotation.service';
-import { QuotationItemSearchResultItem } from '../../../models/quotation.model';
+import { QuotationItemSearchResultItem, QuotationItemStatus, QuotationStatus } from '../../../models/quotation.model';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -32,7 +32,8 @@ export class EmployeeOrderListComponent implements OnInit {
   searchForm!: FormGroup;
   isLoadingQuotationItems = false;
   isLoadingBrands = false;
-  quotationItemStatuses: any[] = [];
+  quotationItemStatuses: any[] = [];  
+  statusOptions: any[] = [];
   private lastStatusByIndex: Record<number, string> = {};
   
   // Quotation items pagination
@@ -50,6 +51,7 @@ export class EmployeeOrderListComponent implements OnInit {
     private snackbar: SnackbarService
   ) {
     this.initializeForm();
+    this.statusOptions = Object.entries(QuotationItemStatus).map(([key, value]) => ({ label: value, value: key }));
   }
 
   ngOnInit(): void {
@@ -71,12 +73,7 @@ export class EmployeeOrderListComponent implements OnInit {
   }
 
   loadQuotationItemStatuses(): void {
-    const statuses = [
-      {id: 'O', name: 'Open'},
-      {id: 'I', name: 'In Progress'},
-      {id: 'C', name: 'Completed'},
-      {id: 'B', name: 'Billed'},
-    ];
+    const statuses = Object.entries(QuotationItemStatus).map(([key, value]) => ({ label: value, value: key }));
     this.quotationItemStatuses = statuses;
   }
 

@@ -8,6 +8,13 @@ export enum QuotationStatus {
     C = 'Completed',
     I = 'Invoiced'
   }
+
+  export enum QuotationItemStatus {
+    O = 'Open',
+    I = 'In Progress',
+    C = 'Completed',
+    B = 'Billed',
+  }
   
   export interface QuotationItem {
     productId: number;

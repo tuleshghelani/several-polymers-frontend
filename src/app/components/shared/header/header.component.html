@@ -82,11 +82,24 @@
           </ul>
         </li>
         
-        <!-- Direct Menu Items -->
-        <li *ngIf="permissions.canViewQuotation">
-          <a routerLink="/quotation" routerLinkActive="active">
-            <i class="fas fa-file-invoice-dollar"></i> Quotation
+        
+        <li class="dropdown" *ngIf="hasTransactionMenuItems()">
+          <a (click)="toggleDispatchQuotationMenu($event)" [class.active]="isDispatchQuotationActive()">
+            <i class="fas fa-exchange-alt"></i> Dispatch Quotation
+            <i class="fas fa-chevron-down"></i>
           </a>
+          <ul class="dropdown-menu" [class.show]="showDispatchQuotationMenu">            
+            <li *ngIf="permissions.canViewQuotation">
+              <a routerLink="/quotation" routerLinkActive="active" fullPath>
+                <i class="fas fa-hand-holding-usd"></i> Quotation
+              </a>
+            </li> 
+            <li *ngIf="permissions.canViewDispatchQuotation">
+              <a routerLink="/quotation/dispatch-list" routerLinkActive="active" fullPath>
+                <i class="fas fa-shopping-cart"></i> Dispatch Quotation
+              </a>
+            </li>           
+          </ul>
         </li>
 
         <li *ngIf="permissions.canViewEmployeeOrder">

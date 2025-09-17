@@ -36,7 +36,7 @@ export class LoginComponent {
           localStorage.setItem('token', response.accessToken);
           localStorage.setItem('user', JSON.stringify(response.user));
           this.snackbar.success('Login successful');
-          this.router.navigate(['/category']);
+          this.router.navigate(['/dashboard']);
           this.isLoading = false;
         },
         error: (error) => {

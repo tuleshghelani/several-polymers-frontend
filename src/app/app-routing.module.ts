@@ -26,10 +26,18 @@ import { BrandListComponent } from './components/brand/brand-list/brand-list.com
 import { BrandFormComponent } from './components/brand/brand-form/brand-form.component';
 import { UserListComponent } from './components/user/user-list/user-list.component';
 import { AddUserComponent } from './components/user/add-user/add-user.component';
+import { DispatchQuotationListComponent } from './components/all-quotation/dispatch-quotation-list/dispatch-quotation-list.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent, 
+    canActivate: [AuthGuard, RoleGuard],
+  },
   
   // Master Menu Routes
   { 
@@ -165,6 +173,12 @@ const routes: Routes = [
   {
     path: 'quotation/dispatch',
     component: DispatchQuotationComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'DISPATCH'] }
+  },
+  {
+    path: 'quotation/dispatch-list',
+    component: DispatchQuotationListComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'DISPATCH'] }
   },

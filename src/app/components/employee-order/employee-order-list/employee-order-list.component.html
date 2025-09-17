@@ -6,10 +6,11 @@
       <div class="search-controls">
         <div class="form-group">
           <app-searchable-select 
-            formControlName="quotationItemStatus"
+            formControlName="selectedQuotationItemStatus"
             [options]="quotationItemStatuses"
             labelKey="name"
             valueKey="id"
+            [multiple]="true"
             [placeholder]="'All Status'"
             [searchPlaceholder]="'Search status...'">
           </app-searchable-select>
@@ -69,20 +70,16 @@
             <td>{{ item.createdRoll }}</td>
             <td>{{ item.remarks }}</td>
             <td>
-              <ng-container *ngIf="!isOperator; else readOnlyStatus">
+              <div class="product-select-group">
                 <app-searchable-select
-                  [options]="quotationItemStatuses"
-                  labelKey="name"
-                  valueKey="id"
-                  [placeholder]="'Select status'"
+                  formControlName="quotationItemStatuses"
+                  [options]="statusOptions"
+                  labelKey="label"
+                  valueKey="value"
+                  [defaultOption]="{ label: 'All Status', value: '' }"
                   [searchPlaceholder]="'Search status...'"
-                  [allowClear]="false"
-                  (focus)="onStatusFocus(i)"
-                  (ngModelChange)="onStatusChange(i, $event)"
-                  [(ngModel)]="item.quotationItemStatus">
-                </app-searchable-select>
-              </ng-container>
-              <ng-template #readOnlyStatus>{{ item.quotationItemStatus }}</ng-template>
+                ></app-searchable-select>
+              </div>
             </td>
           </tr>
           <tr *ngIf="!quotationItems?.length && !isLoadingQuotationItems">
