@@ -666,6 +666,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     const formValue = this.quotationForm.value;
     const items = this.itemsFormArray.controls.map((control) => {
       return {
+        id: control.get('id')?.value,
         productId: control.get('productId')?.value,
         productName: control.get('productName')?.value,
         productType: control.get('productType')?.value,

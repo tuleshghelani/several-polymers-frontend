@@ -171,6 +171,7 @@
                   <th>Quotation Discount</th>
                   <th>Tax (%)</th>
                   <th>Final Price</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -287,11 +288,17 @@
                       <input type="number" formControlName="finalPrice" class="form-control" readonly>
                     </div>
                   </td>
-                  
+                  <td>
+                    {{ getQuotationItemStatusLabel(item.get('quotationItemStatus')?.value) }}
+                  </td>
                   <!-- Remarks -->
                   
                   <td>
-                    <button type="button" (click)="removeItem(i)" class="btn btn-sm btn-danger">
+                    <button 
+                      *ngIf="item?.get('quotationItemStatus')?.value !== 'B'"
+                      type="button" 
+                      (click)="removeItem(i)" 
+                      class="btn btn-sm btn-danger">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </td>
@@ -299,7 +306,7 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="6" class="text-end"><strong>Total:</strong></td>
+                  <td colspan="7" class="text-end"><strong>Total:</strong></td>
                   <td>
                     <div class="input-group">
                       <span class="input-group-text">₹</span>

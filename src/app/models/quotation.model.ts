@@ -17,6 +17,7 @@ export enum QuotationStatus {
   }
   
   export interface QuotationItem {
+    id?: number;
     productId: number;
     quantity: number;
     unitPrice: number;

@@ -11,6 +11,7 @@ import { CustomerService } from '../../../services/customer.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { QuotationService } from '../../../services/quotation.service';
 import { PriceService } from '../../../services/price.service';
+import { QuotationItemStatus } from '../../../models/quotation.model';
 import { BrandService, Brand } from '../../../services/brand.service';
 import { TransportMasterService, TransportMaster } from '../../../services/transport-master.service';
 import { SearchableSelectComponent } from "../../../shared/components/searchable-select/searchable-select.component";
@@ -150,6 +151,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   private createItemFormGroup(initialData?: any): FormGroup {
     return this.fb.group({
+      id: [initialData?.id || ''],
       productId: [initialData?.productId || '', Validators.required],
       productType: [initialData?.productType || ''],
       quantity: [initialData?.quantity || 1, [Validators.required, Validators.min(1)]],
@@ -157,6 +159,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       brandId: [initialData?.brandId || null],
       numberOfRoll: [initialData?.numberOfRoll ?? 0, [Validators.required, Validators.min(0)]],
       weightPerRoll: [initialData?.weightPerRoll ?? 0, [Validators.required, Validators.min(0)]],
+      quotationItemStatus: [initialData?.quotationItemStatus || null],
       remarks: [initialData?.remarks || ''],
       price: [initialData?.price || 0],
       taxPercentage: [{ value: initialData?.taxPercentage ?? 18 }],
@@ -224,6 +227,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   addItem(isInitializing = false): void {
     const itemGroup = this.fb.group({
+      id: [null],
       productId: ['', Validators.required],
       productType: [''],
       quantity: [0, [Validators.required, Validators.min(0)]],
@@ -238,7 +242,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       taxAmount: [0],
       finalPrice: [0],
       quotationDiscountAmount: [0],
-      calculations: [[]]
+      calculations: [[]],
+      quotationItemStatus: null
     });
     
     this.itemsFormArray.push(itemGroup);
@@ -810,6 +815,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         console.log(`Loaded item ${item.productId} with tax percentage: ${taxPercentage}%`);
         
         const itemGroup = this.fb.group({
+          id: [item.id || null],
           productId: [item.productId || '', Validators.required],
           productType: [item.productType || ''],
           quantity: [item.quantity || 1, [Validators.required, Validators.min(1)]],
@@ -823,7 +829,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
           taxAmount: [item.taxAmount || 0],
           finalPrice: [item.finalPrice || 0],
           quotationDiscountAmount: [item.quotationDiscountAmount || 0],
-          calculations: [item.calculations || []]
+          calculations: [item.calculations || []],
+          quotationItemStatus: [item.quotationItemStatus || null]
         });
         
         this.setupItemCalculations(itemGroup, this.itemsFormArray.length);
@@ -875,6 +882,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     
     const items = this.itemsFormArray.controls.map((control) => {
       return {
+        id: control.get('id')?.value,
         productId: control.get('productId')?.value,
         productType: control.get('productType')?.value,
         quantity: control.get('quantity')?.value,
@@ -888,7 +896,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         taxAmount: control.get('taxAmount')?.value,
         finalPrice: control.get('finalPrice')?.value,
         quotationDiscountAmount: control.get('quotationDiscountAmount')?.value,
-        calculations: control.get('calculations')?.value || []
+        calculations: control.get('calculations')?.value || [],
+        quotationItemStatus: control.get('quotationItemStatus')?.value
       };
     });
 
@@ -957,6 +966,18 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     this.calculateTotalAmount();
     
     this.cdr.detectChanges();
+  }
+
+  // Map item status code to human-readable label using QuotationItemStatus enum
+  getQuotationItemStatusLabel(code: string | null | undefined): string {
+    if (!code) return '';
+    const map: Record<string, string> = {
+      O: QuotationItemStatus.O,
+      I: QuotationItemStatus.I,
+      C: QuotationItemStatus.C,
+      B: QuotationItemStatus.B,
+    } as unknown as Record<string, string>;
+    return map[code] || String(code);
   }
 
 }
