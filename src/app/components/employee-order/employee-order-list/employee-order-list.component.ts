@@ -10,6 +10,7 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { Brand, BrandService } from '../../../services/brand.service';
 import { AuthService } from '../../../services/auth.service';
+import { takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-employee-order-list',
@@ -67,7 +68,7 @@ export class EmployeeOrderListComponent implements OnInit {
   private initializeForm(): void {
     this.searchForm = this.fb.group({
       isProduction: [true],
-      quotationItemStatus: ['O'],
+      quotationItemStatuses: [['O', 'I']],
       brandId: [null],
     });
   }
@@ -82,7 +83,7 @@ export class EmployeeOrderListComponent implements OnInit {
     const formValues = this.searchForm.value;
     const payload = {
       isProduction: true,
-      quotationItemStatus: formValues.quotationItemStatus === undefined || formValues.quotationItemStatus === null || formValues.quotationItemStatus === '' ? 'O' : formValues.quotationItemStatus,
+      quotationItemStatuses: Array.isArray(formValues.quotationItemStatuses) && formValues.quotationItemStatuses.length > 0 ? formValues.quotationItemStatuses : ['O', 'I'],
       brandId: formValues.brandId === '' || formValues.brandId === null ? undefined : formValues.brandId,
       page: this.qiCurrentPage,
       size: this.qiPageSize
@@ -105,6 +106,89 @@ export class EmployeeOrderListComponent implements OnInit {
       error: (error) => {
         this.snackbar.error(error?.error?.message || 'Failed to load quotation items');
         this.isLoadingQuotationItems = false;
+      }
+    });
+  }
+
+  // Map code to human-readable label; hide billed from employee order list
+  getItemStatusLabel(statusCode: string | undefined | null): string {
+    if (!statusCode) return '';
+    if (statusCode === 'B') return '';
+    const map: Record<string, string> = {
+      O: QuotationItemStatus.O,
+      I: QuotationItemStatus.I,
+      C: QuotationItemStatus.C,
+    } as unknown as Record<string, string>;
+    return map[statusCode] || String(statusCode);
+  }
+
+  // Allowed forward-only transitions, excluding billed
+  getAvailableItemStatusOptions(currentStatus: string | undefined | null): Array<{ label: string; value: string }> {
+    if (!currentStatus) return [];
+    switch (currentStatus) {
+      case 'O':
+        return [
+          { label: QuotationItemStatus.O, value: 'O' },
+          { label: QuotationItemStatus.I, value: 'I' },
+          { label: QuotationItemStatus.C, value: 'C' }
+        ];
+      case 'I':
+        return [          
+          { label: QuotationItemStatus.I, value: 'I' },
+          { label: QuotationItemStatus.C, value: 'C' }
+        ];
+      case 'C':
+      case 'B':
+      default:
+        return [];
+    }
+  }
+
+  onItemStatusFocus(index: number): void {
+    const current = this.quotationItems[index]?.quotationItemStatus;
+    if (current) {
+      this.lastStatusByIndex[index] = current;
+    }
+  }
+
+  onItemStatusChange(index: number, newStatus: string): void {
+    const item = this.quotationItems[index];
+    if (!item || item.id == null) return;
+    const previousStatus = this.lastStatusByIndex[index] ?? item.quotationItemStatus;
+
+    if (previousStatus === newStatus) {
+      return;
+    }
+
+    const isInvalidTransition =
+      (previousStatus === 'I' && newStatus === 'O') ||
+      (previousStatus === 'C' && (newStatus === 'O' || newStatus === 'I')) ||
+      (previousStatus === 'B');
+
+    if (isInvalidTransition) {
+      this.snackbar.error('Invalid transition. Status can only move forward.');
+      this.quotationItems[index].quotationItemStatus = previousStatus;
+      this.loadQuotationItems();
+      return;
+    }
+
+    this.quotationService.updateQuotationItemStatus(item.id, newStatus).subscribe({
+      next: (res: any) => {
+        if (res?.success) {
+          this.quotationItems[index].quotationItemStatus = newStatus;
+          this.lastStatusByIndex[index] = newStatus;
+          this.loadQuotationItems();
+          this.snackbar.success('Status updated successfully');
+        } else {
+          this.snackbar.error(res?.message || 'Failed to update status');
+          this.quotationItems[index].quotationItemStatus = previousStatus;
+          this.loadQuotationItems();
+        }
+      },
+      error: (err) => {
+        this.quotationItems[index].quotationItemStatus = previousStatus;
+        this.loadQuotationItems();
+        this.snackbar.error(err?.error?.message || 'Failed to update status');
       }
     });
   }
@@ -154,49 +238,6 @@ export class EmployeeOrderListComponent implements OnInit {
     }
   }
 
-  onStatusChange(index: number, newStatus: string): void {
-    const item = this.quotationItems[index];
-    if (!item?.id) return;
-    const previousStatus = this.lastStatusByIndex[index] ?? item.quotationItemStatus;
-
-    if (previousStatus === newStatus) {
-      return;
-    }
-
-    const isInvalidTransition =
-      (previousStatus === 'I' && newStatus === 'O') ||
-      (previousStatus === 'C' && (newStatus === 'O' || newStatus === 'I')) ||
-      (previousStatus === 'B' && (newStatus === 'O' || newStatus === 'I' || newStatus === 'C'));
-
-    if (isInvalidTransition) {
-      this.snackbar.error('Invalid transition. Status can only move forward.');
-      // revert UI
-      this.quotationItems[index].quotationItemStatus = previousStatus;
-      this.loadQuotationItems();
-      return;
-    }
-
-    this.quotationService.updateQuotationItemStatus(item.id, newStatus).subscribe({
-      next: (res: any) => {
-        if (res?.success) {
-          this.quotationItems[index].quotationItemStatus = newStatus;
-          this.lastStatusByIndex[index] = newStatus;
-          this.loadQuotationItems();
-          this.snackbar.success('Status updated successfully');
-        } else {
-          this.snackbar.error(res?.message || 'Failed to update status');
-          this.quotationItems[index].quotationItemStatus = previousStatus;
-          this.loadQuotationItems();
-        }
-      },  
-      error: (err) => {
-        this.quotationItems[index].quotationItemStatus = previousStatus;
-        this.loadQuotationItems();
-        this.snackbar.error(err?.error?.message || 'Failed to update status');
-      }
-    });
-  }
-
   onSearch(): void {
     this.qiCurrentPage = 0;
     this.loadQuotationItems();
@@ -205,7 +246,7 @@ export class EmployeeOrderListComponent implements OnInit {
   resetForm(): void {
     this.searchForm.patchValue({
       isProduction: true,
-      quotationItemStatus: 'O',
+      quotationItemStatuses: ['O'],
       brandId: null,
       sortBy: 'id',
       sortDir: 'desc'

@@ -64,6 +64,7 @@ export enum QuotationStatus {
   export interface QuotationItemSearchRequest {
     isProduction?: boolean;
     quotationItemStatus?: string;
+    quotationItemStatuses?: string[];
     brandId?: number;
     page?: number;
     size?: number;

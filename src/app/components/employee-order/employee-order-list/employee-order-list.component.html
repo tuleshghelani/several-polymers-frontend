@@ -5,8 +5,8 @@
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
       <div class="search-controls">
         <div class="form-group">
-          <app-searchable-select 
-            formControlName="selectedQuotationItemStatus"
+        <app-searchable-select 
+          formControlName="quotationItemStatuses"
             [options]="quotationItemStatuses"
             labelKey="name"
             valueKey="id"
@@ -55,6 +55,7 @@
             <th>Weight/Roll</th>
             <th>No. of Roll</th>
             <th>Created Roll</th>
+            <th>Remaining Roll</th>
             <th>Remarks</th>
             <th>Status</th>
           </tr>
@@ -68,18 +69,26 @@
             <td>{{ item.weightPerRoll }}</td>
             <td>{{ item.numberOfRoll }}</td>
             <td>{{ item.createdRoll }}</td>
+            <td>{{ (item?.numberOfRoll || 0) - (item?.createdRoll || 0) }}</td>
             <td>{{ item.remarks }}</td>
             <td>
-              <div class="product-select-group">
-                <app-searchable-select
-                  formControlName="quotationItemStatuses"
-                  [options]="statusOptions"
-                  labelKey="label"
-                  valueKey="value"
-                  [defaultOption]="{ label: 'All Status', value: '' }"
-                  [searchPlaceholder]="'Search status...'"
-                ></app-searchable-select>
-              </div>
+              <ng-container *ngIf="item.quotationItemStatus !== 'B'; else emptyBill">
+                <span style="margin-right:8px;">
+                  {{ getItemStatusLabel(item.quotationItemStatus) }}
+                </span>
+                <select
+                  [ngModel]="item.quotationItemStatus"
+                  (focus)="onItemStatusFocus(i)"
+                  (change)="onItemStatusChange(i, $any($event.target).value)"
+                >
+                  <option *ngFor="let opt of getAvailableItemStatusOptions(item.quotationItemStatus)" [value]="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </ng-container>
+              <ng-template #emptyBill>
+                
+              </ng-template>
             </td>
           </tr>
           <tr *ngIf="!quotationItems?.length && !isLoadingQuotationItems">
