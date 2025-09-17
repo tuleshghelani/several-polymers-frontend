@@ -119,7 +119,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       items: this.fb.array([]),
       address: [''],
       quotationDiscountPercentage: [100, [Validators.required, Validators.min(0), Validators.max(100)]],
-      transportMasterId: [null, Validators.required],
+      transportMasterId: [null],
       caseNumber: [''],
       packagingAndForwadingCharges: [0, [Validators.required, Validators.min(0)]]
     });
@@ -835,6 +835,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         
         this.setupItemCalculations(itemGroup, this.itemsFormArray.length);
         this.itemsFormArray.push(itemGroup);
+        // Ensure valueChanges subscription so edits to unitPrice, etc. recalc totals
+        this.subscribeToItemChanges(itemGroup, this.itemsFormArray.length - 1);
       });
     }
     
