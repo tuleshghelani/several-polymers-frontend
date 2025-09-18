@@ -77,7 +77,6 @@
         </div>
       </form>
     </div>
-      <button class="btn btn-sm btn-primary mb-2" (click)="addQuotation()">Add Quotation</button>
     <div class="quotations-list card">
       <h2>Quotations</h2>
   
@@ -90,7 +89,6 @@
               <th>Customer Name</th>
               <th>Quotation Date</th>
               <th>Valid Until</th>
-              <th>Total Quotation Amount</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -106,7 +104,6 @@
               </td>
               <td>{{ quotation.quoteDate |  date:'dd-MM-yyyy' }}</td>
               <td>{{ quotation.validUntil |  date:'dd-MM-yyyy' }}</td>
-              <td>{{ quotation.totalAmount | currency:'INR' }}</td>
               <td>
                 <div class="status-container">
                   <span class="status-badge" [ngClass]="getStatusClass(quotation.status)">

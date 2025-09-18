@@ -342,11 +342,6 @@ export class DispatchQuotationListComponent implements OnInit {
     this.router.navigate(['/quotation/create']);
   }
 
-  addQuotation(): void {
-    localStorage.removeItem('editQuotationId');
-    this.router.navigate(['/quotation/create']);
-  }
-
   // Role helpers for template
   canEditQuotation(): boolean {
     return this.authService.isAdmin() || this.authService.isSalesAndMarketing();

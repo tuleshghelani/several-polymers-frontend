@@ -977,6 +977,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
             this.snackbar.error(res?.message || 'Failed to create sale');
           }
           this.isLoading = false;
+          this.initForm();
           this.cdr.detectChanges();
         },
         error: (err) => {
