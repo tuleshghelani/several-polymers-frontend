@@ -28,6 +28,9 @@ import { UserListComponent } from './components/user/user-list/user-list.compone
 import { AddUserComponent } from './components/user/add-user/add-user.component';
 import { DispatchQuotationListComponent } from './components/all-quotation/dispatch-quotation-list/dispatch-quotation-list.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { AttendanceListComponent } from './components/attendance/attendance-list/attendance-list.component';
+import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
+import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -199,6 +202,25 @@ const routes: Routes = [
     component: EmployeeOrderFormComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'HR'] }
+  },
+  
+  {
+    path: 'attendance',
+    component: AttendanceListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+  },
+  {
+    path: 'attendance/create',
+    component: CreateAttendanceComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+  },
+  {
+    path: 'attendance/details',
+    component: AttendanceDetailComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
   },
   
   // Legacy routes (keeping for backward compatibility)
