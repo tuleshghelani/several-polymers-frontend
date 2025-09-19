@@ -352,43 +352,36 @@
     }
   
     &.status-quote {
-      background-color: var(--info-light);
       color: var(--info);
       border: 1px solid var(--info);
     }
   
     &.status-accepted {
-      background-color: var(--success-light);
       color: var(--success);
       border: 1px solid var(--success);
     }
   
     &.status-declined {
-      background-color: var(--danger-light);
       color: var(--danger);
       border: 1px solid var(--danger);
     }
   
     &.status-ready {
-      background-color: var(--warning-light);
       color: var(--warning);
       border: 1px solid var(--warning);
     }
   
     &.status-processing {
-      background-color: var(--primary-light);
       color: var(--primary);
       border: 1px solid var(--primary);
     }
   
     &.status-completed {
-      background-color: var(--success-light);
       color: var(--success);
       border: 1px solid var(--success);
     }
   
     &.status-default {
-      background-color: var(--gray-light);
       color: var(--gray);
       border: 1px solid var(--gray);
     }

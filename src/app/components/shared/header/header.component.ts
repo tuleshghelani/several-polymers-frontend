@@ -9,6 +9,7 @@ interface MenuPermissions {
   canViewTransaction?: boolean;
   canViewEmployee?: boolean;
   canViewEmployeeOrder?: boolean;
+  canViewEmployeeWithdraw?: boolean;
   canViewQuotation?: boolean;
   canViewDispatchQuotation?: boolean;
   canViewTransport?: boolean;
@@ -77,6 +78,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewTransaction: false,
       canViewEmployee: false,
       canViewEmployeeOrder: false,
+      canViewEmployeeWithdraw: false,
       canViewQuotation: false,
       canViewDispatchQuotation: false,
       canViewTransport: false,

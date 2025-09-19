@@ -1,0 +1,69 @@
+.withdraw-list-container {
+  .search-section.card, .withdraws-list.card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+  }
+
+  .search-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+  }
+
+  table.table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: #0d4a7b;
+    color: #fff;
+    z-index: 1;
+  }
+
+  .select-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-icon.refresh {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #f7f7f7;
+    cursor: pointer;
+  }
+
+  @media (max-width: 1024px) {
+    .search-controls { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .search-controls { grid-template-columns: 1fr; }
+
+    .withdraws-list .table-responsive {
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 8px;
+    }
+  }
+}
+
+

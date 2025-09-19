@@ -29,6 +29,8 @@ import { AddUserComponent } from './components/user/add-user/add-user.component'
 import { DispatchQuotationListComponent } from './components/all-quotation/dispatch-quotation-list/dispatch-quotation-list.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AttendanceListComponent } from './components/attendance/attendance-list/attendance-list.component';
+import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
+import { AddWithdrawComponent } from './components/employee-withdraw/add-withdraw/add-withdraw.component';
 import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
 
@@ -221,6 +223,26 @@ const routes: Routes = [
     component: AttendanceDetailComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+  },
+
+  // Employee Withdraw
+  {
+    path: 'employee-withdraw',
+    component: WithdrawListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
+  },
+  {
+    path: 'employee-withdraw/create',
+    component: AddWithdrawComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
+  },
+  {
+    path: 'employee-withdraw/edit/:id',
+    component: AddWithdrawComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'HR'] }
   },
   
   // Legacy routes (keeping for backward compatibility)

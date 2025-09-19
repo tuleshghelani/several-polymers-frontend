@@ -1,0 +1,100 @@
+<div class="withdraw-list-container">
+  <app-loader [show]="isLoading"></app-loader>
+
+  <div class="search-section card">
+    <h2>Search Withdraws</h2>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="search-controls">
+        <div class="form-group">
+          <label>Employee</label>
+          <div class="select-group">
+            <app-searchable-select
+              formControlName="employeeId"
+              [options]="employees"
+              labelKey="name"
+              valueKey="id"
+              [placeholder]="'Select Employee'"
+              [searchPlaceholder]="'Search employees...'"
+            ></app-searchable-select>
+            <button type="button" class="btn-icon refresh" (click)="refreshEmployees()" title="Refresh">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Search</label>
+          <input class="form-control" formControlName="search" placeholder="Search by name..." />
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-sm btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="resetForm()">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+          <a routerLink="/employee-withdraw/create" class="btn btn-sm btn-success">
+            <i class="fas fa-plus"></i> Add Withdraw
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="withdraws-list card">
+    <h2>Withdraws</h2>
+
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th style="width: 140px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let w of withdraws; let i = index; trackBy: trackByWithdraw">
+            <td>{{ startIndex + i + 1 }}</td>
+            <td>{{ w.employeeName }}</td>
+            <td>{{ w.withdrawDate }}</td>
+            <td>{{ w.payment | number: '1.2-2' }}</td>
+            <td class="actions">
+              <a [routerLink]="['/employee-withdraw/edit', w.id]" class="btn btn-xs btn-primary" title="Edit">
+                <i class="fas fa-edit"></i>
+              </a>
+              <button type="button" class="btn btn-xs btn-danger" (click)="confirmDelete(w.id)" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!isLoading && withdraws.length === 0">
+            <td colspan="5" class="text-center">No records found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      [totalElements]="totalElements"
+      (pageChange)="loadPage($event)"
+      (pageSizeChange)="changePageSize($event)"
+    ></app-pagination>
+  </div>
+
+  <app-confirm-modal
+    [show]="showDeleteModal"
+    [title]="'Confirm Delete'"
+    [message]="'Are you sure you want to delete this withdraw?'"
+    (confirm)="onDeleteConfirm()"
+    (cancel)="onDeleteCancel()"
+  ></app-confirm-modal>
+</div>
+
+

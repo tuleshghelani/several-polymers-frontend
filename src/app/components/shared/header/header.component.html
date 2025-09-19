@@ -107,6 +107,11 @@
             <i class="fas fa-clipboard-list"></i> Attendance
           </a>
         </li>
+        <li *ngIf="permissions.canViewEmployeeWithdraw">
+          <a routerLink="/employee-withdraw" routerLinkActive="active">
+            <i class="fas fa-clipboard-list"></i> Employee Withdraw
+          </a>
+        </li>
         <li *ngIf="permissions.canViewEmployeeOrder"> 
           <a routerLink="/employee-order" routerLinkActive="active"> 
             <i class="fas fa-clipboard-list"></i> Employee Order
