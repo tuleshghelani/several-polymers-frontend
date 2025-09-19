@@ -17,4 +17,26 @@ $supporting: #AEC6CF;
   --text-primary: #{$text-primary};
   --text-secondary: #{$text-secondary};
   --supporting: #{$supporting};
-} 
+}
+
+// Extended theme tokens and corrected root variables
+$surface: #ffffff;
+$success: #16a34a;
+$warning: #f59e0b;
+$danger: #dc2626;
+$border: #e5e7eb;
+
+:root {
+  --surface: #{$surface};
+  --success: #{$success};
+  --warning: #{$warning};
+  --danger: #{$danger};
+  --border: #{$border};
+
+  // Derived
+  --primary-light: #{mix($primary, #fff, 85%)};
+  --secondary-light: #{mix($secondary, #fff, 85%)};
+  --success-light: #{mix($success, #fff, 85%)};
+  --warning-light: #{mix($warning, #fff, 85%)};
+  --danger-light: #{mix($danger, #fff, 85%)};
+}

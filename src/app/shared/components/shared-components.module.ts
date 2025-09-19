@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { PaginationComponent } from './pagination/pagination.component';
 import { LoaderComponent } from './loader/loader.component';
 import { SearchableSelectComponent } from './searchable-select/searchable-select.component';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   imports: [
@@ -15,13 +16,15 @@ import { SearchableSelectComponent } from './searchable-select/searchable-select
     // Import standalone components
     PaginationComponent,
     LoaderComponent,
-    SearchableSelectComponent
+    SearchableSelectComponent,
+    FooterComponent
   ],
   exports: [
     // Export standalone components so they can be used in other modules
     PaginationComponent,
     LoaderComponent,
-    SearchableSelectComponent
+    SearchableSelectComponent,
+    FooterComponent
   ]
 })
 export class SharedComponentsModule { } 

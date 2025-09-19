@@ -8,6 +8,10 @@
       (input)="onSearch($event)"
       (focus)="onFocus()"
       (keydown)="handleKeydown($event)"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+      inputmode="search"
     >
     <button *ngIf="allowClear && hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
       <i class="fas fa-times"></i>
@@ -15,7 +19,7 @@
     <i class="fas caret" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
   </div>
   
-  <div class="select-dropdown" *ngIf="isOpen">
+  <div class="select-dropdown" *ngIf="isOpen" (pointerdown)="onDropdownPointerDown()">
     <button class="scroll-btn scroll-up" (click)="scrollOptions('up')">
       <i class="fas fa-chevron-up"></i>
     </button>
@@ -23,7 +27,8 @@
       <div 
         class="option" 
         *ngFor="let option of filteredOptions; let i = index"
-        (mousedown)="selectOption(option)"
+        (click)="selectOption(option)"
+        (touchstart)="selectOption(option)"
         [class.selected]="isSelected(option)"
         [class.highlighted]="i === highlightedIndex"
       >

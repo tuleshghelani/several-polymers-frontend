@@ -151,7 +151,7 @@
         }
         
         &.selected {
-          background-color: rgba(var(--primary-rgb), 0.1);
+          background-color: var(--primary-light);
           color: var(--primary);
 
           .checkbox {

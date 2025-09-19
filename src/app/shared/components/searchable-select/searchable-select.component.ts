@@ -76,13 +76,16 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     if (this.isOpen) {
       this.searchText = '';
       this.filterOptions();
+      this.lockBodyScroll();
     }
+    if (!this.isOpen) { this.unlockBodyScroll(); }
   }
 
   onFocus() {
     this.isOpen = true;
     this.filterOptions();
     this.highlightedIndex = -1;
+    this.lockBodyScroll();
   }
 
   onBlur(event: FocusEvent) {
@@ -100,6 +103,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
         const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
         this.searchText = selected ? selected[this.labelKey] : '';
       }
+      this.unlockBodyScroll();
     }, 100);
   }
 
@@ -113,6 +117,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
         const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
         this.searchText = selected ? selected[this.labelKey] : '';
       }
+      this.unlockBodyScroll();
     }
   }
 
@@ -148,6 +153,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
       this.isOpen = false;
     }
     this.onTouch();
+    if (!this.isOpen) { this.unlockBodyScroll(); }
   }
 
   isSelected(option: any): boolean {
@@ -277,5 +283,24 @@ export class SearchableSelectComponent implements ControlValueAccessor {
         }
       }
     }
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  onDropdownPointerDown() {
+    // Prevent input blur from closing dropdown prematurely on mobile
+  }
+
+  private lockBodyScroll(): void {
+    if (this.isMobile) {
+      document.body.classList.add('no-scroll');
+    }
+  }
+
+  private unlockBodyScroll(): void {
+    document.body.classList.remove('no-scroll');
   }
 } 
