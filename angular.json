@@ -42,8 +42,8 @@
             ],
             "scripts": [
             ]
-            // ,"baseHref": "https://admin.severalpolymers.in/",
-            // "deployUrl": "https://admin.severalpolymers.in/"
+            ,"baseHref": "https://admin.severalpolymers.in/",
+            "deployUrl": "https://admin.severalpolymers.in/"
           },
           "configurations": {
             "production": {
