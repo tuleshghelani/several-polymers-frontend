@@ -9,6 +9,7 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { EmployeeWithdrawService } from '../../../services/employee-withdraw.service';
 import { EmployeeService } from '../../../services/employee.service';
+import { AttendanceService } from '../../../services/attendance.service';
 import { EmployeeWithdrawSearchItem } from '../../../models/employee-withdraw.model';
 
 @Component({
@@ -51,6 +52,7 @@ export class WithdrawListComponent implements OnInit {
     private fb: FormBuilder,
     private withdrawService: EmployeeWithdrawService,
     private employeeService: EmployeeService,
+    private attendanceService: AttendanceService,
     private snackbar: SnackbarService,
     private router: Router
   ) {
@@ -253,6 +255,53 @@ export class WithdrawListComponent implements OnInit {
   }
 
   trackByWithdraw = (_: number, item: EmployeeWithdrawSearchItem) => item.id;
+
+  downloadPayrollSummary(): void {
+    // Check if dates are selected in the form
+    if (!this.searchForm.get('startDate')?.value) {
+      this.snackbar.error('Please select start date');
+      return;
+    }
+
+    if (!this.searchForm.get('endDate')?.value) {
+      this.snackbar.error('Please select end date');
+      return;
+    }
+
+    this.isLoading = true;
+    const params = {
+      startDate: this.formatDateForApi(this.searchForm.get('startDate')?.value),
+      endDate: this.formatDateForApi(this.searchForm.get('endDate')?.value)
+    };
+
+    this.attendanceService.generatePayrollSummaryPdf(params).subscribe({
+      next: (response) => {
+        const url = window.URL.createObjectURL(response.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to download payroll summary');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatDateForApi(dateStr: string): string {
+    const date = new Date(dateStr);
+    return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+  }
 }
 
 

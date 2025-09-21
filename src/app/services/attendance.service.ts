@@ -24,7 +24,7 @@ export class AttendanceService {
     return this.http.post<any>(`${this.apiUrl}/delete`, { attendanceIds });
   }
 
-  generatePdf(params: { employeeId: number, startDate: string }): Observable<{ blob: Blob; filename: string }> {
+  generatePdf(params: { employeeId: number, startDate: string, endDate: string }): Observable<{ blob: Blob; filename: string }> {
     return this.http.post(`${this.apiUrl}/pdf`, params, {
       responseType: 'blob',
       observe: 'response'
@@ -32,6 +32,20 @@ export class AttendanceService {
       map(response => {
         const contentDisposition = response.headers.get('Content-Disposition');
         const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || 'attendance.pdf';
+        const blob = new Blob([response.body!], { type: 'application/pdf' });
+        return { blob, filename };
+      })
+    );
+  }
+
+  generatePayrollSummaryPdf(params: { startDate: string, endDate: string }): Observable<{ blob: Blob; filename: string }> {
+    return this.http.post(`${this.apiUrl}/payroll-summary-pdf`, params, {
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || 'payroll_summary.pdf';
         const blob = new Blob([response.body!], { type: 'application/pdf' });
         return { blob, filename };
       })

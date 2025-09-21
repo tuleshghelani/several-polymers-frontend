@@ -63,7 +63,17 @@
         </div>
       </form>
     </div>
-      <button class="btn btn-sm btn-primary mb-2" (click)="addWithdraw()">Add Withdraw</button>
+      <div class="action-buttons mb-2">
+        <button class="btn btn-sm btn-primary" (click)="addWithdraw()">Add Withdraw</button>
+        <button 
+          class="btn btn-sm btn-success" 
+          (click)="downloadPayrollSummary()"
+          [disabled]="isLoading || !searchForm.get('startDate')?.value || !searchForm.get('endDate')?.value"
+        >
+          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-file-alt'"></i>
+          {{ isLoading ? 'Generating...' : 'Download Summary' }}
+        </button>
+      </div>
     <div class="withdraws-list card">
       <h2>Withdraws</h2>
   
