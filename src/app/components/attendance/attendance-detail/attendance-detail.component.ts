@@ -247,10 +247,16 @@ calculateTotalPayAndHours(){
       return;
     }
 
+    if (!this.endDate.value) {
+      this.snackbar.error('Please select end date');
+      return;
+    }
+
     this.isLoading = true;
     const params = {
       employeeId: this.employee.id,
-      startDate: this.formatDateForApi(this.startDate.value)
+      startDate: this.formatDateForApi(this.startDate.value),
+      endDate: this.formatDateForApi(this.endDate.value)
     };
 
     this.attendanceService.generatePdf(params).subscribe({
@@ -276,10 +282,16 @@ calculateTotalPayAndHours(){
       return;
     }
 
+    if (!this.endDate.value) {
+      this.snackbar.error('Please select end date');
+      return;
+    }
+
     this.isLoading = true;
     const params = {
       employeeId: this.employee.id,
-      startDate: this.formatDateForApi(this.startDate.value)
+      startDate: this.formatDateForApi(this.startDate.value),
+      endDate: this.formatDateForApi(this.endDate.value)
     };
 
     this.attendanceService.generatePdf(params).subscribe({

@@ -82,7 +82,7 @@
               <button 
                 class="btn btn-primary" 
                 (click)="downloadAttendance()"
-                [disabled]="isLoading || !startDate.value"
+                [disabled]="isLoading || !startDate.value || !endDate.value"
               >
                 <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-download'"></i>
                 {{ isLoading ? 'Downloading...' : 'Download' }}
@@ -91,7 +91,7 @@
               <button 
                 class="btn btn-secondary" 
                 (click)="printAttendance()"
-                [disabled]="isLoading || !startDate.value"
+                [disabled]="isLoading || !startDate.value || !endDate.value"
               >
                 <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-print'"></i>
                 {{ isLoading ? 'Processing...' : 'Print' }}
