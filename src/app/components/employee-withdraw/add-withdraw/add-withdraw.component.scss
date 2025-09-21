@@ -1,61 +1,195 @@
-.withdraw-form-container {
-  .form-card {
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+.add-withdraw-container {
+  padding: 2rem;
+  margin: 0 auto;
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
+}
+
+.form-control {
+  height: 20px;
+  padding: 0.375rem 0.5rem;
+}
+
+.back-btn {
+  margin-bottom: 1rem;
+}
+
+.form-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: var(--primary);
+  padding: 1.5rem;
+  
+  .form-title {
+    color: white;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.withdraw-form {
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+// Header Section Styles
+.header-section {
+  background-color: var(--background-light);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 
   .form-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 0.75rem 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  .full-width {
+    grid-column: 1 / -1;
   }
+}
 
-  .select-group {
+// Form Controls Styles
+.form-group {
+  margin-bottom: 1rem;
+
+  label {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+
+    i {
+      color: var(--primary);
+    }
+
+    .required {
+      color: var(--danger);
+      margin-left: 4px;
+    }
+  }
+}
+
+.select-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+
+  app-searchable-select {
+    flex: 1;
   }
 
   .btn-icon.refresh {
-    border: 1px solid #ddd;
+    background-color: var(--background);
+    color: white;
+    width: 42px;
+    height: 35px;
     border-radius: 6px;
-    padding: 8px 10px;
-    background: #f7f7f7;
-    cursor: pointer;
-  }
+    transition: all 0.2s ease;
 
-  .form-actions {
+    &:hover:not(:disabled) {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.input-group {
+  display: flex;
+  align-items: stretch;
+
+  .input-group-text {
+    background-color: var(--background);
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    height: 36px;
+    color: var(--text-secondary);
+    min-width: 40px;
     display: flex;
-    gap: 12px;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
   }
 
-  .required { color: #e53935; }
-  .invalid-feedback { color: #e53935; font-size: 12px; }
+  .form-control {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    flex: 1;
+  }
+}
 
-  @media (max-width: 1024px) {
-    .form-row { grid-template-columns: repeat(2, 1fr); }
+// Form Actions
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    
+    .btn {
+      width: 100%;
+    }
   }
-  @media (max-width: 640px) {
-    .form-row { grid-template-columns: 1fr; }
+}
+
+.invalid-feedback {
+  color: var(--danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Textarea specific styles
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 

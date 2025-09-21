@@ -56,8 +56,14 @@ export class AddWithdrawComponent implements OnInit {
     this.form = this.fb.group({
       employeeId: ['', [Validators.required]],
       payment: [null, [Validators.required, Validators.min(0.01)]],
-      withdrawDate: ['', [Validators.required]] // dd-MM-yyyy
+      withdrawDate: [this.getCurrentDate(), [Validators.required]],
+      remarks: ['']
     });
+  }
+
+  private getCurrentDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   }
 
   private loadEmployees(): void {
@@ -99,7 +105,8 @@ export class AddWithdrawComponent implements OnInit {
           this.form.patchValue({
             employeeId: d.employeeId,
             payment: d.payment,
-            withdrawDate: d.withdrawDate
+            withdrawDate: this.formatDateForInput(d.withdrawDate),
+            remarks: d.remarks || ''
           });
         }
         this.isLoading = false;
@@ -111,31 +118,94 @@ export class AddWithdrawComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) {
-      Object.values(this.form.controls).forEach(c => c.markAsTouched());
-      return;
+  private formatDateForInput(dateString: string): string {
+    if (!dateString) return this.getCurrentDate();
+    // Convert dd-MM-yyyy to yyyy-MM-dd for date input
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
-    this.isLoading = true;
-    const payload = { ...this.form.value };
+    return this.getCurrentDate();
+  }
 
-    const req$ = this.isEditMode
-      ? this.withdrawService.update({ ...payload, id: this.withdrawId as number })
-      : this.withdrawService.create(payload);
+  onSubmit(): void {
+    this.markFormGroupTouched(this.form);
+    
+    if (this.form.valid) {
+      this.isLoading = true;
+      const payload = this.prepareWithdrawData();
 
-    req$.subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.snackbar.success(res.message);
-          this.router.navigate(['/withdraw']);
+      const req$ = this.isEditMode
+        ? this.withdrawService.update({ ...payload, id: this.withdrawId as number })
+        : this.withdrawService.create(payload);
+
+      req$.subscribe({
+        next: (res) => {
+          console.log('✅ Withdraw submit response:', res);
+          if (res.success) {
+            this.snackbar.success(res.message);
+            this.isLoading = false;
+            this.initializeForm();
+            // this.router.navigate(['/employee-withdraw']);
+          }
+        },
+        error: (err) => {
+          console.error('❌ Withdraw submit error:', err);
+          console.error('Error details:', {
+            status: err.status,
+            statusText: err.statusText,
+            message: err.message,
+            url: err.url,
+            headers: err.headers
+          });
+          this.snackbar.error(`Failed to submit: ${err.status} - ${err.statusText}`);
+          this.isLoading = false;
         }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.snackbar.error(err?.message || 'Failed to submit');
-        this.isLoading = false;
+      });
+    } else {
+      // Scroll to first error
+      const firstError = document.querySelector('.is-invalid');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  private prepareWithdrawData() {
+    const formValue = this.form.value;
+    return {
+      ...formValue,
+      withdrawDate: this.formatDateForBackend(formValue.withdrawDate)
+    };
+  }
+
+  private formatDateForBackend(dateString: string): string {
+    if (!dateString) return '';
+    // Convert yyyy-MM-dd to dd-MM-yyyy for backend
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateString;
+  }
+
+  private markFormGroupTouched(formGroup: any) {
+    Object.values(formGroup.controls).forEach((control: any) => {
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else {
+        control.markAsTouched();
+        control.markAsDirty();
       }
     });
+  }
+
+  resetForm(): void {
+    this.initializeForm();
+  }
+
+  cancelEdit(): void {
+    this.router.navigate(['/employee-withdraw']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

@@ -11,6 +11,7 @@ export interface EmployeeWithdrawSearchItem {
   employeeId: number;
   withdrawDate: string;
   payment: number;
+  remarks?: string;
   createdAt?: string;
 }
 
@@ -41,6 +42,7 @@ export interface EmployeeWithdrawDetailResponse {
     employeeName: string;
     payment: number;
     withdrawDate: string;
+    remarks?: string;
   };
 }
 
@@ -48,6 +50,7 @@ export interface EmployeeWithdrawCreateRequest {
   employeeId: number;
   payment: number;
   withdrawDate: string; // dd-MM-yyyy as per API
+  remarks?: string;
 }
 
 export interface EmployeeWithdrawUpdateRequest extends EmployeeWithdrawCreateRequest {

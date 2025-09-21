@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
@@ -18,7 +18,6 @@ import { EmployeeWithdrawSearchItem } from '../../../models/employee-withdraw.mo
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    RouterLink,
     LoaderComponent,
     PaginationComponent,
     SearchableSelectComponent,
@@ -31,6 +30,7 @@ import { EmployeeWithdrawSearchItem } from '../../../models/employee-withdraw.mo
 export class WithdrawListComponent implements OnInit {
   searchForm!: FormGroup;
   isLoading = false;
+  isLoadingEmployees = false;
   employees: any[] = [];
   withdraws: EmployeeWithdrawSearchItem[] = [];
 
@@ -51,7 +51,8 @@ export class WithdrawListComponent implements OnInit {
     private fb: FormBuilder,
     private withdrawService: EmployeeWithdrawService,
     private employeeService: EmployeeService,
-    private snackbar: SnackbarService
+    private snackbar: SnackbarService,
+    private router: Router
   ) {
     this.initializeForm();
   }
@@ -64,7 +65,9 @@ export class WithdrawListComponent implements OnInit {
   private initializeForm(): void {
     this.searchForm = this.fb.group({
       employeeId: [''],
-      search: ['']
+      search: [''],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -76,49 +79,98 @@ export class WithdrawListComponent implements OnInit {
   }
 
   loadEmployees(): void {
+    this.isLoadingEmployees = true;
     this.employeeService.getAllEmployees().subscribe({
       next: (res) => {
         if (res.success) {
           this.employees = res.data || res.content || [];
         }
+        this.isLoadingEmployees = false;
       },
-      error: () => {}
+      error: () => {
+        this.isLoadingEmployees = false;
+      }
     });
   }
 
   refreshEmployees(): void {
+    this.isLoadingEmployees = true;
     this.employeeService.refreshEmployees().subscribe({
       next: (res) => {
         if (res.success) {
           this.employees = res.data || res.content || [];
         }
+        this.isLoadingEmployees = false;
       },
-      error: () => {}
+      error: () => {
+        this.isLoadingEmployees = false;
+      }
     });
   }
 
   loadWithdraws(): void {
-    this.isLoading = true;
+    // this.isLoading = true;
+    console.log('🔄 Starting loadWithdraws - isLoading set to true');
+    
     const params = {
       ...this.searchForm.value,
       currentPage: this.currentPage,
-      perPageRecord: this.pageSize
+      perPageRecord: this.pageSize,
+      startDate: this.searchForm.value.startDate ? this.formatDateForBackend(this.searchForm.value.startDate) : null,
+      endDate: this.searchForm.value.endDate ? this.formatDateForBackend(this.searchForm.value.endDate) : null
     };
+    
+    console.log('📊 Loading withdraws with params:', params);
+    
     this.withdrawService.search(params).subscribe({
       next: (res) => {
-        if (res.success) {
-          this.withdraws = res.data.content;
-          this.totalPages = res.data.totalPages;
-          this.totalElements = res.data.totalElements;
-          this.updatePaginationIndexes();
+        console.log('✅ Withdraw search response received:', res);
+        
+        // Always stop loading first
+        this.isLoading = false;
+        console.log('🔄 Response received - isLoading set to false');
+        
+        // Handle response data
+        if (res && res.success && res.data) {
+          this.withdraws = res.data.content || [];
+          this.totalPages = res.data.totalPages || 0;
+          this.totalElements = res.data.totalElements || 0;
+          console.log('✅ Data processed successfully:', {
+            withdrawsCount: this.withdraws.length,
+            totalPages: this.totalPages,
+            totalElements: this.totalElements
+          });
+        } else {
+          console.warn('⚠️ Unexpected response structure:', res);
+          this.withdraws = [];
+          this.totalPages = 0;
+          this.totalElements = 0;
         }
-        this.isLoading = false;
+        
+        this.updatePaginationIndexes();
       },
-      error: () => {
-        this.snackbar.error('Failed to fetch withdraws');
+      error: (error) => {
+        console.error('❌ Withdraw search error:', error);
         this.isLoading = false;
-      }
+        console.log('🔄 Error occurred - isLoading set to false');
+        
+        this.snackbar.error(`Failed to fetch withdraws: ${error.status} - ${error.statusText}`);
+        this.withdraws = [];
+        this.totalPages = 0;
+        this.totalElements = 0;
+        this.updatePaginationIndexes();
+      }      
     });
+  }
+
+  private formatDateForBackend(dateString: string): string {
+    if (!dateString) return '';
+    // Convert yyyy-MM-dd to dd-MM-yyyy for backend
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateString;
   }
 
   onSearch(): void {
@@ -128,22 +180,49 @@ export class WithdrawListComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.searchForm.reset({ employeeId: '', search: '' });
+    this.searchForm.reset({ employeeId: '', search: '', startDate: null, endDate: null });
     this.onSearch();
   }
 
-  loadPage(page: number): void {
+  onPageChange(page: number): void {
     this.currentPage = page;
     this.loadWithdraws();
   }
 
-  changePageSize(size: number): void {
-    this.pageSize = size;
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadWithdraws();
   }
 
-  confirmDelete(id: number): void {
+  addWithdraw(): void {
+    this.router.navigate(['/employee-withdraw/create']);
+  }
+
+  // Debug method to check loader state
+  checkLoaderState(): void {
+    console.log('🔍 Current loader state:', {
+      isLoading: this.isLoading,
+      withdrawsCount: this.withdraws.length,
+      totalPages: this.totalPages,
+      totalElements: this.totalElements
+    });
+    this.snackbar.info(`Loader: ${this.isLoading ? 'Loading' : 'Stopped'} | Records: ${this.withdraws.length}`);
+  }
+
+  // Emergency method to force stop loader
+  forceStopLoader(): void {
+    console.log('🛑 Force stopping loader');
+    this.isLoading = false;
+    this.snackbar.success('Loader force stopped');
+  }
+
+
+  editWithdraw(id: number): void {
+    this.router.navigate(['/employee-withdraw/edit', id]);
+  }
+
+  deleteWithdraw(id: number): void {
     this.selectedIdToDelete = id;
     this.showDeleteModal = true;
   }

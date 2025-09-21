@@ -1,79 +1,144 @@
-<div class="withdraw-form-container">
-  <app-loader [show]="isLoading"></app-loader>
+<div class="add-withdraw-container">
+  <button class="btn btn-sm btn-secondary back-btn" routerLink="/employee-withdraw">
+    <i class="fas fa-arrow-left"></i> Back to Withdraws
+  </button>
 
   <div class="form-card">
     <div class="card-header">
       <h2 class="form-title">
         <i class="fas fa-money-bill-wave"></i>
-        {{ isEditMode ? 'Edit Withdraw' : 'Add Withdraw' }}
+        {{ isEditMode ? 'Edit Withdraw' : 'Add New Withdraw' }}
       </h2>
-      <a routerLink="/employee-withdraw" class="btn btn-sm btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back to list
-      </a>
     </div>
-
+    
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="withdraw-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="employeeId">
-            <i class="fas fa-user"></i> Employee <span class="required">*</span>
-          </label>
-          <div class="select-group">
-            <app-searchable-select
-              formControlName="employeeId"
-              [options]="employees"
-              labelKey="name"
-              valueKey="id"
-              [placeholder]="'Select Employee'"
-              [searchPlaceholder]="'Search employees...'"
-            ></app-searchable-select>
-            <button 
-              type="button" 
-              class="btn-icon refresh" 
-              (click)="refreshEmployees()" 
-              [disabled]="isLoadingEmployees"
-              title="Refresh Employees"
+      <!-- Header Section -->
+      <div class="header-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="employeeId">
+              <i class="fas fa-user"></i> Select Employee <span class="required">*</span>
+            </label>
+            <div class="select-group">
+              <app-searchable-select
+                formControlName="employeeId"
+                [options]="employees"
+                labelKey="name"
+                valueKey="id"
+                [placeholder]="'Select Employee'"
+                [searchPlaceholder]="'Search employees...'"
+                [class.is-invalid]="isFieldInvalid('employeeId')"
+              ></app-searchable-select>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-primary refresh mt-2" 
+                (click)="refreshEmployees()" 
+                [disabled]="isLoadingEmployees"
+                title="Refresh Employees"
+              >
+                <i class="fas" [ngClass]="isLoadingEmployees ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+              </button>
+            </div>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('employeeId')">
+              Employee is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="withdrawDate">
+              <i class="fas fa-calendar"></i> Withdraw Date <span class="required">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="withdrawDate" 
+              formControlName="withdrawDate" 
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('withdrawDate')"
             >
-              <i class="fas" [ngClass]="isLoadingEmployees ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
-            </button>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('withdrawDate')">
+              Withdraw date is required
+            </div>
           </div>
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('employeeId')">
-            {{ getFieldError('employeeId') }}
+
+          <div class="form-group">
+            <label for="payment">
+              <i class="fas fa-rupee-sign"></i> Amount <span class="required">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">₹</span>
+              <input 
+                type="number" 
+                id="payment"
+                formControlName="payment" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('payment')"
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                inputmode="decimal"
+              >
+            </div>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('payment')">
+              Amount must be greater than 0
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>
-            <i class="fas fa-calendar"></i> Withdraw Date <span class="required">*</span>
-          </label>
-          <input type="text" class="form-control" formControlName="withdrawDate" placeholder="dd-MM-yyyy" />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('withdrawDate')">
-            {{ getFieldError('withdrawDate') }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>
-            <i class="fas fa-rupee-sign"></i> Amount <span class="required">*</span>
-          </label>
-          <input type="number" step="0.01" min="0" class="form-control" formControlName="payment" placeholder="0.00" />
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('payment')">
-            {{ getFieldError('payment') }}
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="remarks">
+              <i class="fas fa-comment"></i> Remarks
+            </label>
+            <textarea 
+              id="remarks"
+              formControlName="remarks" 
+              class="form-control"
+              placeholder="Enter any additional remarks or notes..."
+              rows="3"
+            ></textarea>
           </div>
         </div>
       </div>
 
+      <!-- Form Actions -->
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : (isEditMode ? 'fa-save' : 'fa-plus')"></i>
-          {{ isEditMode ? 'Update' : 'Create' }}
+        <button *ngIf="!isEditMode"
+          type="button" 
+          class="btn btn-sm btn-secondary"
+          (click)="resetForm()"
+          [disabled]="isLoading"
+        >
+          <i class="fas fa-undo"></i> Reset
         </button>
-        <a routerLink="/employee-withdraw" class="btn btn-secondary">
+        <button *ngIf="!isEditMode"
+          type="submit" 
+          class="btn btn-sm btn-primary"
+          [disabled]="form.invalid || isLoading"
+        >
+          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+          {{ isLoading ? 'Saving...' : 'Save Withdraw' }}
+        </button>
+        <button *ngIf="isEditMode"
+          type="button"
+          class="btn btn-sm btn-secondary"
+          (click)="cancelEdit()"
+          [disabled]="isLoading"
+        >
           <i class="fas fa-times"></i> Cancel
-        </a>
+        </button>
+        <button *ngIf="isEditMode"
+          type="submit"
+          class="btn btn-sm btn-primary"
+          [disabled]="form.invalid || isLoading"
+        >
+          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+          {{ isLoading ? 'Updating...' : 'Update Withdraw' }}
+        </button>
       </div>
     </form>
   </div>
 </div>
+
+<app-loader *ngIf="isLoading"></app-loader>
 
 

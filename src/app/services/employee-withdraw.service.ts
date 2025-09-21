@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   EmployeeWithdrawSearchRequest,
@@ -21,10 +22,18 @@ export class EmployeeWithdrawService {
   constructor(private http: HttpClient) {}
 
   search(params: EmployeeWithdrawSearchRequest): Observable<EmployeeWithdrawSearchResponse> {
+    console.log('🔍 Employee Withdraw Search Request:', {
+      url: `${this.apiUrl}/search`,
+      params: params
+    });
     return this.http.post<EmployeeWithdrawSearchResponse>(`${this.apiUrl}/search`, params);
   }
 
   create(body: EmployeeWithdrawCreateRequest): Observable<ApiBaseResponse> {
+    console.log('➕ Employee Withdraw Create Request:', {
+      url: `${this.apiUrl}/create`,
+      body: body
+    });
     return this.http.post<ApiBaseResponse>(`${this.apiUrl}/create`, body);
   }
 
