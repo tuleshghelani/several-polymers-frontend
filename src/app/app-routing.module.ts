@@ -29,8 +29,8 @@ import { AddUserComponent } from './components/user/add-user/add-user.component'
 import { DispatchQuotationListComponent } from './components/all-quotation/dispatch-quotation-list/dispatch-quotation-list.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AttendanceListComponent } from './components/attendance/attendance-list/attendance-list.component';
-import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
 import { AddWithdrawComponent } from './components/employee-withdraw/add-withdraw/add-withdraw.component';
+import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
 import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
 

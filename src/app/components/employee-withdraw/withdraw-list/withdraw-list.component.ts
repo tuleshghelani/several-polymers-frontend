@@ -109,7 +109,7 @@ export class WithdrawListComponent implements OnInit {
   }
 
   loadWithdraws(): void {
-    // this.isLoading = true;
+    this.isLoading = true;
     console.log('🔄 Starting loadWithdraws - isLoading set to true');
     
     const params = {

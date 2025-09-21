@@ -1,6 +1,8 @@
 export interface EmployeeWithdrawSearchRequest {
   employeeId?: number | '';
   search?: string;
+  startDate?: string;
+  endDate?: string;
   currentPage: number;
   perPageRecord: number;
 }

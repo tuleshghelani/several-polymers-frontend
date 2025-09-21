@@ -1,238 +1,124 @@
 <div class="withdraw-list-container">
-  <app-loader [show]="isLoading"></app-loader>
-  
-  <!-- Premium Search Section -->
-  <div class="search-section">
-    <div class="search-header">
-      <div class="search-title">
-        <i class="fas fa-search search-icon"></i>
-        <h2>Search Withdraws</h2>
-      </div>
-      <div class="search-subtitle">
-        <p>Filter and find withdraw records with advanced search options</p>
-      </div>
-    </div>
+    <app-loader [show]="isLoading"></app-loader>
     
-    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
-      <div class="search-controls">
-        <!-- Search Input -->
-        <div class="form-group search-input-group">
-          <label class="form-label">
-            <i class="fas fa-user form-icon"></i>
-            Employee Name
-          </label>
-          <div class="input-wrapper">
+    <div class="search-section card">
+      <h2>Search Withdraws</h2>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="search-controls">
+          <div class="form-group">
             <input 
               type="text" 
               formControlName="search" 
-              class="form-control search-input" 
+              class="form-control" 
               placeholder="Search by employee name..."
             >
-            <i class="fas fa-search input-icon"></i>
           </div>
-        </div>
-
-        <!-- Employee Select -->
-        <div class="form-group employee-select-group">
-          <label class="form-label">
-            <i class="fas fa-users form-icon"></i>
-            Select Employee
-          </label>
-          <div class="select-wrapper">
-            <app-searchable-select
-              formControlName="employeeId"
-              [options]="employees"
-              labelKey="name"
-              valueKey="id"
-              [defaultOption]="{ label: 'All Employees', value: '' }"
-              [searchPlaceholder]="'Search employees...'"
-            ></app-searchable-select>
-            <button 
-              type="button" 
-              class="refresh-btn" 
-              (click)="refreshEmployees()" 
-              [disabled]="isLoadingEmployees"
-              title="Refresh Employees"
+          <div class="form-group">
+            <div class="product-select-group">
+              <app-searchable-select
+                formControlName="employeeId"
+                [options]="employees"
+                labelKey="name"
+                valueKey="id"
+                [defaultOption]="{ label: 'All Employees', value: '' }"
+                [searchPlaceholder]="'Search employees...'"
+              ></app-searchable-select>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-primary refresh"
+                style="margin-top: 3px;"
+                (click)="refreshEmployees()" 
+                [disabled]="isLoadingEmployees"
+                title="Refresh Employees"
+              >
+                <i class="fas" [ngClass]="isLoadingEmployees ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <input 
+              type="date" 
+              formControlName="startDate" 
+              class="form-control" 
+              placeholder="Start Date"
             >
-              <i class="fas" [ngClass]="isLoadingEmployees ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
-            </button>
           </div>
-        </div>
-
-        <!-- Date Range -->
-        <div class="form-group date-range-group">
-          <label class="form-label">
-            <i class="fas fa-calendar-alt form-icon"></i>
-            Date Range
-          </label>
-          <div class="date-inputs">
-            <div class="date-input-wrapper">
-              <input 
-                type="date" 
-                formControlName="startDate" 
-                class="form-control date-input" 
-                placeholder="Start Date"
-              >
-              <i class="fas fa-calendar input-icon"></i>
-            </div>
-            <div class="date-input-wrapper">
-              <input 
-                type="date" 
-                formControlName="endDate" 
-                class="form-control date-input" 
-                placeholder="End Date"
-              >
-              <i class="fas fa-calendar input-icon"></i>
-            </div>
+          <div class="form-group">
+            <input 
+              type="date" 
+              formControlName="endDate" 
+              class="form-control" 
+              placeholder="End Date"
+            >
           </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="form-group action-buttons-group">
           <div class="button-group">
-            <button type="submit" class="btn btn-primary search-btn">
-              <i class="fas fa-search"></i>
-              <span>Search</span>
+            <button type="submit" class="search-btn btn btn-sm btn-primary">
+              <i class="fas fa-search"></i> Search
             </button>
-            <button type="button" class="btn btn-secondary reset-btn" (click)="resetForm()">
-              <i class="fas fa-undo"></i>
-              <span>Reset</span>
+            <button type="button" class="search-btn btn btn-sm btn-secondary" (click)="resetForm()">
+              <i class="fas fa-undo"></i> Reset
             </button>
           </div>
         </div>
-      </div>
-    </form>
-  </div>
-  
-  <!-- Add Withdraw Button -->
-  <div class="action-section">
-    <button (click)="addWithdraw()" class="btn btn-primary add-withdraw-btn">
-      <i class="fas fa-plus"></i>
-      <span>Add Withdraw</span>
-    </button>
-  </div>
-  
-  <!-- Premium Results Section -->
-  <div class="results-section">
-    <div class="results-header">
-      <div class="results-title">
-        <i class="fas fa-list-alt results-icon"></i>
-        <h2>Withdraw Records</h2>
-        <div class="results-count" *ngIf="totalElements > 0">
-          <span class="count-badge">{{ totalElements }} records found</span>
-        </div>
-      </div>
+      </form>
     </div>
-
-    <div class="table-container">
+      <button class="btn btn-sm btn-primary mb-2" (click)="addWithdraw()">Add Withdraw</button>
+    <div class="withdraws-list card">
+      <h2>Withdraws</h2>
+  
       <div class="table-responsive">
-        <table class="premium-table">
+        <table class="table">
           <thead>
             <tr>
-              <th class="col-serial">
-                <i class="fas fa-hashtag"></i>
-                No
-              </th>
-              <th class="col-employee">
-                <i class="fas fa-user"></i>
-                Employee Name
-              </th>
-              <th class="col-date">
-                <i class="fas fa-calendar"></i>
-                Withdraw Date
-              </th>
-              <th class="col-amount">
-                <i class="fas fa-rupee-sign"></i>
-                Amount
-              </th>
-              <th class="col-remarks">
-                <i class="fas fa-comment"></i>
-                Remarks
-              </th>
-              <th class="col-actions">
-                <i class="fas fa-cogs"></i>
-                Actions
-              </th>
+              <th>No</th>
+              <th>Employee Name</th>
+              <th>Withdraw Date</th>
+              <th>Amount</th>
+              <th>Remarks</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let w of withdraws; let index = index" class="table-row">
-              <td class="col-serial">
-                <span class="serial-number">{{ startIndex + index + 1 }}</span>
-              </td>
-              <td class="col-employee">
-                <div class="employee-info">
-                  <div class="employee-avatar">
-                    <i class="fas fa-user"></i>
-                  </div>
-                  <span class="employee-name">{{ w.employeeName }}</span>
-                </div>
-              </td>
-              <td class="col-date">
-                <div class="date-info">
-                  <i class="fas fa-calendar-alt"></i>
-                  <span>{{ w.withdrawDate | date:'dd-MM-yyyy' }}</span>
-                </div>
-              </td>
-              <td class="col-amount">
-                <div class="amount-info">
-                  <span class="currency">₹</span>
-                  <span class="amount">{{ w.payment | number:'1.2-2' }}</span>
-                </div>
-              </td>
-              <td class="col-remarks">
-                <div class="remarks-info">
-                  <span class="remarks-text">{{ w.remarks || '-' }}</span>
-                </div>
-              </td>
-              <td class="col-actions">
-                <div class="action-buttons">
-                  <button 
-                    class="action-btn edit-btn" 
-                    (click)="editWithdraw(w.id!)"
-                    title="Edit Withdraw"
-                  >
-                    <i class="fas fa-edit"></i>
-                    <span class="btn-text">Edit</span>
-                  </button>
-                  <button 
-                    class="action-btn delete-btn" 
-                    (click)="deleteWithdraw(w.id!)"
-                    title="Delete Withdraw"
-                  >
-                    <i class="fas fa-trash"></i>
-                    <span class="btn-text">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="!isLoading && withdraws.length === 0" class="no-data-row">
-              <td colspan="6" class="no-data">
-                <div class="no-data-content">
-                  <i class="fas fa-inbox"></i>
-                  <h3>No Records Found</h3>
-                  <p>No withdraw records match your search criteria</p>
-                </div>
+            <tr *ngFor="let w of withdraws; let index = index">
+              <td>{{ startIndex + index + 1 }}</td>
+              <td>{{ w.employeeName }}</td>
+              <td>{{ w.withdrawDate | date:'dd-MM-yyyy' }}</td>
+              <td>{{ w.payment | currency:'INR' }}</td>
+              <td>{{ w.remarks || '-' }}</td>
+              <td class="actions">                
+                <button 
+                  class="btn-icon edit" 
+                  (click)="editWithdraw(w.id!)"
+                  title="Edit Withdraw"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button 
+                  class="btn-icon delete" 
+                  (click)="deleteWithdraw(w.id!)"
+                  title="Delete Withdraw"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       
-      <!-- Premium Pagination -->
-      <div class="pagination-section" *ngIf="totalPages > 0">
-        <app-pagination
-          [currentPage]="currentPage"
-          [pageSize]="pageSize"
-          [totalElements]="totalElements"
-          [pageSizeOptions]="pageSizeOptions"
-          (pageChange)="onPageChange($event)"
-          (pageSizeChange)="onPageSizeChange($event)"
-        ></app-pagination>
-      </div>
+      <app-pagination
+        *ngIf="totalPages > 0"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalElements]="totalElements"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
+      
     </div>
   </div>
-</div>
 
 <app-confirm-modal
   [show]="showDeleteModal"

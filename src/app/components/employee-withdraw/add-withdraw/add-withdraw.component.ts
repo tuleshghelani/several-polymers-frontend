@@ -145,8 +145,7 @@ export class AddWithdrawComponent implements OnInit {
           if (res.success) {
             this.snackbar.success(res.message);
             this.isLoading = false;
-            this.initializeForm();
-            // this.router.navigate(['/employee-withdraw']);
+            this.router.navigate(['/employee-withdraw']);
           }
         },
         error: (err) => {
