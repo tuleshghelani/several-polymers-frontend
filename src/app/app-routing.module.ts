@@ -210,19 +210,19 @@ const routes: Routes = [
     path: 'attendance',
     component: AttendanceListComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
   },
   {
     path: 'attendance/create',
     component: CreateAttendanceComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
   },
   {
     path: 'attendance/details',
     component: AttendanceDetailComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
   },
 
   // Employee Withdraw

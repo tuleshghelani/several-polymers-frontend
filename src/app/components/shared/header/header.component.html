@@ -102,16 +102,27 @@
           </ul>
         </li>
 
-        <li *ngIf="permissions.canViewEmployeeOrder">
-          <a routerLink="/attendance" routerLinkActive="active">
-            <i class="fas fa-clipboard-list"></i> Attendance
+        <!-- Employee Menu -->
+        <li class="dropdown" *ngIf="hasEmployeeMenuItems()">
+          <a (click)="toggleEmployeeMenu($event)" [class.active]="isEmployeeActive()">
+            <i class="fas fa-users"></i> Employee
+            <i class="fas fa-chevron-down"></i>
           </a>
+          <ul class="dropdown-menu" [class.show]="showEmployeeMenu">
+            <li *ngIf="permissions.canViewEmployeeOrder">
+              <a routerLink="/attendance" routerLinkActive="active">
+                <i class="fas fa-clipboard-list"></i> Attendance
+              </a>
+            </li>
+            <li *ngIf="permissions.canViewEmployeeWithdraw">
+              <a routerLink="/employee-withdraw" routerLinkActive="active">
+                <i class="fas fa-clipboard-list"></i> Employee Withdraw
+              </a>
+            </li>
+          </ul>
         </li>
-        <li *ngIf="permissions.canViewEmployeeWithdraw">
-          <a routerLink="/employee-withdraw" routerLinkActive="active">
-            <i class="fas fa-clipboard-list"></i> Employee Withdraw
-          </a>
-        </li>
+        
+        <!-- Employee Order (standalone) -->
         <li *ngIf="permissions.canViewEmployeeOrder"> 
           <a routerLink="/employee-order" routerLinkActive="active"> 
             <i class="fas fa-clipboard-list"></i> Employee Order

@@ -33,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showMasterMenu: boolean = false;
   showTransactionMenu: boolean = false;
   showDispatchQuotationMenu: boolean = false;
+  showEmployeeMenu: boolean = false;
   isMobileMenuOpen: boolean = false;
   permissions: MenuPermissions;
   userInfo: any;
@@ -99,6 +100,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!target.closest('.dropdown') && !target.closest('.mobile-menu-toggle')) {
       this.showMasterMenu = false;
       this.showTransactionMenu = false;
+      this.showDispatchQuotationMenu = false;
+      this.showEmployeeMenu = false;
       if (!target.closest('.nav-links')) {
         this.isMobileMenuOpen = false;
       }
@@ -114,6 +117,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showMasterMenu = !this.showMasterMenu;
     this.showTransactionMenu = false;
+    this.showDispatchQuotationMenu = false;
+    this.showEmployeeMenu = false;
   }
 
   toggleTransactionMenu(event: Event): void {
@@ -121,6 +126,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showTransactionMenu = !this.showTransactionMenu;
     this.showMasterMenu = false;
+    this.showDispatchQuotationMenu = false;
+    this.showEmployeeMenu = false;
   }
 
   isMasterActive(): boolean {
@@ -182,5 +189,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showDispatchQuotationMenu = !this.showDispatchQuotationMenu;
     this.showTransactionMenu = false;
+    this.showMasterMenu = false;
+    this.showEmployeeMenu = false;
+  }
+
+  toggleEmployeeMenu(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showEmployeeMenu = !this.showEmployeeMenu;
+    this.showMasterMenu = false;
+    this.showTransactionMenu = false;
+    this.showDispatchQuotationMenu = false;
+  }
+
+  isEmployeeActive(): boolean {
+    const currentUrl = this.router.url;
+    return ['/attendance', '/employee-withdraw', '/employee-order'].some(path => 
+      currentUrl.includes(path)
+    );
+  }
+
+  hasEmployeeMenuItems(): boolean {
+    return this.permissions.canViewEmployeeOrder || 
+           this.permissions.canViewEmployeeWithdraw || false;
   }
 }
