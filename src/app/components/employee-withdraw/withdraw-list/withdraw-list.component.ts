@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -54,7 +54,8 @@ export class WithdrawListComponent implements OnInit {
     private employeeService: EmployeeService,
     private attendanceService: AttendanceService,
     private snackbar: SnackbarService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.initializeForm();
   }
@@ -150,6 +151,8 @@ export class WithdrawListComponent implements OnInit {
         }
         
         this.updatePaginationIndexes();
+        // Trigger change detection AFTER data and pagination updates
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('❌ Withdraw search error:', error);
@@ -161,6 +164,8 @@ export class WithdrawListComponent implements OnInit {
         this.totalPages = 0;
         this.totalElements = 0;
         this.updatePaginationIndexes();
+        // Trigger change detection AFTER data and pagination updates
+        this.cdr.detectChanges();
       }      
     });
   }
@@ -241,10 +246,12 @@ export class WithdrawListComponent implements OnInit {
           this.loadWithdraws();
         }
         this.isLoading = false;
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: () => {
         this.snackbar.error('Failed to delete withdraw');
         this.isLoading = false;
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
     });
   }
@@ -283,10 +290,12 @@ export class WithdrawListComponent implements OnInit {
         link.click();
         window.URL.revokeObjectURL(url);
         this.isLoading = false;
+        this.cdr.detectChanges(); // Manually trigger change detection
       },
       error: (error) => {
         this.snackbar.error('Failed to download payroll summary');
         this.isLoading = false;
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
     });
   }
