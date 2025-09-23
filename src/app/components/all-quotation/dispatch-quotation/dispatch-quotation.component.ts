@@ -154,6 +154,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       weightPerRoll: [0, [Validators.required, Validators.min(0)]],
       isQuantityManual: [false],
       remarks: [''],
+      isDispatch: [false],
       // Dispatch-only additional fields
       isProduction: [false],
       id: [null],
@@ -620,6 +621,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           remarks: [item.remarks || ''],
           // dispatch extras
           isProduction: [item.isProduction ?? false],
+          isDispatch: [item.isDispatch ?? false],
           quotationItemStatus: [item.quotationItemStatus ?? 'O', Validators.required],
           createdRoll: [item.createdRoll ?? 0, [Validators.required, Validators.min(0)]],
           // price fields for backend
@@ -683,6 +685,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         remarks: control.get('remarks')?.value,
         // dispatch extras
         isProduction: control.get('isProduction')?.value,
+        isDispatch: control.get('isDispatch')?.value,
         quotationItemStatus: control.get('quotationItemStatus')?.value,
         createdRoll: control.get('createdRoll')?.value,
         // backend fields
@@ -871,6 +874,27 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           this.snackbar.error('Failed to update production status');
           // Revert toggle on error
           group.patchValue({ isProduction: !isProduction }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  onDispatchToggle(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const quotationItemId = group.get('id')?.value;
+    if (!quotationItemId) {
+      return;
+    }
+    const isDispatch = !!group.get('isDispatch')?.value;
+    this.quotationService.updateQuotationItemDispatch(quotationItemId, isDispatch)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.snackbar.success('Dispatch status updated');
+        },
+        error: () => {
+          this.snackbar.error('Failed to update dispatch status');
+          group.patchValue({ isDispatch: !isDispatch }, { emitEvent: false });
           this.cdr.detectChanges();
         }
       });

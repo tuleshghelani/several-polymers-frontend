@@ -195,6 +195,9 @@
                   <input type="checkbox" formControlName="isProduction" (click)="onProductionClick(i, $event)" (change)="onProductionToggle(i)" title="Allowed only when status is Open">
                 </td>
                 <td>
+                  <input type="checkbox" formControlName="isDispatch" (change)="onDispatchToggle(i)">
+                </td>
+                <td>
                   <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true || itemsFormArray.at(i).get('quotationItemStatus')?.value === 'B'">
                     <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)">
                       <option value="O">Open</option>
