@@ -9,4 +9,13 @@
   white-space: nowrap;
 }
 
+.form-field-container {
+  position: relative;
+  margin-bottom: 1rem;
+  min-width: 100px !important;
+}
+// Reduce searchable-select width only on Dispatch page
+.select-group app-searchable-select {
+  width: 120px !important;
+}
 

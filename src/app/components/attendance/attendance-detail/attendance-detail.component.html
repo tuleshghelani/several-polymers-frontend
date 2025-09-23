@@ -26,7 +26,11 @@
       <div class="detail-row">
         <div class="detail-item">
           <label>Mobile:</label>
-          <span>{{employee.mobileNumber || 'N/A'}}</span>
+          <span>{{employee.mobileNumber || 'N/A'}}            
+            <button class="btn-icon whatsapp" title="Open WhatsApp" (click)="openWhatsApp(employee.mobileNumber)">
+              <i class="fab fa-whatsapp"></i>
+            </button>
+          </span>
         </div>
         <div class="detail-item">
           <label>Department:</label>

@@ -6,6 +6,7 @@ import { Subject, takeUntil, debounceTime, filter, distinctUntilChanged, Subscri
 import { formatDate } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { EncryptionService } from '../../../shared/services/encryption.service';
+import { AuthService, UserRole } from '../../../services/auth.service';
 import { SaleService } from '../../../services/sale.service';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
@@ -51,6 +52,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private lastQuantityByIndex: { [index: number]: number } = {};
   private selectedQuotationItemIds = new Set<number>();
   private selectedDispatchItemIds = new Set<number>();
+  canSeeSaleOption = false;
 
   get itemsFormArray() {
     return this.quotationForm.get('items') as FormArray;
@@ -68,11 +70,13 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: Dialog,
     private cdr: ChangeDetectorRef,
-    private saleService: SaleService
+    private saleService: SaleService,
+    private authService: AuthService
   ) {
     const today = new Date();
     this.minValidUntilDate = formatDate(today, 'yyyy-MM-dd', 'en');
     this.initForm();
+    this.canSeeSaleOption = this.authService.hasAnyRole([UserRole.ADMIN, UserRole.SALES_AND_MARKETING]);
   }
 
   ngOnInit() {

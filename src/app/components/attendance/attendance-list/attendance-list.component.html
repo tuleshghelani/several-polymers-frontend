@@ -51,7 +51,11 @@
               <tbody>
                 <tr *ngFor="let employee of employees">
                   <td>{{employee.name}}</td>
-                  <td>{{employee.mobileNumber}}</td>
+                  <td>{{employee.mobileNumber}}
+                    <button class="btn-icon whatsapp" title="Open WhatsApp" (click)="openWhatsApp(employee.mobileNumber)">
+                      <i class="fab fa-whatsapp"></i>
+                    </button>
+                  </td>
                   <td>{{employee.email}}</td>
                   <td>{{employee.designation}}</td>
                   <td>{{employee.department}}</td>
