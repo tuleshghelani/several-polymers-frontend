@@ -3,7 +3,7 @@
     <input 
       type="text" 
       class="search-input" 
-      [placeholder]="placeholder"
+      [placeholder]="getSelectedLabel()"
       [(ngModel)]="searchText"
       (input)="onSearch($event)"
       (focus)="onFocus()"
