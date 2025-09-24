@@ -302,6 +302,33 @@ export class WithdrawListComponent implements OnInit {
     const date = new Date(dateStr);
     return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
   }
+  
+  openWhatsApp(rawNumber: string | number | null | undefined, payment: number, withdrawDate: string): void {
+    const digits = String(rawNumber ?? '').replace(/\D/g, '');
+    if (!digits) {
+      return;
+    }
+    const normalized = digits.length === 10 ? `91${digits}` : digits;
+    const formattedDate = this.formatDateForApi(withdrawDate);
+    const text = encodeURIComponent(`Hello, your withdrawal amount is ${payment} INR on ${formattedDate}`);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // Prefer native app on mobile
+      const nativeUrl = `whatsapp://send?phone=${normalized}&text=${text}`;
+      try {
+        window.location.href = nativeUrl;
+      } catch {
+        // Fallback to web URL if native fails
+        const webUrl = `https://wa.me/${normalized}?text=${text}`;
+        window.open(webUrl);
+      }
+    } else {
+      // Desktop: open web WhatsApp
+      const webUrl = `https://wa.me/${normalized}?text=${text}`;
+      window.open(webUrl);
+    }
+  }
 }
 
 

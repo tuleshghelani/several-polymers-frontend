@@ -253,6 +253,13 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onQuantityChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      // Revert UI change if dispatched
+      const prevValue = this.lastQuantityByIndex[index] ?? Number(group.get('quantity')?.value || 0);
+      group.patchValue({ quantity: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     const status = group.get('quotationItemStatus')?.value;
     const input = event.target as HTMLInputElement;
@@ -318,6 +325,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onNumberOfRollChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      const prevValue = this.lastNumberOfRollByIndex[index] ?? Number(group.get('numberOfRoll')?.value || 0);
+      group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     const status = group.get('quotationItemStatus')?.value;
     const input = event.target as HTMLInputElement;
@@ -800,6 +813,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onCreatedRollChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      const prevValue = this.lastCreatedRollByIndex[index] ?? Number(group.get('createdRoll')?.value || 0);
+      group.patchValue({ createdRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     if (!id) return;
     const target = event.target as HTMLInputElement;

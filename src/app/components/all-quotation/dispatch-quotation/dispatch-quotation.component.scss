@@ -19,3 +19,8 @@
   width: 120px !important;
 }
 
+// Highlight dispatched rows
+.products-table tr.dispatched-row {
+  background-color: #C5C6C7; // light orange
+}
+
