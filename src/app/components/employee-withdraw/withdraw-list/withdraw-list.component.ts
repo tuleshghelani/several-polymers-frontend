@@ -303,14 +303,33 @@ export class WithdrawListComponent implements OnInit {
     return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
   }
   
-  openWhatsApp(rawNumber: string | number | null | undefined, payment: number, withdrawDate: string): void {
+  openWhatsApp(
+    rawNumber: string | number | null | undefined,
+    payment: number,
+    withdrawDate: string,
+    employeeName?: string | null,
+    remarks?: string | null
+  ): void {
     const digits = String(rawNumber ?? '').replace(/\D/g, '');
     if (!digits) {
       return;
     }
     const normalized = digits.length === 10 ? `91${digits}` : digits;
     const formattedDate = this.formatDateForApi(withdrawDate);
-    const text = encodeURIComponent(`Hello, your withdrawal amount is ${payment} INR on ${formattedDate}`);
+    const nameLine = employeeName ? `Name: ${employeeName}` : 'Name:';
+    const remarkLine = remarks ? `Remark : ${remarks}` : 'Remark :';
+    // const message = [
+    //   'Hello,',
+    //   nameLine,
+    //   `Your withdrawal amount is ${payment} Rs on ${formattedDate}`,
+    //   remarkLine,
+    //   'Thanks,',
+    //   'Several Polymers'
+    // ].join('\n');
+    const message = [
+      'Hello ',nameLine
+    ].join('\n');
+    const text = encodeURIComponent(message);
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {

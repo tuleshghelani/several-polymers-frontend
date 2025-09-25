@@ -93,7 +93,7 @@
             <tr *ngFor="let w of withdraws; let index = index">
               <td>{{ startIndex + index + 1 }}</td>
               <td>{{ w.employeeName }}
-                <button class="btn-icon whatsapp" title="Open WhatsApp" (click)="openWhatsApp(w.mobileNumber, w.payment, w.withdrawDate)">
+                <button class="btn-icon whatsapp" title="Open WhatsApp" (click)="openWhatsApp(w.mobileNumber, w.payment, w.withdrawDate, w.employeeName, w.remarks)">
                   <i class="fab fa-whatsapp"></i>
                 </button>
               </td>
