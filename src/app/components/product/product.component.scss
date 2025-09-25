@@ -125,6 +125,7 @@
       margin-bottom: 0;
       border-collapse: separate;
       border-spacing: 0;
+      table-layout: fixed;
 
       thead {
         background-color: #f8f9fa;
@@ -132,7 +133,7 @@
         th {
           border-bottom: 2px solid #dee2e6;
           font-weight: 600;
-          color: #495057;
+          color: #fff;
           padding: 1rem 0.75rem;
           text-align: left;
           position: sticky;
@@ -153,9 +154,21 @@
             padding: 0.875rem 0.75rem;
             border-bottom: 1px solid #dee2e6;
             vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
+      /* Column sizing for desktop/tablet */
+      th:nth-child(1), td:nth-child(1) { /* Name */ width: 220px; }
+      th:nth-child(2), td:nth-child(2) { /* Category */ width: 140px; }
+      th:nth-child(3), td:nth-child(3) { /* Description */ width: 320px; white-space: normal; word-break: break-word; }
+      th:nth-child(4), td:nth-child(4) { /* Min Stock */ width: 110px; }
+      th:nth-child(5), td:nth-child(5) { /* Status */ width: 110px; }
+      th:nth-child(6), td:nth-child(6) { /* Remaining Qty */ width: 150px; }
+      th:nth-child(7), td:nth-child(7) { /* Purchase */ width: 140px; }
+      th:nth-child(8), td:nth-child(8) { /* Sale */ width: 140px; }
+      th:nth-child(9), td:nth-child(9) { /* Actions */ width: 110px; }
     }
 
     .badge-active {
@@ -298,13 +311,13 @@
           letter-spacing: 0.5px;
         }
 
-        .actions {
-          position: sticky;
-          right: 0;
-          background: white;
-          border-left: 1px solid #e9ecef;
-          padding-left: 0.5rem;
-        }
+        // .actions {
+        //   position: sticky;
+        //   right: 0;
+        //   background: white;
+        //   border-left: 1px solid #e9ecef;
+        //   padding-left: 0.5rem;
+        // }
       }
     }
   }
@@ -351,6 +364,10 @@
   z-index: 1001;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   margin: 1rem;
+  max-height: 90vh; /* enable overall dialog height limit */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* contain inner scroll */
 
   .dialog-header {
     display: flex;
@@ -360,6 +377,9 @@
     border-bottom: 1px solid var(--border-color, #e0e0e0);
     background-color: var(--background);
     border-radius: 12px 12px 0 0;
+    position: sticky; /* keep visible while scrolling */
+    top: 0;
+    z-index: 10;
 
     h2 {
       margin: 0;
@@ -400,6 +420,15 @@
         background-color: rgba(0, 0, 0, 0.1);
       }
     }
+  }
+
+  /* Make form the scroll container */
+  form {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0; /* allow flex child to shrink for overflow */
   }
 
   .form-grid {
@@ -474,14 +503,10 @@
     min-width: auto;
     margin: 1rem;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
 
     .dialog-header {
       padding: 0.875rem 1.25rem;
-      position: sticky;
-      top: 0;
-      background: white;
-      z-index: 10;
 
       h2 {
         font-size: 1.125rem;
@@ -500,6 +525,17 @@
       padding: 1rem;
     }
   }
+}
+
+/* Tablet/Desktop dialog sizing */
+@media (min-width: 768px) {
+  .dialog { width: 720px; max-width: calc(100% - 4rem); }
+}
+@media (min-width: 992px) {
+  .dialog { width: 860px; }
+}
+@media (min-width: 1200px) {
+  .dialog { width: 980px; }
 }
 
 .dialog-content {
@@ -553,6 +589,9 @@
   border-top: 1px solid #e9ecef;
   background-color: #f8f9fa;
   border-radius: 0 0 12px 12px;
+  position: sticky; /* keep footer visible */
+  bottom: 0;
+  z-index: 9;
 
   button {
     min-width: 120px;
