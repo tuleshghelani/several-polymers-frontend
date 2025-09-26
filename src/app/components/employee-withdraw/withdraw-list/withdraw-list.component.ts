@@ -316,20 +316,7 @@ export class WithdrawListComponent implements OnInit {
     }
     const normalized = digits.length === 10 ? `91${digits}` : digits;
     const formattedDate = this.formatDateForApi(withdrawDate);
-    const nameLine = employeeName ? `Name: ${employeeName}` : 'Name:';
-    const remarkLine = remarks ? `Remark : ${remarks}` : 'Remark :';
-    // const message = [
-    //   'Hello,',
-    //   nameLine,
-    //   `Your withdrawal amount is ${payment} Rs on ${formattedDate}`,
-    //   remarkLine,
-    //   'Thanks,',
-    //   'Several Polymers'
-    // ].join('\n');
-    const message = [
-      'Hello ',nameLine
-    ].join('\n');
-    const text = encodeURIComponent(message);
+    const text = encodeURIComponent(`Hello ${employeeName}, your withdrawal amount is ${payment} INR on ${formattedDate}`);
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {

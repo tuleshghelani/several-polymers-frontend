@@ -24,3 +24,26 @@
   background-color: #C5C6C7; // light orange
 }
 
+// Ensure Status select remains visible and usable on small desktop widths
+.products-table td.status-col select,
+.products-table th.status-col select {
+  min-width: 85px;
+}
+
+// Make the last two columns sticky so they don't scroll out of view
+.products-table {
+  th.status-col,
+  td.status-col {
+    // position: sticky;
+    // right: 40px; // placed just before created roll
+    // background: #fff;
+    // z-index: 2;
+    min-width: 85px;
+  }
+}
+
+// Ensure the table can scroll horizontally if needed
+.table-responsive {
+  overflow-x: auto;
+}
+

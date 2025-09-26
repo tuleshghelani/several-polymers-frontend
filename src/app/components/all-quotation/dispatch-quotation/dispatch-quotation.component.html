@@ -99,14 +99,14 @@
                 <th>Sale/dispatch</th>
                 <th>Product</th>
                 <th>Brand</th>
-                <th>Number of Roll</th>
+                <th>No of Rolls</th>
                 <th>Weight Per Roll</th>
                 <th>Quantity</th>
                 <th>Remarks</th>
-                <th>Is Production</th>
-                <th>Is Dispatch</th>
-                <th>Status</th>
-                <th>Created Roll</th>
+                <th>Production</th>
+                <th>Dispatch</th>
+                <th class="status-col">Status</th>
+                <th class="created-roll-col">Created Roll</th>
                 <!-- <th>Actions</th> -->
               </tr>
             </thead>
@@ -118,7 +118,6 @@
                         <label class="small text-muted">Sale:</label>
                         <ng-container *ngIf="itemsFormArray.at(i).get('quotationItemStatus')?.value != 'B'">
                           <input type="checkbox"
-                                 [disabled]="!isSelectable(i) || itemsFormArray.at(i).get('isDispatch')?.value === true"
                                  [checked]="isSelected(i)"
                                  (change)="toggleSelection(i, $event)"
                                  title="Select for sale creation">
@@ -127,7 +126,6 @@
                       <div>
                         <label class="small text-muted">Dispatch:</label>
                         <input type="checkbox"
-                               [disabled]="itemsFormArray.at(i).get('isDispatch')?.value === true"
                                [checked]="isDispatchSelected(i)"
                                (change)="toggleDispatchSelection(i, $event)"
                                title="Select for dispatch slip">
@@ -189,7 +187,7 @@
                          [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B' || itemsFormArray.at(i).get('isDispatch')?.value === true">
                 </td>
                 <td>
-                  <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks" readonly>
+                  <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks">
                 </td>
 
                 <td>
@@ -198,7 +196,7 @@
                 <td>
                   <input type="checkbox" formControlName="isDispatch" (change)="onDispatchToggle(i)">
                 </td>
-                <td>
+                <td class="status-col">
                   <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true || itemsFormArray.at(i).get('quotationItemStatus')?.value === 'B'">
                     <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)" [disabled]="itemsFormArray.at(i).get('isDispatch')?.value === true">
                       <option value="O">Open</option>
@@ -208,7 +206,7 @@
                     </select>
                   </ng-container>
                 </td>
-                <td>
+                <td >
                   <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1" (focus)="onCreatedRollFocus(i)" (change)="onCreatedRollChange(i, $event)" [readonly]="itemsFormArray.at(i).get('isDispatch')?.value === true">
                 </td>
 

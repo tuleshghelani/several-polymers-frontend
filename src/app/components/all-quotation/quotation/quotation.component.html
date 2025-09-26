@@ -142,7 +142,7 @@
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : ' fa-file-pdf'"></i>
                 </button>
-                <button *ngIf="canEditQuotation() && (quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C' || quotation.status == 'PC')"
+                <button 
                   class="btn-icon edit" 
                   (click)="editQuotation(quotation.id!)"
                   title="Edit quotation"

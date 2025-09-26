@@ -384,7 +384,7 @@ export class DispatchQuotationListComponent implements OnInit {
     
     quotation.isPrinting = true;
     
-    this.quotationService.generatePdf(id).subscribe({
+    this.quotationService.generateDispatchPdf(id, null).subscribe({
       next: (response) => {
         const blob = response.blob;
         const url = window.URL.createObjectURL(blob);
