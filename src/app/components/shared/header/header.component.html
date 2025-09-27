@@ -109,7 +109,7 @@
             <i class="fas fa-chevron-down"></i>
           </a>
           <ul class="dropdown-menu" [class.show]="showEmployeeMenu">
-            <li *ngIf="permissions.canViewEmployeeOrder">
+            <li *ngIf="permissions.canViewEmployeeWithdraw">
               <a routerLink="/attendance" routerLinkActive="active">
                 <i class="fas fa-clipboard-list"></i> Attendance
               </a>

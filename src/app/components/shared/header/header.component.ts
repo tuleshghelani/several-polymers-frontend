@@ -210,7 +210,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   hasEmployeeMenuItems(): boolean {
-    return this.permissions.canViewEmployeeOrder || 
-           this.permissions.canViewEmployeeWithdraw || false;
+    return this.permissions.canViewEmployeeWithdraw || false;
   }
 }
