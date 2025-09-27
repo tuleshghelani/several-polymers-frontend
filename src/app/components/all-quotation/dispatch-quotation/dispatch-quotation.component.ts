@@ -6,6 +6,7 @@ import { Subject, takeUntil, debounceTime, filter, distinctUntilChanged, Subscri
 import { formatDate } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { EncryptionService } from '../../../shared/services/encryption.service';
+import { AuthService, UserRole } from '../../../services/auth.service';
 import { SaleService } from '../../../services/sale.service';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
@@ -51,6 +52,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
   private lastQuantityByIndex: { [index: number]: number } = {};
   private selectedQuotationItemIds = new Set<number>();
   private selectedDispatchItemIds = new Set<number>();
+  canSeeSaleOption = false;
 
   get itemsFormArray() {
     return this.quotationForm.get('items') as FormArray;
@@ -68,11 +70,13 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: Dialog,
     private cdr: ChangeDetectorRef,
-    private saleService: SaleService
+    private saleService: SaleService,
+    private authService: AuthService
   ) {
     const today = new Date();
     this.minValidUntilDate = formatDate(today, 'yyyy-MM-dd', 'en');
     this.initForm();
+    this.canSeeSaleOption = this.authService.hasAnyRole([UserRole.ADMIN, UserRole.SALES_AND_MARKETING]);
   }
 
   ngOnInit() {
@@ -150,6 +154,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
       weightPerRoll: [0, [Validators.required, Validators.min(0)]],
       isQuantityManual: [false],
       remarks: [''],
+      isDispatch: [false],
       // Dispatch-only additional fields
       isProduction: [false],
       id: [null],
@@ -248,6 +253,13 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onQuantityChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      // Revert UI change if dispatched
+      const prevValue = this.lastQuantityByIndex[index] ?? Number(group.get('quantity')?.value || 0);
+      group.patchValue({ quantity: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     const status = group.get('quotationItemStatus')?.value;
     const input = event.target as HTMLInputElement;
@@ -313,6 +325,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onNumberOfRollChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      const prevValue = this.lastNumberOfRollByIndex[index] ?? Number(group.get('numberOfRoll')?.value || 0);
+      group.patchValue({ numberOfRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     const status = group.get('quotationItemStatus')?.value;
     const input = event.target as HTMLInputElement;
@@ -616,6 +634,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           remarks: [item.remarks || ''],
           // dispatch extras
           isProduction: [item.isProduction ?? false],
+          isDispatch: [item.isDispatch ?? false],
           quotationItemStatus: [item.quotationItemStatus ?? 'O', Validators.required],
           createdRoll: [item.createdRoll ?? 0, [Validators.required, Validators.min(0)]],
           // price fields for backend
@@ -679,6 +698,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
         remarks: control.get('remarks')?.value,
         // dispatch extras
         isProduction: control.get('isProduction')?.value,
+        isDispatch: control.get('isDispatch')?.value,
         quotationItemStatus: control.get('quotationItemStatus')?.value,
         createdRoll: control.get('createdRoll')?.value,
         // backend fields
@@ -793,6 +813,12 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
 
   onCreatedRollChange(index: number, event: Event) {
     const group = this.itemsFormArray.at(index) as FormGroup;
+    if (group.get('isDispatch')?.value === true) {
+      const prevValue = this.lastCreatedRollByIndex[index] ?? Number(group.get('createdRoll')?.value || 0);
+      group.patchValue({ createdRoll: prevValue }, { emitEvent: false });
+      this.cdr.detectChanges();
+      return;
+    }
     const id = group.get('id')?.value;
     if (!id) return;
     const target = event.target as HTMLInputElement;
@@ -867,6 +893,27 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           this.snackbar.error('Failed to update production status');
           // Revert toggle on error
           group.patchValue({ isProduction: !isProduction }, { emitEvent: false });
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  onDispatchToggle(index: number) {
+    const group = this.itemsFormArray.at(index) as FormGroup;
+    const quotationItemId = group.get('id')?.value;
+    if (!quotationItemId) {
+      return;
+    }
+    const isDispatch = !!group.get('isDispatch')?.value;
+    this.quotationService.updateQuotationItemDispatch(quotationItemId, isDispatch)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.snackbar.success('Dispatch status updated');
+        },
+        error: () => {
+          this.snackbar.error('Failed to update dispatch status');
+          group.patchValue({ isDispatch: !isDispatch }, { emitEvent: false });
           this.cdr.detectChanges();
         }
       });

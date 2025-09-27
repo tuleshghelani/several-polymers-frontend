@@ -83,7 +83,7 @@
             <button type="button" class="btn btn-info me-2" *ngIf="hasDispatchSelection()" (click)="createDispatchSlip()">
               <i class="fa-solid fa-file-pdf"></i> Create Dispatch Slip
             </button>
-            <button type="button" class="btn btn-success me-2" *ngIf="hasSelection()" (click)="createSaleFromSelected()">
+            <button type="button" class="btn btn-success me-2" *ngIf="canSeeSaleOption && hasSelection()" (click)="createSaleFromSelected()">
               <i class="fa-solid fa-cart-plus"></i> Create Sale
             </button>
             <!-- <button type="button" class="btn btn-sm btn-primary" (click)="addItem()">
@@ -99,25 +99,25 @@
                 <th>Sale/dispatch</th>
                 <th>Product</th>
                 <th>Brand</th>
-                <th>Number of Roll</th>
+                <th>No of Rolls</th>
                 <th>Weight Per Roll</th>
                 <th>Quantity</th>
                 <th>Remarks</th>
-                <th>Is Production</th>
-                <th>Status</th>
-                <th>Created Roll</th>
+                <th>Production</th>
+                <th>Dispatch</th>
+                <th class="status-col">Status</th>
+                <th class="created-roll-col">Created Roll</th>
                 <!-- <th>Actions</th> -->
               </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of itemsFormArray.controls; let i=index" [formGroupName]="i">
+                <tr *ngFor="let item of itemsFormArray.controls; let i=index" [formGroupName]="i" [class.dispatched-row]="itemsFormArray.at(i).get('isDispatch')?.value === true">
                   <td>
                     <div class="d-flex flex-column gap-2">
-                      <div>
+                      <div *ngIf="canSeeSaleOption">
                         <label class="small text-muted">Sale:</label>
                         <ng-container *ngIf="itemsFormArray.at(i).get('quotationItemStatus')?.value != 'B'">
                           <input type="checkbox"
-                                 [disabled]="!isSelectable(i)"
                                  [checked]="isSelected(i)"
                                  (change)="toggleSelection(i, $event)"
                                  title="Select for sale creation">
@@ -134,15 +134,17 @@
                   </td>
                 <td>
                   <div class="form-field-container">
-                    <input type="text" formControlName="productName" class="form-control" placeholder="Product Name" readonly>
+                    {{itemsFormArray.at(i).get('productName')?.value}}
+                    <!-- <input type="text" formControlName="productName" class="form-control" placeholder="Product Name" readonly> -->
                   </div>
                 </td>
 
                 <td>
                   <div class="form-field-container">
                     <div class="select-group">
-                      <input type="text" formControlName="brandName" class="form-control" placeholder="Brand" readonly>
-                      <button 
+                      {{itemsFormArray.at(i).get('brandName')?.value}}
+                      <!-- <input type="text" formControlName="brandName" class="form-control" placeholder="Brand" readonly> -->
+                      <!-- <button 
                         type="button" 
                         class="btn btn-sm btn-primary refresh" 
                         (click)="refreshBrands()"
@@ -150,7 +152,7 @@
                         title="Refresh Brands"
                       >
                         <i class="fas" [ngClass]="isLoadingBrands ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
-                      </button>
+                      </button> -->
                     </div>
                   </div>
                 </td>
@@ -165,7 +167,7 @@
                            (focus)="onNumberOfRollFocus(i)"
                            (change)="onNumberOfRollChange(i, $event)"
                            (input)="onRollWeightChange(i)"
-                           [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B'">
+                           [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B' || itemsFormArray.at(i).get('isDispatch')?.value === true">
                   </div>
                 </td>
                 <td>
@@ -182,18 +184,21 @@
                          (focus)="onQuantityFocus(i)"
                          (change)="onQuantityChange(i, $event)"
                          (input)="onQuantityEdit(i)"
-                         [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B'">
+                         [readonly]="itemsFormArray.at(i).get('quotationItemStatus')?.value == 'B' || itemsFormArray.at(i).get('isDispatch')?.value === true">
                 </td>
                 <td>
-                  <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks" readonly>
+                  <input type="text" formControlName="remarks" class="form-control" placeholder="Remarks">
                 </td>
 
                 <td>
-                  <input type="checkbox" formControlName="isProduction" (click)="onProductionClick(i, $event)" (change)="onProductionToggle(i)" title="Allowed only when status is Open">
+                  <input type="checkbox" formControlName="isProduction" (click)="onProductionClick(i, $event)" (change)="onProductionToggle(i)" [disabled]="itemsFormArray.at(i).get('isDispatch')?.value === true" title="Allowed only when status is Open">
                 </td>
                 <td>
+                  <input type="checkbox" formControlName="isDispatch" (change)="onDispatchToggle(i)">
+                </td>
+                <td class="status-col">
                   <ng-container *ngIf="itemsFormArray.at(i).get('isProduction')?.value === true || itemsFormArray.at(i).get('quotationItemStatus')?.value === 'B'">
-                    <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)">
+                    <select class="form-control" formControlName="quotationItemStatus" (focus)="onStatusFocus(i)" (change)="onStatusChange(i, $event)" [disabled]="itemsFormArray.at(i).get('isDispatch')?.value === true">
                       <option value="O">Open</option>
                       <option value="I">In progress</option>
                       <option value="C">Completed</option>
@@ -201,8 +206,8 @@
                     </select>
                   </ng-container>
                 </td>
-                <td>
-                  <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1" (focus)="onCreatedRollFocus(i)" (change)="onCreatedRollChange(i, $event)">
+                <td >
+                  <input type="number" formControlName="createdRoll" class="form-control" min="0" step="1" (focus)="onCreatedRollFocus(i)" (change)="onCreatedRollChange(i, $event)" [readonly]="itemsFormArray.at(i).get('isDispatch')?.value === true">
                 </td>
 
                 <!-- <td>

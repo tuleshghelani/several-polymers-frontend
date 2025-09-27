@@ -478,7 +478,7 @@
     th {
       background-color: var(--background-light);
       color: var(--text-primary);
-      font-weight: 600;
+      font-weight: 200;
       padding: 1rem;
       white-space: nowrap;
       border-bottom: 2px solid var(--border-color);
@@ -490,8 +490,11 @@
       border-bottom: 1px solid var(--border-color);
   
       .form-control {
-        min-width: 90px;
+        // min-width: 90px;
         // height: 40px;
+      }
+      select {
+        width: 38px;
       }
   
       &:first-child {
@@ -519,7 +522,18 @@
   .form-field-container {
     position: relative;
     margin-bottom: 1rem;
-    min-width: 400px;
+    min-width: 250px;
+    .form-control, .input-group {
+      &.is-invalid {
+        border-color: var(--danger);
+        background-image: url("data:image/svg+xml,..."); // Error icon SVG
+      }
+    }
+  }
+  .form-field-container-brand {
+    position: relative;
+    margin-bottom: 1rem;
+    min-width: 200px;
     .form-control, .input-group {
       &.is-invalid {
         border-color: var(--danger);

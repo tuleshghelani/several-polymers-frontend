@@ -162,13 +162,13 @@
                 <tr>
                   <th>Product</th>
                   <th>Brand</th>
-                  <th>Number of Roll</th>
+                  <th>No. of Roll</th>
                   <th>Weight Per Roll</th>
                   <th>Quantity</th>
                   <th>Unit Price</th>
                   <th>Remarks</th>
                   <th>Item Price</th>
-                  <th>Quotation Discount</th>
+                  <th>Quotation Dis.</th>
                   <th>Tax (%)</th>
                   <th>Final Price</th>
                   <th>Status</th>
@@ -206,7 +206,7 @@
 
                   <!-- Brand Selection -->
                   <td>
-                    <div class="form-field-container">
+                    <div class="form-field-container-brand">
                       <div class="select-group">
                         <app-searchable-select 
                           [formControlName]="'brandId'" 
@@ -254,9 +254,9 @@
                     <div class="input-group">
                       <input type="number" formControlName="unitPrice" class="form-control"
                         [class.is-invalid]="isItemFieldInvalid(i, 'unitPrice')" min="0.01" step="0.01">
-                      <span class="input-group-text" *ngIf="isLoadingPrices && loadingPriceIndex === i">
+                      <!-- <span class="input-group-text" *ngIf="isLoadingPrices && loadingPriceIndex === i">
                         <i class="fas fa-spinner fa-spin"></i>
-                      </span>
+                      </span> -->
                       <!-- Optional debug information -->
                       <small *ngIf="false" class="form-text text-muted">
                         PID: {{item.get('productId')?.value}}

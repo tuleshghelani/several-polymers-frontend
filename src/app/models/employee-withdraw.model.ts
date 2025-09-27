@@ -12,6 +12,7 @@ export interface EmployeeWithdrawSearchItem {
   employeeName: string;
   employeeId: number;
   withdrawDate: string;
+  mobileNumber?: string;
   payment: number;
   remarks?: string;
   createdAt?: string;

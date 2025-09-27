@@ -371,6 +371,57 @@ export class DispatchQuotationListComponent implements OnInit {
       // Swallow errors; native handlers may block exceptions
     }
   }
+
+  
+
+  printDispatchQuotation(id: number, quotation: any): void {
+    if (!id) {
+      this.snackbar.error('Please select quotation');
+      return;
+    }
+
+    this.isLoading = true;
+    
+    quotation.isPrinting = true;
+    
+    this.quotationService.generateDispatchPdf(id, null).subscribe({
+      next: (response) => {
+        const blob = response.blob;
+        const url = window.URL.createObjectURL(blob);
+        
+        // Create an iframe for printing
+        const printFrame = document.createElement('iframe');
+        printFrame.style.display = 'none';
+        printFrame.src = url;
+        
+        document.body.appendChild(printFrame);
+        printFrame.onload = () => {
+          setTimeout(() => {
+            try {
+              printFrame.contentWindow?.print();
+              // Only set loading to false after print dialog is shown
+              this.isLoading = false;
+              quotation.isPrinting = false;
+            } catch (error) {
+              this.snackbar.error('Failed to open print dialog');
+              this.isLoading = false;
+            }
+          }, 1000);
+
+          // Cleanup after longer delay
+          // setTimeout(() => {
+          //   document.body.removeChild(printFrame);
+          //   window.URL.revokeObjectURL(url);
+          // }, 5000);
+        };
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to generate dispatch quotation');
+        quotation.isPrinting = false;
+        this.isLoading = false;
+      }
+    });
+  }
 }
 
 
