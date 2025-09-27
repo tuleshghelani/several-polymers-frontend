@@ -48,8 +48,10 @@ export class CreateAttendanceComponent implements OnInit {
 
   private initializeForm(): void {
     const today = new Date();
-    const startDateTime = this.setDefaultTime(today, 15, 0);  // 3:00 PM IST
-    const endDateTime = this.setDefaultTime(today, 23, 0);   // 11:00 PM IST
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const startDateTime = this.setDefaultTime(today, 14, 0);   // 8:00 AM IST
+    const endDateTime = this.setDefaultTime(tomorrow, 1, 0);    // 8:00 PM IST
   
     this.attendanceForm = this.fb.group({
       employeeIds: ['', Validators.required],
