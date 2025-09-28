@@ -306,26 +306,30 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="7" class="text-end"><strong>Total:</strong></td>
-                  <td>
+                  <td colspan="1" class="text-end"><strong>Total:</strong></td>
+                  <td colspan="1" class="text-end"><strong>item price:</strong></td>
+                  <td colspan="2">
                     <div class="input-group">
-                      <span class="input-group-text">₹</span>
+                      <!-- <span class="input-group-text">₹</span> -->
                       <input type="number" [value]="totals.price" class="form-control" readonly>
                     </div>
                   </td>
-                  <td>
+                  <td colspan="1" class="text-end"><strong>dis.:</strong></td>
+                  <td colspan="2">
                     <div class="input-group">
                       <input type="number" [value]="totals.quotationDiscountAmount" class="form-control" readonly>
                     </div>
                   </td>
-                  <td>
+                  <td colspan="1" class="text-end"><strong>tax price:</strong></td>
+                  <td colspan="2">
                     <div class="input-group">
                       <input type="number" [value]="totals.tax" class="form-control" readonly>
                     </div>
                   </td>
-                  <td>
+                  <td colspan="1" class="text-end"><strong>final price:</strong></td>
+                  <td colspan="2">
                     <div class="input-group">
-                      <span class="input-group-text">₹</span>
+                      <!-- <span class="input-group-text">₹</span> -->
                       <input type="number" [value]="totals.finalPrice" class="form-control" readonly>
                     </div>
                   </td>
@@ -372,7 +376,7 @@
           </div>
           <div class="summary-item">
             <span>Total Amount:</span>
-            <strong>₹{{ getTotalAmount() | number:'1.2-2' }}</strong>
+            <strong>{{ getTotalAmount() | number:'1.2-2' }}</strong>
           </div>
         </div>
   
