@@ -5,6 +5,7 @@ interface AttendanceDay {
   date: string;
   startTime: string;
   endTime: string;
+  shift: string;
 }
 
 @Component({
@@ -36,7 +37,8 @@ export class CalendarViewComponent implements OnChanges {
       this.attendanceDays[dateStr] = {
         date: dateStr,
         startTime: new Date(record.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        endTime: new Date(record.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        endTime: new Date(record.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        shift: record.shift || 'N/A'
       };
     });
   }
@@ -84,6 +86,12 @@ export class CalendarViewComponent implements OnChanges {
 
   getTooltipText(day: any): string {
     if (!day?.attendance) return '';
-    return `Time: ${day.attendance.startTime} - ${day.attendance.endTime}`;
+    const shiftDisplay = this.getShiftDisplay(day.attendance.shift);
+    return `Time: ${day.attendance.startTime} - ${day.attendance.endTime}\nShift: ${shiftDisplay}`;
+  }
+
+  getShiftDisplay(shift: string): string {
+    if (!shift || shift === 'N/A') return 'N/A';
+    return shift === 'D' ? 'Day' : shift === 'N' ? 'Night' : 'N/A';
   }
 } 

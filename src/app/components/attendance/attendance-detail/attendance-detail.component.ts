@@ -345,4 +345,9 @@ calculateTotalPayAndHours(){
       // Swallow errors; native handlers may block exceptions
     }
   }
+
+  getShiftDisplay(shift: string | null | undefined): string {
+    if (!shift) return 'N/A';
+    return shift === 'D' ? 'Day' : shift === 'N' ? 'Night' : 'N/A';
+  }
 }

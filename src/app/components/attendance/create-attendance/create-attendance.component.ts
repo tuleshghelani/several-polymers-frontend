@@ -57,6 +57,7 @@ export class CreateAttendanceComponent implements OnInit {
       employeeIds: ['', Validators.required],
       startDateTime: [startDateTime, Validators.required],
       endDateTime: [endDateTime, [Validators.required, this.validateEndDateTime.bind(this)]],
+      shift: ['D', Validators.required],
       remarks: ['']
     });
 

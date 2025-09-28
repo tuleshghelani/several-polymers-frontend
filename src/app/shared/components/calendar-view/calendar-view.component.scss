@@ -73,6 +73,13 @@
           font-size: 0.65rem;
           margin-top: 2px;
         }
+
+        .shift {
+          font-size: 0.6rem;
+          margin-top: 1px;
+          font-weight: 500;
+          opacity: 0.8;
+        }
       }
     }
   }
@@ -98,6 +105,10 @@
       
       .time {
         font-size: 0.7rem;
+      }
+      
+      .shift {
+        font-size: 0.65rem;
       }
     }
   }

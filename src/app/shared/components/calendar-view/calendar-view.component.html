@@ -18,6 +18,9 @@
         <span class="time" *ngIf="day?.attendance">
           {{day.attendance.startTime}}
         </span>
+        <span class="shift" *ngIf="day?.attendance">
+          {{getShiftDisplay(day.attendance.shift)}}
+        </span>
       </div>
     </div>
   </div>

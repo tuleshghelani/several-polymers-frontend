@@ -135,6 +135,7 @@
               <th>Date</th>
               <th>Start Time</th>
               <th>End Time</th>
+              <th>Shift</th>
               <th>Regular Hours</th>
               <th>Regular Pay</th>
               <th>Overtime Hours</th>
@@ -155,6 +156,7 @@
               <td>{{record.startDateTime | date:'dd-MM-yyyy'}}</td>
               <td>{{record.startDateTime | date:'HH:mm'}}</td>
               <td>{{record.endDateTime | date:'HH:mm'}}</td>
+              <td>{{getShiftDisplay(record.shift)}}</td>
               <td>{{record.regularHours}}</td>
               <td>{{record.regularPay}}</td>
               <td>{{record.overtimeHours}}</td>
@@ -163,12 +165,13 @@
               <td>{{record.remarks}}</td>
             </tr>
             <tr *ngIf="!attendanceRecords?.length">
-              <td colspan="6" class="text-center">No attendance records found</td>
+              <td colspan="11" class="text-center">No attendance records found</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td><b>Total</b></td>
+              <td></td>
               <td></td>
               <td></td>
               <td></td>
