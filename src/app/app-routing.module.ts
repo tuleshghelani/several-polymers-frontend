@@ -31,6 +31,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AddBatchComponent } from './components/add-batch/add-batch.component';
 import { AttendanceListComponent } from './components/attendance/attendance-list/attendance-list.component';
 import { AddWithdrawComponent } from './components/employee-withdraw/add-withdraw/add-withdraw.component';
+import { MachineListComponent } from './components/machine/machine-list/machine-list.component';
+import { AddMachineComponent } from './components/machine/add-machine/add-machine.component';
 import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
 import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
@@ -63,6 +65,24 @@ const routes: Routes = [
     component: CustomerComponent, 
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  {
+    path: 'machine',
+    component: MachineListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'machine/create',
+    component: AddMachineComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'machine/edit/:id',
+    component: AddMachineComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN'] }
   },
   {
     path: 'employee',

@@ -8,6 +8,7 @@ interface MenuPermissions {
   canViewMaster?: boolean;
   canViewTransaction?: boolean;
   canViewEmployee?: boolean;
+  canViewMachine?: boolean;
   canViewEmployeeOrder?: boolean;
   canViewEmployeeWithdraw?: boolean;
   canViewQuotation?: boolean;
@@ -79,6 +80,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewMaster: false,
       canViewTransaction: false,
       canViewEmployee: false,
+      canViewMachine: false,
       canViewEmployeeOrder: false,
       canViewEmployeeWithdraw: false,
       canViewQuotation: false,
@@ -134,7 +136,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isMasterActive(): boolean {
     const currentUrl = this.router.url;
-    return ['/category', '/product', '/customer', '/employee', '/transport-master', '/brand', '/user'].some(path => 
+    return ['/category', '/product', '/customer', '/employee', '/machine', '/transport-master', '/brand', '/user'].some(path => 
       currentUrl.includes(path)
     );
   }
@@ -158,6 +160,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
            this.permissions.canViewProduct || 
            this.permissions.canViewCustomer || 
            this.permissions.canViewEmployee || 
+           this.permissions.canViewMachine || 
            this.permissions.canViewTransport || 
            this.permissions.canViewBrand ||
            this.permissions.canViewUser || false;

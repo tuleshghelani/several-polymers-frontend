@@ -1,0 +1,53 @@
+@import '../../../../variables';
+@import '../../../../styles.scss';
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 1rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.table-responsive { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.actions { white-space: nowrap; }
+
+.status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.status.active { background: #e6fbf0; color: #0a8a4a; }
+.status.inactive { background: #fdeaea; color: #c02222; }
+
+.empty { text-align: center; color: #777; }
+
+@media (max-width: 768px) {
+  .table th:nth-child(1),
+  .table td:nth-child(1) { display: none; }
+}
+
+

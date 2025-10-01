@@ -1,0 +1,56 @@
+<div class="page">
+  <div class="page-header">
+    <h2>Machines</h2>
+    <a class="btn btn-primary" routerLink="/machine/create">Add Machine</a>
+  </div>
+
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+    <input type="text" placeholder="Search machine..." formControlName="search" />
+    <button class="btn btn-secondary" type="submit">Search</button>
+    <button class="btn btn-link" type="button" (click)="resetForm()">Reset</button>
+  </form>
+
+  <app-loader *ngIf="isLoading"></app-loader>
+
+  <div class="table-responsive" *ngIf="!isLoading">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let m of machines; let i = index">
+          <td>{{ startIndex + i + 1 }}</td>
+          <td>{{ m.name }}</td>
+          <td>
+            <span class="status" [class.active]="m.status === 'A'" [class.inactive]="m.status !== 'A'">
+              {{ m.status === 'A' ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="actions">
+            <a class="btn btn-sm" [routerLink]="['/machine/edit', m.id]">Edit</a>
+            <button class="btn btn-sm btn-danger" (click)="deleteMachine(m.id)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="machines.length === 0">
+          <td colspan="4" class="empty">No machines found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalElements]="totalElements"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>
+
+

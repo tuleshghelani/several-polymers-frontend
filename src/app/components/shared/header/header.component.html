@@ -44,6 +44,11 @@
                 <i class="fas fa-user-tie"></i> Employee
               </a>
             </li>
+            <li *ngIf="permissions.canViewMachine">
+              <a routerLink="/machine" routerLinkActive="active">
+                <i class="fas fa-cogs"></i> Machine
+              </a>
+            </li>
             <li *ngIf="permissions.canViewTransport">
               <a routerLink="/transport-master" routerLinkActive="active">
                 <i class="fas fa-truck"></i> Transport

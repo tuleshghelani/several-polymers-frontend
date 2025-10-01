@@ -1,0 +1,31 @@
+<div class="page">
+  <div class="page-header">
+    <h2>{{ isEditMode ? 'Edit Machine' : 'Add Machine' }}</h2>
+    <a class="btn btn-link" routerLink="/machine">Back to list</a>
+  </div>
+
+  <app-loader *ngIf="isLoading"></app-loader>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+    <div class="form-row">
+      <label>Name <span>*</span></label>
+      <input type="text" formControlName="name" placeholder="Enter machine name" />
+      <div class="error" *ngIf="isFieldInvalid('name')">{{ getFieldError('name') }}</div>
+    </div>
+
+    <div class="form-row">
+      <label>Status</label>
+      <select formControlName="status">
+        <option value="A">Active</option>
+        <option value="I">Inactive</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Create' }}</button>
+      <a class="btn" routerLink="/machine">Cancel</a>
+    </div>
+  </form>
+</div>
+
+

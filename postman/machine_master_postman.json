@@ -1,0 +1,164 @@
+{
+    "info": {
+      "name": "MachineMaster Controller",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "_postman_id": "b3b7f5d6-7f2d-4f11-9d9a-0000machine0001"
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": [
+        {
+          "key": "token",
+          "value": "{{token}}",
+          "type": "string"
+        }
+      ]
+    },
+    "variable": [
+      { "key": "baseURL", "value": "http://localhost:8080" },
+      { "key": "token", "value": "" }
+    ],
+    "item": [
+      {
+        "name": "Create Machine",
+        "request": {
+          "method": "POST",
+          "header": [ { "key": "Content-Type", "value": "application/json" } ],
+          "url": {
+            "raw": "{{baseURL}}/api/machines",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines"]
+          },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"CNC-01\",\n  \"status\": \"A\"\n}"
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/machines" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machine created successfully\"\n}"
+          }
+        ]
+      },
+      {
+        "name": "Update Machine",
+        "request": {
+          "method": "PUT",
+          "header": [ { "key": "Content-Type", "value": "application/json" } ],
+          "url": {
+            "raw": "{{baseURL}}/api/machines/:id",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines", ":id"],
+            "variable": [ { "key": "id", "value": "1" } ]
+          },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"CNC-Prime\",\n  \"status\": \"A\"\n}"
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "PUT", "url": { "raw": "{{baseURL}}/api/machines/1" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machine updated successfully\"\n}"
+          }
+        ]
+      },
+      {
+        "name": "Delete Machine",
+        "request": {
+          "method": "DELETE",
+          "header": [ { "key": "Content-Type", "value": "application/json" } ],
+          "url": {
+            "raw": "{{baseURL}}/api/machines/:id",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines", ":id"],
+            "variable": [ { "key": "id", "value": "1" } ]
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "DELETE", "url": { "raw": "{{baseURL}}/api/machines/1" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machine deleted successfully\"\n}"
+          }
+        ]
+      },
+      {
+        "name": "Search Machines (paged)",
+        "request": {
+          "method": "POST",
+          "header": [ { "key": "Content-Type", "value": "application/json" } ],
+          "url": {
+            "raw": "{{baseURL}}/api/machines/search",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines", "search"]
+          },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"search\": \"cnc\",\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"id\",\n  \"sortDir\": \"desc\"\n}"
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/machines/search" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machines fetched successfully\",\n  \"data\": {\n    \"content\": [\n      { \"id\": 1, \"name\": \"CNC-01\", \"status\": \"A\" }\n    ],\n    \"totalElements\": 1,\n    \"totalPages\": 1,\n    \"page\": 0,\n    \"size\": 10\n  }\n}"
+          }
+        ]
+      },
+      {
+        "name": "Get Machine Details",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseURL}}/api/machines/:id",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines", ":id"],
+            "variable": [ { "key": "id", "value": "1" } ]
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": { "raw": "{{baseURL}}/api/machines/1" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machine details fetched\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"CNC-01\",\n    \"status\": \"A\"\n  }\n}"
+          }
+        ]
+      },
+      {
+        "name": "Get Machine List (all)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseURL}}/api/machines/list",
+            "host": ["{{baseURL}}"],
+            "path": ["api", "machines", "list"]
+          }
+        },
+        "response": [
+          {
+            "name": "200 OK",
+            "originalRequest": { "method": "GET", "url": { "raw": "{{baseURL}}/api/machines/list" } },
+            "status": "OK",
+            "code": 200,
+            "body": "{\n  \"success\": true,\n  \"message\": \"Machine list fetched successfully\",\n  \"data\": [\n    { \"id\": 1, \"name\": \"CNC-01\", \"status\": \"A\" }\n  ]\n}"
+          }
+        ]
+      }
+    ]
+  }  
