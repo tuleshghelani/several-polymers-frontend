@@ -190,6 +190,7 @@
                           [searchPlaceholder]="'Search products...'"
                           [class.is-invalid]="isItemFieldInvalid(i, 'productId')"
                           (selectionChange)="onProductSelect(i, $event)"
+                          [focusWidthPx]="400"
                         ></app-searchable-select>
                         <button 
                           type="button" 
@@ -216,6 +217,7 @@
                           [placeholder]="'Select Brand'" 
                           [searchPlaceholder]="'Search brands...'"
                           [class.is-invalid]="isItemFieldInvalid(i, 'brandId')"
+                          [focusWidthPx]="400"
                         ></app-searchable-select>
                         <button 
                           type="button" 

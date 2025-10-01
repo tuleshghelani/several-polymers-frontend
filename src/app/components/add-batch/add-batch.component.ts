@@ -22,6 +22,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   isEdit = false;
   loading = false;
+  submitted = false;
   private currentId: number | null = null;
   private destroy$ = new Subject<void>();
 
@@ -63,9 +64,16 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       cpwBagUse: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
       cpwBagOpeningStock: new FormControl<number>({value: 0, disabled: true}, { nonNullable: true }),
       machineId: new FormControl<number | null>(null, { validators: [Validators.required] }),
-      mixer: this.fb.array([]),
-      production: this.fb.array([])
+      mixer: this.fb.array([], [this.minArrayLengthValidator(1)]),
+      production: this.fb.array([], [this.minArrayLengthValidator(1)])
     });
+  }
+
+  private minArrayLengthValidator(min: number) {
+    return (control: any) => {
+      const arr = control as FormArray;
+      return arr && arr.length >= min ? null : { minLengthArray: { requiredLength: min, actualLength: arr ? arr.length : 0 } };
+    };
   }
 
   private loadMachines(): void {
@@ -140,7 +148,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     return this.fb.group({
       productId: new FormControl<number | null>(productId, { validators: [Validators.required] }),
       quantity: new FormControl<number | null>(quantity, { validators: [Validators.required, Validators.min(0.001)] }),
-      numberOfRoll: new FormControl<number | null>(numberOfRoll, { validators: [Validators.required, Validators.min(1)] })
+      numberOfRoll: new FormControl<number | null>(numberOfRoll, { validators: [] })
     });
   }
 
@@ -149,9 +157,10 @@ export class AddBatchComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
+    this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.snackbar.error('Please fill all required fields');
+      this.snackbar.error('Please fill required fields and add at least one Mixer and Production item');
       return;
     }
 

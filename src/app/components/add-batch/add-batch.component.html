@@ -25,7 +25,7 @@
       <div class="form-row col-4">
         <label>Machine</label>
         <app-searchable-select formControlName="machineId" [options]="machines" [labelKey]="'name'" [valueKey]="'id'" placeholder="Select machine"></app-searchable-select>
-        <div class="error" *ngIf="form.get('machineId')?.invalid && form.get('machineId')?.touched">Required</div>
+        <div class="error" *ngIf="(form.get('machineId')?.invalid && form.get('machineId')?.touched) || (submitted && form.get('machineId')?.invalid)">Machine is required</div>
       </div>
     </div>
 
@@ -48,35 +48,42 @@
       </div>
     </div>
   <div class="panes">
-    <div class="pane left">
+      <div class="pane left">
       <div class="pane-header">
         <h3>Mixer</h3>
         <button class="btn small" type="button" (click)="addMixer()">Add</button>
       </div>
       <div formArrayName="mixer" class="list">
+        <div class="error" *ngIf="(submitted || mixerArray.touched) && mixerArray.invalid">Add at least one mixer item</div>
         <div class="item" *ngFor="let group of mixerArray.controls; let i = index" [formGroupName]="i">
           <div class="item-grid">
             <app-searchable-select class="full" formControlName="productId" [options]="products" [labelKey]="'name'" [valueKey]="'id'" placeholder="Select product"></app-searchable-select>
-            <input type="number" step="0.001" placeholder="Quantity (KG)" formControlName="quantity" />
+            <input type="number" step="0.001" min="0.001" placeholder="Quantity (KG)" formControlName="quantity" />
             <button type="button" class="icon danger" (click)="removeMixer(i)">✕</button>
           </div>
+          <div class="error" *ngIf="(submitted || group.touched) && group.get('productId')?.invalid">Product is required</div>
+          <div class="error" *ngIf="(submitted || group.touched) && group.get('quantity')?.invalid">Valid quantity is required</div>
         </div>
       </div>
     </div>
 
-    <div class="pane right">
+      <div class="pane right">
       <div class="pane-header">
         <h3>Production</h3>
         <button class="btn small" type="button" (click)="addProduction()">Add</button>
       </div>
       <div formArrayName="production" class="list">
+        <div class="error" *ngIf="(submitted || productionArray.touched) && productionArray.invalid">Add at least one production item</div>
         <div class="item" *ngFor="let group of productionArray.controls; let i = index" [formGroupName]="i">
           <div class="item-grid">
             <app-searchable-select class="full" formControlName="productId" [options]="products" [labelKey]="'name'" [valueKey]="'id'" placeholder="Select product"></app-searchable-select>
-            <input type="number" step="0.001" placeholder="Quantity (KG)" formControlName="quantity" />
+            <input type="number" step="0.001" min="0.001" placeholder="Quantity (KG)" formControlName="quantity" />
             <input type="number" step="1" placeholder="No. of Rolls" formControlName="numberOfRoll" />
             <button type="button" class="icon danger" (click)="removeProduction(i)">✕</button>
           </div>
+          <div class="error" *ngIf="(submitted || group.touched) && group.get('productId')?.invalid">Product is required</div>
+          <div class="error" *ngIf="(submitted || group.touched) && group.get('quantity')?.invalid">Valid quantity is required</div>
+          <!-- <div class="error" *ngIf="(submitted || group.touched) && group.get('numberOfRoll')?.invalid">Number of rolls must be at least 1</div> -->
         </div>
       </div>
     </div>
