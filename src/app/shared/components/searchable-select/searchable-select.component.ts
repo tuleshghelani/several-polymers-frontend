@@ -28,6 +28,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   @Input() searchPlaceholder: string = 'Search...';
   @Input() multiple = false;
   @Input() allowClear = true;
+  @Input() focusWidthPx?: number; // Optional width applied on focus (in pixels)
 
   searchText: string = '';
   isOpen: boolean = false;

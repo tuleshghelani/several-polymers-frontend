@@ -28,6 +28,7 @@ import { UserListComponent } from './components/user/user-list/user-list.compone
 import { AddUserComponent } from './components/user/add-user/add-user.component';
 import { DispatchQuotationListComponent } from './components/all-quotation/dispatch-quotation-list/dispatch-quotation-list.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { AddBatchComponent } from './components/add-batch/add-batch.component';
 import { AttendanceListComponent } from './components/attendance/attendance-list/attendance-list.component';
 import { AddWithdrawComponent } from './components/employee-withdraw/add-withdraw/add-withdraw.component';
 import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
@@ -148,6 +149,20 @@ const routes: Routes = [
     component: AddPurchaseComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+
+  // Batch Routes
+  {
+    path: 'batch/create',
+    component: AddBatchComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+  },
+  {
+    path: 'batch/edit/:id',
+    component: AddBatchComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
   },
   {
     path: 'sale',

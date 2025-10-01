@@ -12,6 +12,7 @@
       autocorrect="off"
       spellcheck="false"
       inputmode="search"
+      [style.width.px]="isOpen && focusWidthPx ? focusWidthPx : null"
     >
     <button *ngIf="allowClear && hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
       <i class="fas fa-times"></i>
