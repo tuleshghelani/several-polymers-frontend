@@ -1,0 +1,99 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h2>Batch List</h2>
+      <p class="sub">Track production batches by date, shift and machine</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-outline" type="button" (click)="resetForm()">
+        <i class="fas fa-sync"></i> Reset
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="filters">
+    <div class="row">
+      <div class="col">
+        <label>Date</label>
+        <input type="date" formControlName="date" />
+      </div>
+      <div class="col">
+        <label>Shift</label>
+        <select formControlName="shift">
+          <option value="">All</option>
+          <option *ngFor="let s of shifts" [value]="s.value">{{ s.label }}</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>Machine</label>
+        <app-searchable-select
+          [options]="machines"
+          [labelKey]="'name'"
+          [valueKey]="'id'"
+          [placeholder]="'Select machine'"
+          [defaultOption]="{ label: 'All machines', value: null }"
+          (ngModelChange)="searchForm.controls['machineId'].setValue($event)"
+        ></app-searchable-select>
+      </div>
+      <div class="col actions">
+        <button class="btn btn-secondary" type="submit">Search</button>
+        <button class="btn btn-link" type="button" (click)="resetForm()">Reset</button>
+      </div>
+    </div>
+  </form>
+
+  <app-loader *ngIf="isLoading"></app-loader>
+
+  <div class="table-card" *ngIf="!isLoading">
+    <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Shift</th>
+          <th>Batch Name</th>
+          <th>Resign Use</th>
+          <th>Resign Opening</th>
+          <th>CPW Use</th>
+          <th>CPW Opening</th>
+          <th>Machine</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of batches; let i = index">
+          <td>{{ (currentPage * pageSize) + i + 1 }}</td>
+          <td>{{ b.date }}</td>
+          <td>{{ b.shift }}</td>
+          <td>{{ b.name }}</td>
+          <td>{{ b.resignBagUse }}</td>
+          <td>{{ b.resignBagOpeningStock }}</td>
+          <td>{{ b.cpwBagUse }}</td>
+          <td>{{ b.cpwBagOpeningStock }}</td>
+          <td>{{ getMachineName(b.machineId) }}</td>
+        </tr>
+        <tr *ngIf="batches.length === 0">
+          <td colspan="9" class="empty"><i class="fas fa-folder-open"></i> No batches found for the selected filters</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="table-footer">
+      <div class="meta">
+        Showing {{ (currentPage * pageSize) + (batches.length ? 1 : 0) }}-
+        {{ (currentPage * pageSize) + batches.length }} of {{ totalElements }}
+      </div>
+      <app-pagination
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalElements]="totalElements"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
+    </div>
+  </div>
+</div>
+
+

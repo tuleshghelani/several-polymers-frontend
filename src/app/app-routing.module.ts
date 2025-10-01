@@ -33,6 +33,7 @@ import { AttendanceListComponent } from './components/attendance/attendance-list
 import { AddWithdrawComponent } from './components/employee-withdraw/add-withdraw/add-withdraw.component';
 import { MachineListComponent } from './components/machine/machine-list/machine-list.component';
 import { AddMachineComponent } from './components/machine/add-machine/add-machine.component';
+import { BatchListComponent } from './components/batch/batch-list/batch-list.component';
 import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
 import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
@@ -83,6 +84,12 @@ const routes: Routes = [
     component: AddMachineComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'batch',
+    component: BatchListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
   },
   {
     path: 'employee',

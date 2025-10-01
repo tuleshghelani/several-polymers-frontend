@@ -174,8 +174,8 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       cpwBagUse: rawValue.cpwBagUse,
       cpwBagOpeningStock: rawValue.cpwBagOpeningStock,
       machineId: rawValue.machineId,
-      mixer: (rawValue.mixer || []).map((m: any) => ({ bachId: rawValue.id ?? null, productId: m.productId, quantity: m.quantity })),
-      production: (rawValue.production || []).map((p: any) => ({ bachId: rawValue.id ?? null, productId: p.productId, quantity: p.quantity, numberOfRoll: p.numberOfRoll }))
+      mixer: (rawValue.mixer || []).map((m: any) => ({ batchId: rawValue.id ?? null, productId: m.productId, quantity: m.quantity })),
+      production: (rawValue.production || []).map((p: any) => ({ batchId: rawValue.id ?? null, productId: p.productId, quantity: p.quantity, numberOfRoll: p.numberOfRoll }))
     };
 
     this.loading = true;

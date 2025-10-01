@@ -1,11 +1,11 @@
 export interface BatchMixerItemRequest {
-  bachId: number | null;
+  batchId: number | null;
   productId: number;
   quantity: number;
 }
 
 export interface BatchProductionItemRequest {
-  bachId: number | null;
+  batchId: number | null;
   productId: number;
   quantity: number;
   numberOfRoll: number;
@@ -83,3 +83,35 @@ export interface MachineListResponse {
   data: Array<{ id: number; name: string; status: string }>;
 }
 
+
+export interface BatchSearchRequest {
+  date?: string; // YYYY-MM-DD
+  shift?: string; // 'A' | 'B' | 'C'
+  machineId?: number;
+  page: number;
+  size: number;
+  sortBy?: string;
+  sortDir?: string;
+}
+
+export interface BatchListItem {
+  id: number;
+  date: string;
+  shift: string;
+  name: string;
+  resignBagUse: number;
+  resignBagOpeningStock: number;
+  cpwBagUse: number;
+  cpwBagOpeningStock: number;
+  machineId: number;
+}
+
+export interface BatchSearchResponse {
+  success: boolean;
+  message: string;
+  data: {
+    content: BatchListItem[];
+    totalRecords: number;
+    pageSize: number;
+  };
+}
