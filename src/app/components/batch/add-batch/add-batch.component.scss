@@ -24,6 +24,7 @@
 .row { display: flex; gap: 12px; flex-wrap: wrap; }
 .col-3 { flex: 1 1 calc(25% - 12px); min-width: 220px; }
 .col-4 { flex: 1 1 calc(33.333% - 12px); min-width: 220px; }
+.col-12 { flex: 1 1 100%; width: 100%; }
 
 .form-row {
   display: flex; flex-direction: column; gap: 6px;
@@ -31,6 +32,72 @@
 
 input, select { 
   padding: 10px; border: 1px solid var(--supporting); border-radius: 8px; 
+}
+
+// Optional field label styling
+.optional {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+// Premium styling for operator input
+.operator-input {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2d3748;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  &::placeholder {
+    color: #a0aec0;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary, #4299e1);
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+    transform: translateY(-1px);
+  }
+  
+  &:hover:not(:focus) {
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  &.ng-invalid.ng-touched {
+    border-color: #e53e3e;
+    background: linear-gradient(135deg, #fef5f5 0%, #ffffff 100%);
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+  }
+  
+  &.ng-valid.ng-touched {
+    border-color: #38a169;
+    background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
+  }
+}
+
+// Responsive design for operator field
+@media (max-width: 768px) {
+  .operator-input {
+    font-size: 16px; // Prevents zoom on iOS
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .operator-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
 }
 
 .error { color: #e53e3e; font-size: 12px; }

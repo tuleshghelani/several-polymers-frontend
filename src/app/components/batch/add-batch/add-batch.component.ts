@@ -10,6 +10,8 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { ProductService } from '../../../services/product.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { UrlEncryptionService } from '../../../shared/services/url-encryption.service';
+import { EncryptionService } from '../../../shared/services/encryption.service';
 
 @Component({
   selector: 'app-add-batch',
@@ -38,18 +40,52 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private snackbar: SnackbarService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private urlEncryptionService: UrlEncryptionService,
+    private encryptionService: EncryptionService
   ) {}
 
   ngOnInit(): void {
     this.initForm();
     this.loadMachines();
     this.loadProducts();
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
+    
+    // Check for encrypted ID in route params (new approach)
+    const encryptedIdParam = this.route.snapshot.paramMap.get('encryptedId');
+    if (encryptedIdParam) {
+      const decryptedId = this.urlEncryptionService.decryptId(encryptedIdParam);
+      if (decryptedId) {
+        this.isEdit = true;
+        this.currentId = decryptedId;
+        this.fetchFullDetails(this.currentId);
+      } else {
+        this.snackbar.error('Invalid batch ID. Redirecting to batch list.');
+        this.router.navigate(['/batch']);
+        return;
+      }
+    }
+    
+    // Fallback: Check for regular ID in query params (for backward compatibility)
+    const idParam = this.route.snapshot.queryParamMap.get('id');
+    if (idParam && !encryptedIdParam) {
       this.isEdit = true;
       this.currentId = Number(idParam);
       this.fetchFullDetails(this.currentId);
+    }
+    
+    // Check for encrypted ID in localStorage (similar to quotation pattern)
+    if (!encryptedIdParam && !idParam) {
+      const encryptedBatchId = localStorage.getItem('editBatchId');
+      if (encryptedBatchId) {
+        const decryptedId = this.encryptionService.decrypt(encryptedBatchId);
+        if (decryptedId) {
+          this.isEdit = true;
+          this.currentId = parseInt(decryptedId, 10);
+          this.fetchFullDetails(this.currentId);
+          // Clear the localStorage after use
+          localStorage.removeItem('editBatchId');
+        }
+      }
     }
   }
 
@@ -64,6 +100,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       cpwBagUse: new FormControl<number>(0, { nonNullable: true, validators: [Validators.required, Validators.min(0)] }),
       cpwBagOpeningStock: new FormControl<number>({value: 0, disabled: true}, { nonNullable: true }),
       machineId: new FormControl<number | null>(null, { validators: [Validators.required] }),
+      operator: new FormControl<string>('', { nonNullable: true, validators: [] }),
       mixer: this.fb.array([], [this.minArrayLengthValidator(1)]),
       production: this.fb.array([], [this.minArrayLengthValidator(1)])
     });
@@ -107,7 +144,8 @@ export class AddBatchComponent implements OnInit, OnDestroy {
           resignBagOpeningStock: d.resignBagOpeningStock,
           cpwBagUse: d.cpwBagUse,
           cpwBagOpeningStock: d.cpwBagOpeningStock,
-          machineId: d.machineId
+          machineId: d.machineId,
+          operator: d.operator || ''
         });
         this.mixerArray.clear();
         (d.mixerItems || []).forEach(item => this.mixerArray.push(this.createMixerGroup(item.productId, item.quantity)));
@@ -174,17 +212,22 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       cpwBagUse: rawValue.cpwBagUse,
       cpwBagOpeningStock: rawValue.cpwBagOpeningStock,
       machineId: rawValue.machineId,
+      operator: rawValue.operator || undefined,
       mixer: (rawValue.mixer || []).map((m: any) => ({ batchId: rawValue.id ?? null, productId: m.productId, quantity: m.quantity })),
       production: (rawValue.production || []).map((p: any) => ({ batchId: rawValue.id ?? null, productId: p.productId, quantity: p.quantity, numberOfRoll: p.numberOfRoll }))
     };
 
     this.loading = true;
     this.batchService.upsert(payload).pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => {
+      next: (response) => {
+        // Clear any stored encrypted batch ID after successful save/update
+        localStorage.removeItem('editBatchId');
+        
         this.snackbar.success(this.isEdit ? 'Batch updated successfully' : 'Batch created successfully');
         this.router.navigate(['/batch']);
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error saving batch:', error);
         this.snackbar.error('Failed to save batch');
       },
       complete: () => { this.loading = false; }

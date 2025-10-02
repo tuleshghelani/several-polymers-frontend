@@ -180,13 +180,19 @@ const routes: Routes = [
 
   // Batch Routes
   {
+    path: 'batch/add',
+    component: AddBatchComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
+  },
+  {
     path: 'batch/create',
     component: AddBatchComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }
   },
   {
-    path: 'batch/edit/:id',
+    path: 'batch/edit/:encryptedId',
     component: AddBatchComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'PRODUCT_MANAGER'] }

@@ -30,6 +30,21 @@
     </div>
 
     <div class="row">
+      <div class="form-row col-12">
+        <label>Operator <span class="optional">(Optional)</span></label>
+        <input 
+          type="text" 
+          formControlName="operator" 
+          placeholder="Enter operator name (optional)"
+          class="operator-input"
+        />
+        <div class="error" *ngIf="(form.get('operator')?.invalid && form.get('operator')?.touched) || (submitted && form.get('operator')?.invalid)">
+          <span *ngIf="form.get('operator')?.errors?.['minlength']">Operator name must be at least 2 characters</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="form-row col-3">
         <label>Resign Bag Use (KG)</label>
         <input type="number" step="0.001" formControlName="resignBagUse" />

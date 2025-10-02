@@ -38,7 +38,7 @@
             [valueKey]="'id'"
             [placeholder]="'Select machine'"
             [defaultOption]="{ label: 'All machines', value: null }"
-            (ngModelChange)="searchForm.controls['machineId'].setValue($event)"
+            formControlName="machineId"
           ></app-searchable-select>
         </div>
         <div class="button-group">
@@ -76,6 +76,7 @@
             <th>CPW Use</th>
             <th>CPW Opening</th>
             <th>Machine</th>
+            <th>Operator</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -90,6 +91,9 @@
             <td>{{ batch.cpwBagUse }}</td>
             <td>{{ batch.cpwBagOpeningStock }}</td>
             <td>{{ getMachineName(batch.machineId) }}</td>
+            <td class="operator-cell">
+              <span class="operator-name" [title]="batch.operator">{{ batch.operator || 'N/A' }}</span>
+            </td>
             <td class="actions">
               <button 
                 class="btn-icon edit" 
@@ -105,10 +109,17 @@
               >
                 <i class="fas fa-eye"></i>
               </button>
+              <button 
+                class="btn-icon delete" 
+                (click)="deleteBatch(batch.id, batch.name)"
+                title="Delete Batch"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </td>
           </tr>
           <tr *ngIf="!batches?.length">
-            <td colspan="10" class="text-center">
+            <td colspan="11" class="text-center">
               <i class="fas fa-folder-open"></i> No batches found for the selected filters
             </td>
           </tr>

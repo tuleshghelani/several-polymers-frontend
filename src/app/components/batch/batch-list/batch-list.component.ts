@@ -9,6 +9,8 @@ import { SearchableSelectComponent } from '../../../shared/components/searchable
 import { BatchService } from '../../../services/batch.service';
 import { BatchListItem, BatchSearchRequest } from '../../../models/batch.model';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { UrlEncryptionService } from '../../../shared/services/url-encryption.service';
+import { EncryptionService } from '../../../shared/services/encryption.service';
 
 @Component({
   selector: 'app-batch-list',
@@ -49,7 +51,9 @@ export class BatchListComponent implements OnInit {
     private fb: FormBuilder,
     private batchService: BatchService,
     private snackbar: SnackbarService,
-    private router: Router
+    private router: Router,
+    private urlEncryptionService: UrlEncryptionService,
+    private encryptionService: EncryptionService
   ) {
     this.initializeForm();
   }
@@ -86,7 +90,7 @@ export class BatchListComponent implements OnInit {
       startDate: form.startDate || undefined,
       endDate: form.endDate || undefined,
       shift: form.shift || undefined,
-      machineId: form.machineId || undefined,
+      machineId: (form.machineId !== null && form.machineId !== undefined) ? form.machineId : undefined,
       page: this.currentPage,
       size: this.pageSize,
       sortBy: 'id',
@@ -113,6 +117,7 @@ export class BatchListComponent implements OnInit {
 
   onSearch(): void {
     this.currentPage = 0;
+    console.log('Form values on search:', this.searchForm.value);
     this.loadBatches();
   }
 
@@ -150,11 +155,47 @@ export class BatchListComponent implements OnInit {
   }
 
   editBatch(id: number): void {
-    this.router.navigate(['/batch/add'], { queryParams: { id } });
+    try {
+      // Store encrypted ID in localStorage (similar to quotation pattern)
+      const encryptedIdForStorage = this.encryptionService.encrypt(id.toString());
+      localStorage.setItem('editBatchId', encryptedIdForStorage);
+      
+      // Also use encrypted URL parameter
+      const encryptedId = this.urlEncryptionService.encryptId(id);
+      if (encryptedId) {
+        this.router.navigate(['/batch/edit', encryptedId]);
+      } else {
+        // Fallback to /batch/add route if URL encryption fails
+        this.router.navigate(['/batch/add']);
+      }
+    } catch (error) {
+      console.error('Error encrypting batch ID:', error);
+      this.snackbar.error('Failed to navigate to edit page');
+    }
   }
 
   viewBatch(id: number): void {
-    this.router.navigate(['/batch/view', id]);
+    // For now, redirect to edit page since there's no dedicated view component
+    this.editBatch(id);
+  }
+
+  deleteBatch(id: number, batchName: string): void {
+    const confirmMessage = `Are you sure you want to delete batch "${batchName}"? This action cannot be undone.`;
+    
+    if (confirm(confirmMessage)) {
+      this.isLoading = true;
+      this.batchService.deleteBatch(id).subscribe({
+        next: (response) => {
+          this.snackbar.success('Batch deleted successfully');
+          this.loadBatches(); // Refresh the list
+        },
+        error: (error) => {
+          console.error('Error deleting batch:', error);
+          this.snackbar.error(error?.message || 'Failed to delete batch');
+          this.isLoading = false;
+        }
+      });
+    }
   }
 }
 

@@ -595,6 +595,30 @@
             }
           }
 
+          &.delete {
+            background: rgba(229, 62, 62, 0.1);
+            color: #e53e3e;
+
+            &::before {
+              background: #e53e3e;
+            }
+
+            &:hover {
+              color: white;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+
+              i {
+                transform: scale(1.1);
+              }
+            }
+
+            &:active {
+              transform: translateY(-1px);
+              box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+            }
+          }
+
           &:active {
             transform: translateY(0);
           }
@@ -712,6 +736,59 @@
 
 .batch-container > *:nth-child(4) {
   animation-delay: 0.3s;
+}
+
+// Premium Operator Cell Styling
+.operator-cell {
+  position: relative;
+  padding: 0.75rem 1rem !important;
+  
+  .operator-name {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    
+    &::before {
+      content: '👤';
+      margin-right: 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    &:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+  }
+}
+
+// Special styling for N/A operator values
+.operator-name:contains('N/A'), 
+.operator-name[title*='N/A'] {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%) !important;
+  box-shadow: 0 2px 8px rgba(160, 174, 192, 0.3) !important;
+  
+  &::before {
+    content: '❓' !important;
+  }
+  
+  &:hover {
+    background: linear-gradient(135deg, #718096 0%, #a0aec0 100%) !important;
+    box-shadow: 0 4px 16px rgba(160, 174, 192, 0.4) !important;
+  }
 }
 
 

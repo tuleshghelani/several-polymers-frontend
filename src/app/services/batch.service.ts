@@ -25,6 +25,10 @@ export class BatchService {
   searchBatches(request: BatchSearchRequest): Observable<BatchSearchResponse> {
     return this.http.post<BatchSearchResponse>(`${this.apiUrl}/api/batchs/search`, request);
   }
+
+  deleteBatch(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/api/batchs/${id}`);
+  }
 }
 
 

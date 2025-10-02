@@ -20,6 +20,7 @@ export interface BatchUpsertRequest {
   cpwBagUse: number;
   cpwBagOpeningStock: number;
   machineId: number;
+  operator?: string;
   mixer: BatchMixerItemRequest[];
   production: BatchProductionItemRequest[];
 }
@@ -38,6 +39,7 @@ export interface BatchFullDetailsResponse {
     cpwBagOpeningStock: number;
     machineId: number;
     machineName: string;
+    operator?: string;
     clientId?: number;
     clientName?: string;
     createdBy?: string;
@@ -105,6 +107,7 @@ export interface BatchListItem {
   cpwBagUse: number;
   cpwBagOpeningStock: number;
   machineId: number;
+  operator?: string;
 }
 
 export interface BatchSearchResponse {
