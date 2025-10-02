@@ -197,6 +197,14 @@ export class BatchListComponent implements OnInit {
       });
     }
   }
+
+  // Track by function for ngFor performance optimization
+  trackByBatchId(index: number, batch: BatchListItem): number {
+    return batch.id;
+  }
+
+  // Math utility for template
+  Math = Math;
 }
 
 

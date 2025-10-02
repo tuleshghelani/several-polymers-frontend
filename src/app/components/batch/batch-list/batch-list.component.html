@@ -1,141 +1,500 @@
-<div class="batch-container">
-  <app-loader [show]="isLoading"></app-loader>
+<!-- Premium Batch Management Interface -->
+<div class="batch-container" role="main" aria-label="Batch Management">
+  <!-- Loading Overlay -->
+  <app-loader [show]="isLoading" aria-live="polite"></app-loader>
   
-  <div class="search-section card">
-    <h2>Search Batches</h2>
-    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-      <div class="search-controls">
-        <div class="form-group">
-          <label>Start Date</label>
-          <input 
-            type="date" 
-            formControlName="startDate" 
-            class="form-control" 
-            placeholder="Start Date"
+  <!-- Hero Section with Breadcrumb -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="breadcrumb" role="navigation" aria-label="Breadcrumb">
+        <span class="breadcrumb-item">
+          <i class="fas fa-home" aria-hidden="true"></i>
+          <span class="sr-only">Home</span>
+        </span>
+        <i class="fas fa-chevron-right breadcrumb-separator" aria-hidden="true"></i>
+        <span class="breadcrumb-item">Production</span>
+        <i class="fas fa-chevron-right breadcrumb-separator" aria-hidden="true"></i>
+        <span class="breadcrumb-item active" aria-current="page">Batch Management</span>
+      </div>
+      <h1 class="hero-title">
+        <i class="fas fa-layer-group hero-icon" aria-hidden="true"></i>
+        Batch Management
+      </h1>
+      <!-- <p class="hero-subtitle">Monitor and manage production batches with advanced filtering and real-time tracking</p> -->
+    </div>
+    <!-- <div class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-value">{{ totalElements }}</div>
+        <div class="stat-label">Total Batches</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ batches.length }}</div>
+        <div class="stat-label">Current View</div>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- Advanced Search Section -->
+  <div class="search-section glass-card" role="search" aria-label="Batch Search Filters">
+    <div class="search-header">
+      <h2 class="search-title">
+        <i class="fas fa-filter search-icon" aria-hidden="true"></i>
+        Advanced Search & Filters
+      </h2>
+      <div class="search-actions">
+        <button 
+          type="button" 
+          class="btn-icon-only collapse-btn"
+          aria-label="Toggle search filters"
+          title="Toggle search filters"
+        >
+          <i class="fas fa-chevron-up" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form" novalidate>
+      <div class="search-grid">
+        <!-- Date Range Section -->
+        <div class="date-range-section">
+          <h3 class="section-subtitle">
+            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+            Date Range
+          </h3>
+          <div class="date-inputs">
+            <div class="form-group">
+              <label for="startDate" class="form-label">
+                Start Date
+                <span class="label-hint">From</span>
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  id="startDate"
+                  type="date" 
+                  formControlName="startDate" 
+                  class="form-control date-input" 
+                  placeholder="Select start date"
+                  aria-describedby="startDate-help"
+                >
+                <i class="fas fa-calendar input-icon" aria-hidden="true"></i>
+              </div>
+              <small id="startDate-help" class="form-help">Select the starting date for batch search</small>
+            </div>
+            
+            <div class="date-separator">
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </div>
+            
+            <div class="form-group">
+              <label for="endDate" class="form-label">
+                End Date
+                <span class="label-hint">To</span>
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  id="endDate"
+                  type="date" 
+                  formControlName="endDate" 
+                  class="form-control date-input" 
+                  placeholder="Select end date"
+                  aria-describedby="endDate-help"
+                >
+                <i class="fas fa-calendar input-icon" aria-hidden="true"></i>
+              </div>
+              <small id="endDate-help" class="form-help">Select the ending date for batch search</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+          <h3 class="section-subtitle">
+            <i class="fas fa-sliders-h" aria-hidden="true"></i>
+            Production Filters
+          </h3>
+          <div class="filter-inputs">
+            <div class="form-group">
+              <label for="shift" class="form-label">
+                Work Shift
+                <span class="label-hint">Production shift</span>
+              </label>
+              <div class="select-wrapper">
+                <select 
+                  id="shift"
+                  formControlName="shift" 
+                  class="form-control select-input"
+                  aria-describedby="shift-help"
+                >
+                  <option value="">All Shifts</option>
+                  <option *ngFor="let s of shifts" [value]="s.value">{{ s.label }}</option>
+                </select>
+                <i class="fas fa-chevron-down select-icon" aria-hidden="true"></i>
+              </div>
+              <small id="shift-help" class="form-help">Filter by production shift (Day/Night)</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="machine" class="form-label">
+                Production Machine
+                <span class="label-hint">Equipment</span>
+              </label>
+              <div class="searchable-select-wrapper">
+                <app-searchable-select
+                  id="machine"
+                  [options]="machines"
+                  [labelKey]="'name'"
+                  [valueKey]="'id'"
+                  [placeholder]="'Select production machine'"
+                  [defaultOption]="{ label: 'All machines', value: null }"
+                  formControlName="machineId"
+                  aria-describedby="machine-help"
+                ></app-searchable-select>
+              </div>
+              <small id="machine-help" class="form-help">Choose specific production machine or view all</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Actions -->
+      <div class="search-actions-bar">
+        <div class="search-info">
+          <span class="results-count" *ngIf="totalElements > 0">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            Showing {{ batches.length }} of {{ totalElements }} batches
+          </span>
+        </div>
+        <div class="search-buttons">
+          <button 
+            type="button" 
+            class="btn btn-secondary btn-reset" 
+            (click)="resetForm()"
+            [disabled]="isLoading"
+            aria-label="Reset all search filters"
           >
-        </div>
-        <div class="form-group">
-          <label>End Date</label>
-          <input 
-            type="date" 
-            formControlName="endDate" 
-            class="form-control" 
-            placeholder="End Date"
-          >
-        </div>
-        <div class="form-group">
-          <label>Shift</label>
-          <select formControlName="shift" class="form-control">
-            <option value="">All Shifts</option>
-            <option *ngFor="let s of shifts" [value]="s.value">{{ s.label }}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Machine</label>
-          <app-searchable-select
-            [options]="machines"
-            [labelKey]="'name'"
-            [valueKey]="'id'"
-            [placeholder]="'Select machine'"
-            [defaultOption]="{ label: 'All machines', value: null }"
-            formControlName="machineId"
-          ></app-searchable-select>
-        </div>
-        <div class="button-group">
-          <button type="submit" class="search-btn btn btn-sm btn-primary">
-            <i class="fas fa-search"></i> Search
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            <span>Reset Filters</span>
           </button>
-          <button type="button" class="search-btn btn btn-sm btn-secondary" (click)="resetForm()">
-            <i class="fas fa-undo"></i> Reset
+          <button 
+            type="submit" 
+            class="btn btn-primary btn-search" 
+            [disabled]="isLoading"
+            aria-label="Apply search filters"
+          >
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span>Apply Filters</span>
+            <div class="btn-loader" *ngIf="isLoading">
+              <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+            </div>
           </button>
         </div>
       </div>
     </form>
   </div>
 
-  <div class="action-buttons">
-    <button routerLink="/batch/add" class="btn btn-sm btn-primary">
-      <i class="fas fa-plus"></i> Add Batch
-    </button>
+  <!-- Quick Actions Bar -->
+  <div class="quick-actions-bar">
+    <div class="actions-left">
+      <div class="view-options">
+        <button class="btn-icon-only view-btn active" title="Table view" aria-label="Table view">
+          <i class="fas fa-table" aria-hidden="true"></i>
+        </button>
+        <button class="btn-icon-only view-btn" title="Card view" aria-label="Card view">
+          <i class="fas fa-th-large" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <div class="actions-right">
+      <button class="btn btn-outline export-btn" title="Export data" aria-label="Export batch data">
+        <i class="fas fa-download" aria-hidden="true"></i>
+        <span>Export</span>
+      </button>
+      <button 
+        routerLink="/batch/add" 
+        class="btn btn-primary add-batch-btn"
+        aria-label="Create new batch"
+      >
+        <i class="fas fa-plus" aria-hidden="true"></i>
+        <span>New Batch</span>
+      </button>
+    </div>
   </div>
 
-  <div class="batches-list card">
-    <h2>Batches</h2>
-    <p class="sub">Track production batches by date range, shift and machine</p>
+  <!-- Batches Data Section -->
+  <div class="batches-section glass-card" role="region" aria-label="Batch Data Table">
+    <div class="section-header">
+      <div class="section-title-group">
+        <h2 class="section-title">
+          <i class="fas fa-database section-icon" aria-hidden="true"></i>
+          Production Batches
+        </h2>
+        <p class="section-description">Comprehensive view of all production batches with detailed metrics</p>
+      </div>
+      <div class="section-actions">
+        <div class="sort-controls">
+          <label for="sortBy" class="sr-only">Sort by</label>
+          <select id="sortBy" class="sort-select" aria-label="Sort batches by">
+            <option value="date">Latest First</option>
+            <option value="name">Batch Name</option>
+            <option value="machine">Machine</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Date</th>
-            <th>Shift</th>
-            <th>Batch Name</th>
-            <th>Resign Use</th>
-            <th>Resign Opening</th>
-            <th>CPW Use</th>
-            <th>CPW Opening</th>
-            <th>Machine</th>
-            <th>Operator</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let batch of batches; let index = index">
-            <td>{{ startIndex + index + 1 }}</td>
-            <td>{{ batch.date | date:'dd-MM-yyyy' }}</td>
-            <td>{{ getShiftLabel(batch.shift) }}</td>
-            <td>{{ batch.name }}</td>
-            <td>{{ batch.resignBagUse }}</td>
-            <td>{{ batch.resignBagOpeningStock }}</td>
-            <td>{{ batch.cpwBagUse }}</td>
-            <td>{{ batch.cpwBagOpeningStock }}</td>
-            <td>{{ getMachineName(batch.machineId) }}</td>
-            <td class="operator-cell">
-              <span class="operator-name" [title]="batch.operator">{{ batch.operator || 'N/A' }}</span>
-            </td>
-            <td class="actions">
-              <button 
-                class="btn-icon edit" 
-                (click)="editBatch(batch.id)"
-                title="Edit Batch"
-              >
-                <i class="fas fa-edit"></i>
-              </button>
-              <button 
-                class="btn-icon view" 
-                (click)="viewBatch(batch.id)"
-                title="View Batch Details"
-              >
-                <i class="fas fa-eye"></i>
-              </button>
-              <button 
-                class="btn-icon delete" 
-                (click)="deleteBatch(batch.id, batch.name)"
-                title="Delete Batch"
-              >
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="!batches?.length">
-            <td colspan="11" class="text-center">
-              <i class="fas fa-folder-open"></i> No batches found for the selected filters
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Table Container -->
+    <div class="table-container">
+      <div class="table-responsive" role="region" aria-label="Batch data table" tabindex="0">
+        <table class="data-table" role="table">
+          <thead role="rowgroup">
+            <tr role="row">
+              <th scope="col" class="col-number">
+                <div class="th-content">
+                  <span>No.</span>
+                </div>
+              </th>
+              <th scope="col" class="col-date sortable">
+                <div class="th-content">
+                  <i class="fas fa-calendar-day" aria-hidden="true"></i>
+                  <span>Date</span>
+                  <i class="fas fa-sort sort-icon" aria-hidden="true"></i>
+                </div>
+              </th>
+              <th scope="col" class="col-shift">
+                <div class="th-content">
+                  <i class="fas fa-clock" aria-hidden="true"></i>
+                  <span>Shift</span>
+                </div>
+              </th>
+              <th scope="col" class="col-batch-name sortable">
+                <div class="th-content">
+                  <i class="fas fa-tag" aria-hidden="true"></i>
+                  <span>Batch Name</span>
+                  <i class="fas fa-sort sort-icon" aria-hidden="true"></i>
+                </div>
+              </th>
+              <th scope="col" class="col-resign-use">
+                <div class="th-content">
+                  <i class="fas fa-flask" aria-hidden="true"></i>
+                  <span>Resin Use</span>
+                </div>
+              </th>
+              <th scope="col" class="col-resign-opening">
+                <div class="th-content">
+                  <i class="fas fa-box-open" aria-hidden="true"></i>
+                  <span>Resin Opening</span>
+                </div>
+              </th>
+              <th scope="col" class="col-cpw-use">
+                <div class="th-content">
+                  <i class="fas fa-vial" aria-hidden="true"></i>
+                  <span>CPW Use</span>
+                </div>
+              </th>
+              <th scope="col" class="col-cpw-opening">
+                <div class="th-content">
+                  <i class="fas fa-box" aria-hidden="true"></i>
+                  <span>CPW Opening</span>
+                </div>
+              </th>
+              <th scope="col" class="col-machine sortable">
+                <div class="th-content">
+                  <i class="fas fa-cogs" aria-hidden="true"></i>
+                  <span>Machine</span>
+                  <i class="fas fa-sort sort-icon" aria-hidden="true"></i>
+                </div>
+              </th>
+              <th scope="col" class="col-operator">
+                <div class="th-content">
+                  <i class="fas fa-user-hard-hat" aria-hidden="true"></i>
+                  <span>Operator</span>
+                </div>
+              </th>
+              <th scope="col" class="col-actions">
+                <div class="th-content">
+                  <i class="fas fa-tools" aria-hidden="true"></i>
+                  <span>Actions</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody role="rowgroup">
+            <tr 
+              *ngFor="let batch of batches; let index = index; trackBy: trackByBatchId" 
+              role="row"
+              class="data-row"
+              [attr.aria-rowindex]="startIndex + index + 1"
+            >
+              <td role="gridcell" class="cell-number">
+                <div class="cell-content">
+                  <span class="row-number">{{ startIndex + index + 1 }}</span>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-date">
+                <div class="cell-content">
+                  <div class="date-display">
+                    <span class="date-value">{{ batch.date | date:'dd MMM yyyy' }}</span>
+                    <span class="date-day">{{ batch.date | date:'EEEE' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-shift">
+                <div class="cell-content">
+                  <div class="shift-badge" [class]="'shift-' + (batch.shift || '').toLowerCase()">
+                    <i class="fas" [class]="batch.shift === 'D' ? 'fa-sun' : 'fa-moon'" aria-hidden="true"></i>
+                    <span>{{ getShiftLabel(batch.shift) }}</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-batch-name">
+                <div class="cell-content">
+                  <div class="batch-name-display">
+                    <span class="batch-name">{{ batch.name }}</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-resign-use">
+                <div class="cell-content">
+                  <div class="metric-display">
+                    <span class="metric-value">{{ batch.resignBagUse || 0 }}</span>
+                    <span class="metric-unit">bags</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-resign-opening">
+                <div class="cell-content">
+                  <div class="metric-display">
+                    <span class="metric-value">{{ batch.resignBagOpeningStock || 0 }}</span>
+                    <span class="metric-unit">bags</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-cpw-use">
+                <div class="cell-content">
+                  <div class="metric-display">
+                    <span class="metric-value">{{ batch.cpwBagUse || 0 }}</span>
+                    <span class="metric-unit">bags</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-cpw-opening">
+                <div class="cell-content">
+                  <div class="metric-display">
+                    <span class="metric-value">{{ batch.cpwBagOpeningStock || 0 }}</span>
+                    <span class="metric-unit">bags</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-machine">
+                <div class="cell-content">
+                  <div class="machine-display">
+                    <i class="fas fa-cog machine-icon" aria-hidden="true"></i>
+                    <span class="machine-name">{{ getMachineName(batch.machineId) }}</span>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-operator">
+                <div class="cell-content">
+                  <div class="operator-display">
+                    <div class="operator-avatar">
+                      <i class="fas" [class]="batch.operator && batch.operator !== 'N/A' ? 'fa-user' : 'fa-user-slash'" aria-hidden="true"></i>
+                    </div>
+                    <div class="operator-info">
+                      <span class="operator-name" [title]="batch.operator">
+                        {{ batch.operator || 'Unassigned' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td role="gridcell" class="cell-actions">
+                <div class="cell-content">
+                  <div class="action-buttons" role="group" [attr.aria-label]="'Actions for batch ' + batch.name">
+                    <button 
+                      class="btn-action btn-edit" 
+                      (click)="editBatch(batch.id)"
+                      [attr.aria-label]="'Edit batch ' + batch.name"
+                      title="Edit batch"
+                    >
+                      <i class="fas fa-edit" aria-hidden="true"></i>
+                      <span class="btn-text">Edit</span>
+                    </button>
+                    <button 
+                      class="btn-action btn-view" 
+                      (click)="viewBatch(batch.id)"
+                      [attr.aria-label]="'View batch ' + batch.name + ' details'"
+                      title="View details"
+                    >
+                      <i class="fas fa-eye" aria-hidden="true"></i>
+                      <span class="btn-text">View</span>
+                    </button>
+                    <button 
+                      class="btn-action btn-delete" 
+                      (click)="deleteBatch(batch.id, batch.name)"
+                      [attr.aria-label]="'Delete batch ' + batch.name"
+                      title="Delete batch"
+                    >
+                      <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                      <span class="btn-text">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Empty State -->
+            <tr *ngIf="!batches?.length && !isLoading" role="row" class="empty-row">
+              <td colspan="11" role="gridcell" class="empty-cell">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="empty-title">No Batches Found</h3>
+                  <p class="empty-description">
+                    No production batches match your current search criteria.
+                    Try adjusting your filters or create a new batch.
+                  </p>
+                  <button routerLink="/batch/add" class="btn btn-primary empty-action">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Create First Batch
+                  </button>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Loading State -->
+            <tr *ngIf="isLoading" role="row" class="loading-row">
+              <td colspan="11" role="gridcell" class="loading-cell">
+                <div class="loading-state">
+                  <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                  </div>
+                  <p class="loading-text">Loading batch data...</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     
-    <app-pagination
-      *ngIf="totalPages > 0"
-      [currentPage]="currentPage"
-      [pageSize]="pageSize"
-      [totalElements]="totalElements"
-      [pageSizeOptions]="pageSizeOptions"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)"
-    ></app-pagination>
+    <!-- Pagination Section -->
+    <div class="pagination-section" *ngIf="totalPages > 0 && !isLoading">
+      <div class="pagination-info">
+        <span class="pagination-text">
+          Showing {{ startIndex + 1 }} to {{ Math.min(endIndex, totalElements) }} of {{ totalElements }} entries
+        </span>
+      </div>
+      <app-pagination
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalElements]="totalElements"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        aria-label="Batch data pagination"
+      ></app-pagination>
+    </div>
   </div>
 </div>
 
