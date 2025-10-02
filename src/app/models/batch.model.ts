@@ -85,7 +85,8 @@ export interface MachineListResponse {
 
 
 export interface BatchSearchRequest {
-  date?: string; // YYYY-MM-DD
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
   shift?: string; // 'A' | 'B' | 'C'
   machineId?: number;
   page: number;

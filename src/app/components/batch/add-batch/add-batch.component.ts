@@ -4,12 +4,12 @@ import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Va
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
-import { BatchService } from '../../services/batch.service';
-import { BatchFullDetailsResponse, BatchUpsertRequest } from '../../models/batch.model';
-import { LoaderComponent } from '../../shared/components/loader/loader.component';
-import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
-import { ProductService } from '../../services/product.service';
-import { SnackbarService } from '../../shared/services/snackbar.service';
+import { BatchService } from '../../../services/batch.service';
+import { BatchFullDetailsResponse, BatchUpsertRequest } from '../../../models/batch.model';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
+import { ProductService } from '../../../services/product.service';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-add-batch',
@@ -182,7 +182,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     this.batchService.upsert(payload).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.snackbar.success(this.isEdit ? 'Batch updated successfully' : 'Batch created successfully');
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/batch']);
       },
       error: () => {
         this.snackbar.error('Failed to save batch');
