@@ -203,8 +203,19 @@ export class BatchListComponent implements OnInit {
     return batch.id;
   }
 
-  // Math utility for template
-  Math = Math;
+  // Navigate to create new batch and clear any stored edit data
+  createNewBatch(): void {
+    // Clear any stored encrypted batch ID to ensure clean slate for new batch
+    localStorage.removeItem('editBatchId');
+    
+    // Navigate to add batch route
+    this.router.navigate(['/batch/add']);
+  }
+
+  // Get end index for pagination display
+  getEndIndex(): number {
+    return Math.min(this.endIndex, this.totalElements);
+  }
 }
 
 

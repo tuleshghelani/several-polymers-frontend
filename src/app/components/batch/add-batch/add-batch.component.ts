@@ -50,14 +50,16 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     this.loadMachines();
     this.loadProducts();
     
-    // Check for encrypted ID in route params (new approach)
+    // Check for encrypted ID in route params (for edit mode)
     const encryptedIdParam = this.route.snapshot.paramMap.get('encryptedId');
+    console.log('encryptedIdParam', encryptedIdParam);
     if (encryptedIdParam) {
       const decryptedId = this.urlEncryptionService.decryptId(encryptedIdParam);
       if (decryptedId) {
         this.isEdit = true;
         this.currentId = decryptedId;
         this.fetchFullDetails(this.currentId);
+        return; // Exit early for edit mode
       } else {
         this.snackbar.error('Invalid batch ID. Redirecting to batch list.');
         this.router.navigate(['/batch']);
@@ -67,14 +69,27 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     
     // Fallback: Check for regular ID in query params (for backward compatibility)
     const idParam = this.route.snapshot.queryParamMap.get('id');
-    if (idParam && !encryptedIdParam) {
+    if (idParam) {
       this.isEdit = true;
       this.currentId = Number(idParam);
       this.fetchFullDetails(this.currentId);
+      return; // Exit early for edit mode
     }
     
-    // Check for encrypted ID in localStorage (similar to quotation pattern)
-    if (!encryptedIdParam && !idParam) {
+    // For create mode: Only check localStorage if we're not explicitly in edit mode
+    // and the current route is exactly '/batch/add' or '/batch/create'
+    const currentUrl = this.router.url;
+    const isCreateRoute = currentUrl === '/batch/add' || currentUrl === '/batch/create';
+    
+    if (isCreateRoute) {
+      // For create mode, clear any existing localStorage data to ensure clean slate
+      localStorage.removeItem('editBatchId');
+      this.isEdit = false;
+      this.currentId = null;
+      // Ensure form is reset to default values for create mode
+      this.resetFormToDefaults();
+    } else {
+      // Only check localStorage for edit data if we're not on a create route
       const encryptedBatchId = localStorage.getItem('editBatchId');
       if (encryptedBatchId) {
         const decryptedId = this.encryptionService.decrypt(encryptedBatchId);
@@ -104,6 +119,32 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       mixer: this.fb.array([], [this.minArrayLengthValidator(1)]),
       production: this.fb.array([], [this.minArrayLengthValidator(1)])
     });
+  }
+
+  private resetFormToDefaults(): void {
+    const today = formatDate(new Date(), 'yyyy-MM-dd', 'en-US');
+    
+    // Reset form to default values
+    this.form.patchValue({
+      id: null,
+      date: today,
+      shift: 'D',
+      resignBagUse: 0,
+      resignBagOpeningStock: 0,
+      cpwBagUse: 0,
+      cpwBagOpeningStock: 0,
+      machineId: null,
+      operator: ''
+    });
+
+    // Clear form arrays
+    this.mixerArray.clear();
+    this.productionArray.clear();
+
+    // Reset form state
+    this.form.markAsUntouched();
+    this.form.markAsPristine();
+    this.submitted = false;
   }
 
   private minArrayLengthValidator(min: number) {
