@@ -49,6 +49,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     this.initForm();
     this.loadMachines();
     this.loadProducts();
+    this.prefillOpeningStocksIfCreate();
     
     // Check for encrypted ID in route params (for edit mode)
     const encryptedIdParam = this.route.snapshot.paramMap.get('encryptedId');
@@ -88,6 +89,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       this.currentId = null;
       // Ensure form is reset to default values for create mode
       this.resetFormToDefaults();
+      this.prefillOpeningStocksIfCreate();
     } else {
       // Only check localStorage for edit data if we're not on a create route
       const encryptedBatchId = localStorage.getItem('editBatchId');
@@ -145,6 +147,26 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     this.form.markAsUntouched();
     this.form.markAsPristine();
     this.submitted = false;
+  }
+
+  private prefillOpeningStocksIfCreate(): void {
+    // Only prefill in create mode
+    if (this.isEdit) { return; }
+    this.productService.getRemainingQuantitiesByCodes()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res?.success && res?.data) {
+            const resign = Number(res.data['RESIGN'] ?? 0);
+            const cpw = Number(res.data['CPW'] ?? 0);
+            this.form.patchValue({
+              resignBagOpeningStock: resign,
+              cpwBagOpeningStock: cpw
+            });
+          }
+        },
+        error: () => {}
+      });
   }
 
   private minArrayLengthValidator(min: number) {
@@ -233,6 +255,17 @@ export class AddBatchComponent implements OnInit, OnDestroy {
 
   refreshMachines(): void {
     this.loadMachines();
+  }
+
+  // Helpers to display bag counts
+  getResignUseBags(): number {
+    const kg = Number(this.form?.get('resignBagUse')?.value || 0);
+    return +(kg / 25).toFixed(3);
+  }
+
+  getCpwOpeningBags(): number {
+    const kg = Number(this.form?.get('cpwBagOpeningStock')?.value || 0);
+    return +(kg / 250).toFixed(3);
   }
 
   submit(): void {

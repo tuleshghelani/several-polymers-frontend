@@ -64,4 +64,12 @@ export class ProductService {
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  // Fetch remaining quantities by product codes (e.g., RESIGN, CPW)
+  getRemainingQuantitiesByCodes(): Observable<{ success: boolean; data: Record<string, number> }> {
+    return this.http.post<{ success: boolean; data: Record<string, number> }>(
+      `${this.apiUrl}/remaining-quantities/codes`,
+      {}
+    );
+  }
 }
