@@ -29,6 +29,11 @@ export class BatchService {
   deleteBatch(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/api/batchs/${id}`);
   }
+
+  // Export batches as Excel
+  exportBatches(request: Partial<BatchSearchRequest>): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/api/batchs/export`, request, { responseType: 'blob' });
+  }
 }
 
 

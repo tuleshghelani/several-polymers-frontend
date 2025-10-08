@@ -30,6 +30,7 @@ import { EncryptionService } from '../../../shared/services/encryption.service';
 export class BatchListComponent implements OnInit {
   searchForm!: FormGroup;
   isLoading = false;
+  isExporting = false;
   batches: BatchListItem[] = [];
 
   // Pagination properties
@@ -56,6 +57,7 @@ export class BatchListComponent implements OnInit {
     private encryptionService: EncryptionService
   ) {
     this.initializeForm();
+    this.setDefaultDatesToCurrentMonth();
   }
 
   ngOnInit(): void {
@@ -70,6 +72,16 @@ export class BatchListComponent implements OnInit {
       shift: [''],
       machineId: [null]
     });
+  }
+
+  private setDefaultDatesToCurrentMonth(): void {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const toIsoDate = (d: Date) => d.toISOString().slice(0, 10);
+    this.searchForm.patchValue({
+      startDate: toIsoDate(firstDay),
+      endDate: toIsoDate(today)
+    }, { emitEvent: false });
   }
 
   loadMachines(): void {
@@ -142,6 +154,40 @@ export class BatchListComponent implements OnInit {
     this.pageSize = size;
     this.currentPage = 0;
     this.loadBatches();
+  }
+
+  // Export current filter selection to Excel
+  export(): void {
+    if (this.isExporting) { return; }
+    const form = this.searchForm.value;
+    const request = {
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
+      shift: form.shift || undefined,
+      machineId: (form.machineId !== null && form.machineId !== undefined) ? form.machineId : undefined
+    };
+
+    this.isExporting = true;
+    this.batchService.exportBatches(request).subscribe({
+      next: (blob) => {
+        const fileName = 'bach-report.xlsx';
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        this.snackbar.success('Export started. File download should begin shortly.');
+        this.isExporting = false;
+      },
+      error: (err) => {
+        console.error('Export failed', err);
+        this.snackbar.error('Failed to export batch report');
+        this.isExporting = false;
+      }
+    });
   }
 
   getMachineName(machineId: number): string {

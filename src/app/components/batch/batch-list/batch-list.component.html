@@ -205,9 +205,10 @@
       </div>
     </div>
     <div class="actions-right">
-      <button class="btn btn-outline export-btn" title="Export data" aria-label="Export batch data">
-        <i class="fas fa-download" aria-hidden="true"></i>
-        <span>Export</span>
+      <button class="btn btn-outline export-btn" title="Export data" aria-label="Export batch data" (click)="export()" [disabled]="isExporting || isLoading">
+        <i class="fas" [class]="isExporting ? 'fa-spinner fa-spin' : 'fa-download'" aria-hidden="true"></i>
+        <span *ngIf="!isExporting">Export</span>
+        <span *ngIf="isExporting">Exporting...</span>
       </button>
       <button 
         class="btn btn-primary add-batch-btn"
