@@ -9,6 +9,7 @@ export interface BatchProductionItemRequest {
   productId: number;
   quantity: number;
   numberOfRoll: number;
+  isWastage: boolean;
 }
 
 export interface BatchUpsertRequest {
@@ -74,6 +75,7 @@ export interface BatchFullDetailsResponse {
       productStatus: string;
       quantity: number;
       numberOfRoll: number;
+      isWastage: boolean;
       categoryName: string;
     }>;
   };

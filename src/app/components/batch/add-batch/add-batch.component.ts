@@ -213,7 +213,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
         this.mixerArray.clear();
         (d.mixerItems || []).forEach(item => this.mixerArray.push(this.createMixerGroup(item.productId, item.quantity)));
         this.productionArray.clear();
-        (d.productionItems || []).forEach(item => this.productionArray.push(this.createProductionGroup(item.productId, item.quantity, item.numberOfRoll)));
+        (d.productionItems || []).forEach(item => this.productionArray.push(this.createProductionGroup(item.productId, item.quantity, item.numberOfRoll, item.isWastage || false)));
       },
       error: () => {
         this.snackbar.error('Failed to load batch details');
@@ -245,11 +245,12 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createProductionGroup(productId: number | null = null, quantity: number | null = null, numberOfRoll: number | null = null): FormGroup {
+  private createProductionGroup(productId: number | null = null, quantity: number | null = null, numberOfRoll: number | null = null, isWastage: boolean = false): FormGroup {
     return this.fb.group({
       productId: new FormControl<number | null>(productId, { validators: [Validators.required] }),
       quantity: new FormControl<number | null>(quantity, { validators: [Validators.required, Validators.min(0.001)] }),
-      numberOfRoll: new FormControl<number | null>(numberOfRoll, { validators: [] })
+      numberOfRoll: new FormControl<number | null>(numberOfRoll, { validators: [] }),
+      isWastage: new FormControl<boolean>(isWastage, { validators: [] })
     });
   }
 
@@ -288,7 +289,7 @@ export class AddBatchComponent implements OnInit, OnDestroy {
       machineId: rawValue.machineId,
       operator: rawValue.operator || undefined,
       mixer: (rawValue.mixer || []).map((m: any) => ({ batchId: rawValue.id ?? null, productId: m.productId, quantity: m.quantity })),
-      production: (rawValue.production || []).map((p: any) => ({ batchId: rawValue.id ?? null, productId: p.productId, quantity: p.quantity, numberOfRoll: p.numberOfRoll }))
+      production: (rawValue.production || []).map((p: any) => ({ batchId: rawValue.id ?? null, productId: p.productId, quantity: p.quantity, numberOfRoll: p.numberOfRoll, isWastage: p.isWastage || false }))
     };
 
     this.loading = true;
