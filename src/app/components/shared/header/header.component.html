@@ -64,6 +64,11 @@
                 <i class="fas fa-user-cog"></i> Users
               </a>
             </li>
+            <li *ngIf="permissions.canViewEnquiry">
+              <a routerLink="/enquiry" routerLinkActive="active">
+                <i class="fas fa-question-circle"></i> Enquiry
+              </a>
+            </li>
           </ul>
         </li>
         

@@ -23,6 +23,7 @@ interface MenuPermissions {
   canCreateSale?: boolean;
   canViewUser?: boolean;
   canViewBatch?: boolean;
+  canViewEnquiry?: boolean;
 }
 
 @Component({
@@ -94,7 +95,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewSale: false,
       canCreateSale: false,
       canViewUser: false,
-      canViewBatch: false
+      canViewBatch: false,
+      canViewEnquiry: false
     };
   }
 
@@ -136,7 +138,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isMasterActive(): boolean {
     const currentUrl = this.router.url;
-    return ['/category', '/product', '/customer', '/employee', '/machine', '/transport-master', '/brand', '/user'].some(path => 
+    return ['/category', '/product', '/customer', '/employee', '/machine', '/transport-master', '/brand', '/user', '/enquiry'].some(path => 
       currentUrl.includes(path)
     );
   }
@@ -163,7 +165,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
            this.permissions.canViewMachine || 
            this.permissions.canViewTransport || 
            this.permissions.canViewBrand ||
-           this.permissions.canViewUser || false;
+           this.permissions.canViewUser ||
+           this.permissions.canViewEnquiry || false;
   }
 
   hasTransactionMenuItems(): boolean {

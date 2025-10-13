@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/brand/brand-form/brand-form.component.scss"],
+  "sourcesContent": [".brand-form {\r\n  padding: 2rem;\r\n  // max-width: 1400px;\r\n  margin: 0 auto;\r\n\r\n  @media (max-width: 768px) {\r\n    padding: 1rem;\r\n  }\r\n  .form-grid {\r\n    display: grid;\r\n    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));\r\n    gap: 16px;\r\n  }\r\n  .form-actions {\r\n    margin-top: 16px;\r\n    display: flex;\r\n    gap: 10px;\r\n  }\r\n}\r\n\r\n"],
+  "mappings": ";AAAA,CAAA;AACE,WAAA;AAEA,UAAA,EAAA;;AAEA,OAAA,CAAA,SAAA,EAAA;AALF,GAAA;AAMI,aAAA;;;AAEF,CARF,WAQE,CAAA;AACE,WAAA;AACA,yBAAA,OAAA,QAAA,EAAA,OAAA,KAAA,EAAA;AACA,OAAA;;AAEF,CAbF,WAaE,CAAA;AACE,cAAA;AACA,WAAA;AACA,OAAA;;",
+  "names": []
+}

@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "Enquiry Master Controller",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "e3e7f5d6-7f2d-4f11-9d9a-0000enquiry0001"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Enquiry",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"mobile\": \"+1234567890\",\n  \"mail\": \"john.doe@example.com\",\n  \"subject\": \"Product Inquiry\",\n  \"address\": \"123 Main St, City, State\",\n  \"description\": \"Interested in your polymer products\",\n  \"status\": \"A\",\n  \"type\": \"Individual\",\n  \"company\": \"ABC Corporation\",\n  \"city\": \"New York\",\n  \"state\": \"NY\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseURL}}/api/enquiries" }
+          },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry created successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update Enquiry (body id)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"name\": \"John Doe Updated\",\n  \"mobile\": \"+1234567890\",\n  \"mail\": \"john.doe.updated@example.com\",\n  \"subject\": \"Updated Product Inquiry\",\n  \"address\": \"456 Updated St, City, State\",\n  \"description\": \"Updated interest in your polymer products\",\n  \"status\": \"A\",\n  \"type\": \"Corporate\",\n  \"company\": \"XYZ Corporation\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "PUT", "url": { "raw": "{{baseURL}}/api/enquiries" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry updated successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Update Enquiry (path id)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/:id",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", ":id"],
+          "variable": [
+            { "key": "id", "value": "1" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"mobile\": \"+1234567890\",\n  \"mail\": \"john.doe.updated@example.com\",\n  \"subject\": \"Updated Product Inquiry\",\n  \"address\": \"456 Updated St, City, State\",\n  \"description\": \"Updated interest in your polymer products\",\n  \"status\": \"A\",\n  \"type\": \"Corporate\",\n  \"company\": \"XYZ Corporation\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "PUT", "url": { "raw": "{{baseURL}}/api/enquiries/1" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry updated successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete Enquiry (body id)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "DELETE", "url": { "raw": "{{baseURL}}/api/enquiries" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry deleted successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Delete Enquiry (path id)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/:id",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", ":id"],
+          "variable": [
+            { "key": "id", "value": "1" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "DELETE", "url": { "raw": "{{baseURL}}/api/enquiries/1" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry deleted successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Enquiries (paged)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/getEnquiries",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", "getEnquiries"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"id\",\n  \"sortDir\": \"desc\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/enquiries/getEnquiries" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiries retrieved successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"mobile\": \"+1234567890\",\n      \"mail\": \"john.doe@example.com\",\n      \"subject\": \"Product Inquiry\",\n      \"address\": \"123 Main St, City, State\",\n      \"description\": \"Interested in your polymer products\",\n      \"status\": \"A\",\n      \"type\": \"Individual\",\n      \"company\": \"ABC Corporation\",\n      \"city\": \"New York\",\n      \"state\": \"NY\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Search Enquiries",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/search",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", "search"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"search\": \"john\",\n  \"page\": 0,\n  \"size\": 10,\n  \"sortBy\": \"id\",\n  \"sortDir\": \"desc\"\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/enquiries/search" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiries retrieved successfully\",\n  \"data\": {\n    \"content\": [\n      { \n        \"id\": 1, \n        \"name\": \"John Doe\", \n        \"mobile\": \"+1234567890\",\n        \"mail\": \"john.doe@example.com\",\n        \"subject\": \"Product Inquiry\",\n        \"address\": \"123 Main St, City, State\",\n        \"description\": \"Interested in your polymer products\",\n        \"status\": \"A\",\n        \"type\": \"Individual\",\n        \"company\": \"ABC Corporation\",\n        \"city\": \"New York\",\n        \"state\": \"NY\"\n      }\n    ],\n    \"totalElements\": 1,\n    \"totalPages\": 1\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Details (body id)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/details",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", "details"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "POST", "url": { "raw": "{{baseURL}}/api/enquiries/details" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry details retrieved successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"John Doe\",\n    \"mobile\": \"+1234567890\",\n    \"mail\": \"john.doe@example.com\",\n    \"subject\": \"Product Inquiry\",\n    \"address\": \"123 Main St, City, State\",\n    \"description\": \"Interested in your polymer products\",\n    \"status\": \"A\",\n    \"type\": \"Individual\",\n    \"company\": \"ABC Corporation\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"clientId\": 10,\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": null,\n    \"createdById\": 1,\n    \"createdByName\": \"Admin User\",\n    \"updatedById\": null,\n    \"updatedByName\": null\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Details (path id)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseURL}}/api/enquiries/:id",
+          "host": ["{{baseURL}}"],
+          "path": ["api", "enquiries", ":id"],
+          "variable": [
+            { "key": "id", "value": "1" }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "originalRequest": { "method": "GET", "url": { "raw": "{{baseURL}}/api/enquiries/1" } },
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"Enquiry details retrieved successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"John Doe\",\n    \"mobile\": \"+1234567890\",\n    \"mail\": \"john.doe@example.com\",\n    \"subject\": \"Product Inquiry\",\n    \"address\": \"123 Main St, City, State\",\n    \"description\": \"Interested in your polymer products\",\n    \"status\": \"A\",\n    \"type\": \"Individual\",\n    \"company\": \"ABC Corporation\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"clientId\": 10,\n    \"createdAt\": \"2024-01-01T00:00:00Z\",\n    \"updatedAt\": null,\n    \"createdById\": 1,\n    \"createdByName\": \"Admin User\",\n    \"updatedById\": null,\n    \"updatedByName\": null\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
