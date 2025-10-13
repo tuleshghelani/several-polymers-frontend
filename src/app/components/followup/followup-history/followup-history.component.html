@@ -16,12 +16,17 @@
     <div class="timeline" *ngIf="followups.length > 0">
       <div class="timeline-item" *ngFor="let followup of followups">
         <div class="timeline-marker">
-          <div class="marker"></div>
+          <div class="marker" [ngClass]="{'completed': followup.followUpStatus === 'C'}"></div>
         </div>
         <div class="timeline-content">
-          <div class="timeline-date">
-            <i class="fas fa-calendar-alt"></i>
-            {{ formatDate(followup.nextActionDate) }}
+          <div class="timeline-header">
+            <span class="timeline-date">
+              <i class="fas fa-calendar-alt"></i>
+              {{ formatDate(followup.nextActionDate) }}
+            </span>
+            <span class="status-badge" [ngClass]="{'completed': followup.followUpStatus === 'C', 'scheduled': followup.followUpStatus === 'S'}">
+              {{ followup.followUpStatus === 'C' ? 'Completed' : followup.followUpStatus === 'S' ? 'Schedule' : followup.followUpStatus }}
+            </span>
           </div>
           <div class="timeline-description" *ngIf="followup.description">
             {{ followup.description }}

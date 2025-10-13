@@ -8,29 +8,33 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="dialog-content">
-      <div class="form-field">
-        <label for="nextActionDate">Next Action Date & Time <span class="required">*</span></label>
-        <input 
-          type="datetime-local" 
-          id="nextActionDate"
-          formControlName="nextActionDate" 
-          class="form-control"
-          [min]="minDate | date:'yyyy-MM-ddTHH:mm'"
-        >
-        <div class="error" *ngIf="form.get('nextActionDate')?.invalid && form.get('nextActionDate')?.touched">
-          <span *ngIf="form.get('nextActionDate')?.errors?.['required']">Next action date is required</span>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="nextActionDate">Next Action Date & Time <span class="required">*</span></label>
+          <input 
+            type="datetime-local" 
+            id="nextActionDate"
+            formControlName="nextActionDate" 
+            class="form-control"
+            [min]="minDate | date:'yyyy-MM-ddTHH:mm'"
+          >
+          <div class="error" *ngIf="form.get('nextActionDate')?.invalid && form.get('nextActionDate')?.touched">
+            <span *ngIf="form.get('nextActionDate')?.errors?.['required']">Next action date is required</span>
+          </div>
         </div>
       </div>
 
-      <div class="form-field">
-        <label for="description">Description <span class="optional">(Optional)</span></label>
-        <textarea 
-          id="description"
-          formControlName="description" 
-          class="form-control"
-          rows="4"
-          placeholder="Enter follow-up details..."
-        ></textarea>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="description">Description <span class="optional">(Optional)</span></label>
+          <textarea 
+            id="description"
+            formControlName="description" 
+            class="form-control"
+            rows="4"
+            placeholder="Enter follow-up details..."
+          ></textarea>
+        </div>
       </div>
     </div>
 
