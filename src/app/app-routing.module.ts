@@ -39,6 +39,7 @@ import { CreateAttendanceComponent } from './components/attendance/create-attend
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
 import { AddEnquiryComponent } from './components/enquiry/add-enquiry/add-enquiry.component';
 import { EnquiryListComponent } from './components/enquiry/enquiry-list/enquiry-list.component';
+import { FollowupListComponent } from './components/followup/followup-list/followup-list.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -317,6 +318,14 @@ const routes: Routes = [
   {
     path: 'enquiry/edit/:encryptedId',
     component: AddEnquiryComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
+  },
+  
+  // Follow-up Routes
+  {
+    path: 'followup',
+    component: FollowupListComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },

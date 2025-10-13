@@ -1,0 +1,128 @@
+<div class="followup-list-container">
+  <h2>Follow-Up List</h2>
+
+  <!-- Search Form -->
+  <div class="search-filters card mb-4">
+    <div class="card-header">
+      <h5>Search Filters</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="followUpStatus">Status</label>
+              <select class="form-control" id="followUpStatus" formControlName="followUpStatus">
+                <option value="">All</option>
+                <option value="S">Scheduled</option>
+                <option value="C">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="search">Search</label>
+              <input type="text" class="form-control" id="search" formControlName="search" placeholder="Search by description or enquiry name">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="startDate">Start Date</label>
+              <input type="date" class="form-control" id="startDate" formControlName="startDate">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input type="date" class="form-control" id="endDate" formControlName="endDate">
+            </div>
+            </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+            Search
+          </button>
+          <button type="button" class="btn btn-secondary ml-2" (click)="resetFilters()">
+            Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary mb-3">
+    <p *ngIf="!loading && totalElements > 0">
+      Showing {{ currentPage * pageSize + 1 }} to {{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }} of {{ totalElements }} entries
+    </p>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Follow-Up Table -->
+  <div *ngIf="!loading" class="followup-table card">
+    <div class="card-header">
+      <h5>Follow-Ups</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Enquiry Name</th>
+              <th>Status</th>
+              <th (click)="onSort('nextActionDate')" class="sortable">
+                Next Action Date
+                <span *ngIf="sortBy === 'nextActionDate'" class="sort-indicator">
+                  <i class="fas fa-sort-up" *ngIf="sortDir === 'asc'"></i>
+                  <i class="fas fa-sort-down" *ngIf="sortDir === 'desc'"></i>
+                </span>
+              </th>
+              <th>Description</th>
+              <th>Mobile number</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let followUp of followUps">
+              <td>{{ followUp.enquiryName }}</td>
+              <td>
+                <span [ngClass]="{'badge': true, 'badge-warning': followUp.followUpStatus === 'S', 'badge-success': followUp.followUpStatus === 'C'}">
+                  {{ getStatusDisplay(followUp.followUpStatus) }}
+                </span>
+              </td>
+              <td>{{ followUp.nextActionDate | date:'mediumDate' }}</td>
+              <td>{{ followUp.description }}</td>
+              <td>{{ followUp.mobile }}</td>
+            </tr>
+            <tr *ngIf="followUps.length === 0">
+              <td colspan="7" class="text-center">No follow-ups found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && totalPages > 1" class="pagination-container mt-4">
+    <nav aria-label="Follow-up pagination">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" (click)="onPageChange(currentPage - 1)" tabindex="-1">Previous</a>
+        </li>
+        <li *ngFor="let page of [].constructor(totalPages); let i = index" class="page-item" [class.active]="i === currentPage">
+          <a class="page-link" (click)="onPageChange(i)">{{ i + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+          <a class="page-link" (click)="onPageChange(currentPage + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

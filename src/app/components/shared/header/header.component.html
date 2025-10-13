@@ -69,6 +69,11 @@
                 <i class="fas fa-question-circle"></i> Enquiry
               </a>
             </li>
+            <li *ngIf="permissions.canViewFollowup">
+              <a routerLink="/followup" routerLinkActive="active">
+                <i class="fas fa-university"></i>Followup
+              </a>
+            </li>
           </ul>
         </li>
         

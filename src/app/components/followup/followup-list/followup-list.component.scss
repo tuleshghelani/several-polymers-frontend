@@ -1,0 +1,141 @@
+.followup-list-container {
+  padding: 20px;
+
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .search-filters {
+    margin-bottom: 20px;
+
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+
+      label {
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .form-control {
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        padding: 8px 12px;
+      }
+    }
+
+    .form-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  .results-summary {
+    p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  }
+
+  .followup-table {
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    table {
+      th {
+        // background-color: #e9ecef;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+
+        &.sortable:hover {
+          background-color: #dde0e3;
+        }
+
+        .sort-indicator {
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+
+          .fa-sort-up,
+          .fa-sort-down {
+            font-size: 12px;
+            position: absolute;
+            right: 0;
+          }
+
+          .fa-sort-up {
+            top: 0;
+          }
+
+          .fa-sort-down {
+            bottom: 0;
+          }
+        }
+      }
+
+      td {
+        vertical-align: middle;
+      }
+
+      .badge {
+        font-size: 0.75em;
+        padding: 0.4em 0.6em;
+      }
+
+      .badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+      }
+
+      .badge-success {
+        background-color: #28a745;
+        color: #fff;
+      }
+    }
+  }
+
+  .pagination-container {
+    .page-item {
+      &.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+
+      &.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+      }
+
+      .page-link {
+        color: #007bff;
+        cursor: pointer;
+        &:hover {
+          background-color: #e9ecef;
+        }
+      }
+    }
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+}

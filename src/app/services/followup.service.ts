@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { FollowUp, FollowUpListResponse, FollowUpRequest, FollowUpResponse } from '../models/followup.model';
+import { FollowUp, FollowUpListResponse, FollowUpRequest, FollowUpResponse, FollowUpSearchRequest, FollowUpSearchResponse } from '../models/followup.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,5 +31,10 @@ export class FollowUpService {
   // Delete a followup
   deleteFollowUp(id: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/delete`, { id });
+  }
+
+  // Search followups with pagination
+  searchFollowUps(searchRequest: FollowUpSearchRequest): Observable<FollowUpSearchResponse> {
+    return this.http.post<FollowUpSearchResponse>(`${this.apiUrl}/search`, searchRequest);
   }
 }

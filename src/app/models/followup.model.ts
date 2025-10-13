@@ -6,6 +6,7 @@ export interface FollowUp {
   enquiryId: number;
   enquiryName?: string;
   clientId?: number;
+  mobile?: string;
   clientName?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -37,6 +38,31 @@ export interface FollowUpListResponse {
   status: string;
   message: string;
   data: FollowUpListData;
+}
+
+// New interface for search request
+export interface FollowUpSearchRequest {
+  id?: number;
+  followUpStatus?: string;
+  clientId?: number;
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  page: number;
+  size: number;
+  sortBy: string;
+  sortDir: string;
+}
+
+// New interface for search response
+export interface FollowUpSearchResponse {
+  success: boolean;
+  message: string;
+  data: {
+    content: FollowUp[];
+    totalElements: number;
+    totalPages: number;
+  };
 }
 
 // Helper function to get the display status
