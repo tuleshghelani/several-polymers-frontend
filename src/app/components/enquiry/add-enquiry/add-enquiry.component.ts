@@ -3,17 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { EnquiryService } from '../../../services/enquiry.service';
 import { EnquiryDetailsResponse, EnquiryUpsertRequest } from '../../../models/enquiry.model';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { UrlEncryptionService } from '../../../shared/services/url-encryption.service';
+import { FollowupHistoryComponent } from '../../followup/followup-history/followup-history.component';
+import { FollowupDialogComponent } from '../../followup/followup-dialog/followup-dialog.component';
 
 @Component({
   selector: 'app-add-enquiry',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoaderComponent, FollowupHistoryComponent, MatDialogModule],
   templateUrl: './add-enquiry.component.html',
   styleUrls: ['./add-enquiry.component.scss']
 })
@@ -22,7 +25,7 @@ export class AddEnquiryComponent implements OnInit, OnDestroy {
   isEdit = false;
   loading = false;
   submitted = false;
-  private currentId: number | null = null;
+  currentId: number | null = null;
   private destroy$ = new Subject<void>();
 
   // Status options
@@ -38,8 +41,32 @@ export class AddEnquiryComponent implements OnInit, OnDestroy {
     private snackbar: SnackbarService,
     private router: Router,
     private route: ActivatedRoute,
-    private urlEncryptionService: UrlEncryptionService
+    private urlEncryptionService: UrlEncryptionService,
+    private dialog: MatDialog
   ) {}
+
+  // Open follow-up dialog to add a new follow-up
+  openFollowupDialog(): void {
+    if (!this.currentId) {
+      this.snackbar.error('Cannot add follow-up: No enquiry ID available');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(FollowupDialogComponent, {
+      width: '500px',
+      data: { enquiryId: this.currentId }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Refresh the follow-up history if a new follow-up was added
+        const followupHistoryComponent = document.querySelector('app-followup-history');
+        // if (followupHistoryComponent && typeof followupHistoryComponent['loadFollowups'] === 'function') {
+        //   followupHistoryComponent['loadFollowups']();
+        // }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.initForm();

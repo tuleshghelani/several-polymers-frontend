@@ -1,0 +1,36 @@
+<div class="followup-history">
+  <app-loader *ngIf="loading"></app-loader>
+
+  <div class="history-header">
+    <h3>Follow-up History</h3>
+  </div>
+
+  <div class="history-content" *ngIf="!loading">
+    <div class="empty-state" *ngIf="followups.length === 0">
+      <div class="icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <p>No follow-ups recorded yet</p>
+    </div>
+
+    <div class="timeline" *ngIf="followups.length > 0">
+      <div class="timeline-item" *ngFor="let followup of followups">
+        <div class="timeline-marker">
+          <div class="marker"></div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-date">
+            <i class="fas fa-calendar-alt"></i>
+            {{ formatDate(followup.nextActionDate) }}
+          </div>
+          <div class="timeline-description" *ngIf="followup.description">
+            {{ followup.description }}
+          </div>
+          <div class="timeline-meta" *ngIf="followup.createdAt">
+            <small>Created: {{ formatDate(followup.createdAt) }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
