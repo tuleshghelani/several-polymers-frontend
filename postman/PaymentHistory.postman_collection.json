@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Payment History Controller",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "00000000-0000-0000-0000-paymenthistory0001"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Payment History",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/payment-history/save",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api",
+            "payment-history",
+            "save"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 1000.00,\n  \"customerId\": 1,\n  \"customerName\": \"John Doe\",\n  \"type\": \"C\",\n  \"remarks\": \"Payment for order #123\",\n  \"isReceived\": true,\n  \"date\": \"15-10-2025\",\n  \"createdById\": 1,\n  \"createdByName\": \"Admin User\",\n  \"clientId\": 1\n}"
+        }
+      }
+    },
+    {
+      "name": "Update Payment History",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/payment-history/update",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api",
+            "payment-history",
+            "update"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"amount\": 1500.00,\n  \"customerId\": 1,\n  \"customerName\": \"John Doe\",\n  \"type\": \"B\",\n  \"remarks\": \"Updated payment for order #123\",\n  \"isReceived\": true,\n  \"date\": \"15-10-2025\",\n  \"updatedById\": 1,\n  \"updatedByName\": \"Admin User\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete Payment History",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/payment-history/delete",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api",
+            "payment-history",
+            "delete"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      }
+    },
+    {
+      "name": "Search Payment Histories",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/payment-history/search",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api",
+            "payment-history",
+            "search"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"search\": \"john\",\n  \"currentPage\": 0,\n  \"perPageRecord\": 10,\n  \"clientId\": 1,\n  \"startDate\": \"01-01-2025 00:00:00\",\n  \"endDate\": \"31-12-2025 23:59:59\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get Payment History Detail",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseURL}}/api/payment-history/get-detail",
+          "host": [
+            "{{baseURL}}"
+          ],
+          "path": [
+            "api",
+            "payment-history",
+            "get-detail"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        }
+      }
+    }
+  ]
+}

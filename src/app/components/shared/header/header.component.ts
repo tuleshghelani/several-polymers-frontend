@@ -25,6 +25,7 @@ interface MenuPermissions {
   canViewBatch?: boolean;
   canViewEnquiry?: boolean;
   canViewFollowup?: boolean;
+  canViewPayment?: boolean;
 }
 
 @Component({
@@ -98,7 +99,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       canViewUser: false,
       canViewBatch: false,
       canViewEnquiry: false,
-      canViewFollowup: false
+      canViewFollowup: false,
+      canViewPayment: false,
     };
   }
 

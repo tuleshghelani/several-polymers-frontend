@@ -1,0 +1,225 @@
+@import '../../../../variables';
+@import '../../../../styles.scss';
+.payment-history-list-container {
+  padding: 20px;
+  margin: 0 auto;
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    .page-title {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #333;
+
+      i {
+        margin-right: 10px;
+        color: #007bff;
+      }
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+
+        &:hover {
+          background-color: #0069d9;
+          border-color: #0062cc;
+        }
+
+        i {
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+
+  .search-section {
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+
+    .search-form {
+      .search-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: end;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .form-group {
+          margin-bottom: 0;
+
+          label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+          }
+
+          .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+
+            &:focus {
+              border-color: #80bdff;
+              outline: 0;
+              box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            }
+          }
+
+          app-searchable-select {
+            display: block;
+          }
+        }
+
+        .button-group {
+          display: flex;
+          gap: 10px;
+          justify-content: flex-end;
+
+          @media (max-width: 768px) {
+            justify-content: stretch;
+          }
+
+          .btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+
+            &.btn-outline-secondary {
+              background-color: transparent;
+              border: 1px solid #6c757d;
+              color: #6c757d;
+
+              &:hover {
+                background-color: #6c757d;
+                color: #fff;
+              }
+
+              &:disabled {
+                opacity: 0.65;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .payment-history-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: #f8f9fa;
+
+        th {
+          padding: 12px 15px;
+          text-align: left;
+          font-weight: 600;
+          border-bottom: 2px solid #dee2e6;
+
+          &:first-child {
+            border-top-left-radius: 8px;
+          }
+
+          &:last-child {
+            border-top-right-radius: 8px;
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          &:hover {
+            background-color: #f8f9fa;
+          }
+
+          &:not(:last-child) {
+            td {
+              border-bottom: 1px solid #dee2e6;
+            }
+          }
+
+          td {
+            padding: 12px 15px;
+            vertical-align: middle;
+
+            &.actions {
+              display: flex;
+              gap: 5px;
+
+              .btn {
+                padding: 5px 10px;
+                border-radius: 4px;
+                font-size: 12px;
+
+                &.btn-outline-primary {
+                  border-color: #007bff;
+                  color: #007bff;
+
+                  &:hover {
+                    background-color: #007bff;
+                    color: #fff;
+                  }
+                }
+
+                &.btn-outline-danger {
+                  border-color: #dc3545;
+                  color: #dc3545;
+
+                  &:hover {
+                    background-color: #dc3545;
+                    color: #fff;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pagination-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+}

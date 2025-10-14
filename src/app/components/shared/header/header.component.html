@@ -74,6 +74,11 @@
                 <i class="fas fa-university"></i>Followup
               </a>
             </li>
+            <li *ngIf="permissions.canViewPayment">
+              <a routerLink="/payment-history" routerLinkActive="active">
+                <i class="fas fa-money-bill-wave"></i> Payment
+              </a>
+            </li>
           </ul>
         </li>
         

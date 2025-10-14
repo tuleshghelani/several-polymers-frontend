@@ -1,4 +1,4 @@
-﻿import { NgModule } from '@angular/core';
+﻿﻿import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { CategoryComponent } from './components/category/category.component';
@@ -40,6 +40,8 @@ import { AttendanceDetailComponent } from './components/attendance/attendance-de
 import { AddEnquiryComponent } from './components/enquiry/add-enquiry/add-enquiry.component';
 import { EnquiryListComponent } from './components/enquiry/enquiry-list/enquiry-list.component';
 import { FollowupListComponent } from './components/followup/followup-list/followup-list.component';
+import { PaymentHistoryListComponent } from './components/payment-history/payment-history-list/payment-history-list.component';
+import { AddPaymentHistoryComponent } from './components/payment-history/add-payment-history/add-payment-history.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -329,7 +331,26 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'SALES_AND_MARKETING', 'DISPATCH'] }
   },
-  
+
+  // Payment Routes
+  {
+    path: 'payment-history',
+    component: PaymentHistoryListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING'] }
+  },
+  {
+    path: 'payment-history/add',
+    component: AddPaymentHistoryComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING'] }
+  },
+  {
+    path: 'payment-history/edit/:encryptedId',
+    component: AddPaymentHistoryComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'SALES_AND_MARKETING'] }
+  },
   // Legacy routes (keeping for backward compatibility)
   {
     path: 'combined-purchase-sale',

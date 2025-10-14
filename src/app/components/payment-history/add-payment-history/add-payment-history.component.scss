@@ -1,0 +1,167 @@
+@import '../../../../variables';
+@import '../../../../styles.scss';
+.add-payment-history-container {
+  padding: 20px;
+  margin: 0 auto;
+
+  .back-btn {
+    margin-bottom: 20px;
+  }
+
+  .form-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    .card-header {
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+
+      .form-title {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #333;
+        
+        i {
+          margin-right: 10px;
+        }
+      }
+    }
+
+    .payment-history-form {
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+
+        label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: 500;
+          color: #555;
+
+          .required {
+            color: #dc3545;
+          }
+
+          i {
+            margin-right: 5px;
+            color: #6c757d;
+          }
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          font-size: 14px;
+
+          &:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+          }
+
+          &.is-invalid {
+            border-color: #dc3545;
+          }
+        }
+
+        .form-check {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .form-check-input {
+            margin: 0;
+          }
+        }
+
+        .select-group {
+          display: flex;
+          gap: 10px;
+
+          app-searchable-select {
+            flex: 1;
+          }
+
+          .refresh {
+            height: fit-content;
+            align-self: flex-end;
+          }
+        }
+
+        textarea.form-control {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .invalid-feedback {
+          display: block;
+          width: 100%;
+          margin-top: 0.25rem;
+          font-size: 80%;
+          color: #dc3545;
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+
+        .btn {
+          padding: 8px 16px;
+          border-radius: 4px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &.btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+
+            &:hover {
+              background-color: #5a6268;
+              border-color: #545b62;
+            }
+          }
+
+          &.btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+
+            &:hover {
+              background-color: #0069d9;
+              border-color: #0062cc;
+            }
+
+            &:disabled {
+              background-color: #007bff;
+              border-color: #007bff;
+              opacity: 0.65;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+}
