@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FollowUp, FollowUpSearchRequest, getFollowUpStatusDisplay } from '../../../models/followup.model';
 import { FollowUpService } from '../../../services/followup.service';
+import { Router } from '@angular/router';
+import { UrlEncryptionService } from '../../../shared/services/url-encryption.service';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-followup-list',
@@ -27,7 +30,10 @@ export class FollowupListComponent implements OnInit {
 
   constructor(
     private followUpService: FollowUpService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private snackbar: SnackbarService,
+    private router: Router,
+    private urlEncryptionService: UrlEncryptionService
   ) {
     this.searchForm = this.fb.group({
       id: [''],
@@ -41,6 +47,37 @@ export class FollowupListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFollowUps();
+  }
+  
+  editEnquiry(id: number): void {
+    try {
+      // Use encrypted URL parameter only
+      const encryptedId = this.urlEncryptionService.encryptId(id);
+      if (encryptedId) {
+        this.router.navigate(['/enquiry/edit', encryptedId]);
+      } else {
+        // Fallback to /enquiry/add route if URL encryption fails
+        this.router.navigate(['/enquiry/add']);
+      }
+    } catch (error) {
+      console.error('Error encrypting enquiry ID:', error);
+      this.snackbar.error('Failed to navigate to edit page');
+    }
+  }  
+
+  openWhatsApp(rawNumber: string | number | null | undefined): void {
+    const digits = String(rawNumber ?? '').replace(/\D/g, '');
+    if (!digits) {
+      return;
+    }
+    const normalized = digits.length === 10 ? `91${digits}` : digits;
+    const url = `whatsapp://send?phone=${normalized}`;
+    try {
+      // Attempt to open native WhatsApp app via custom protocol
+      window.location.href = url;
+    } catch {
+      // Swallow errors; native handlers may block exceptions
+    }
   }
 
   loadFollowUps(): void {
