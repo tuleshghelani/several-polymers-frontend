@@ -32,9 +32,6 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   @Input() maxHeight: string = '200px'; // Maximum height for dropdown
   @Input() virtualScroll = false; // Enable virtual scrolling for large datasets
   @Input() searchDebounceMs = 300; // Debounce search input
-  @Input() enableSearch = true; // Enable/disable search functionality
-  @Input() searchMinLength = 0; // Minimum characters to start searching
-  @Input() showSearchIcon = true; // Show search icon in input
 
   @ViewChild('searchInput', { static: false }) searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('dropdown', { static: false }) dropdown!: ElementRef<HTMLDivElement>;
@@ -45,12 +42,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   selectedValues: any[] = [];
   filteredOptions: any[] = [];
   highlightedIndex: number = -1;
-  isSearching: boolean = false;
   
   onChange: any = () => {};
   onTouch: any = () => {};
 
-  isMobile = this.detectMobile();
+  isMobile = window.innerWidth <= 768;
   isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
   isSmallMobile = window.innerWidth <= 480;
   private currentScrollPosition = 0;
@@ -58,8 +54,6 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   private searchTimeout: any;
   private resizeObserver?: ResizeObserver;
   private intersectionObserver?: IntersectionObserver;
-  private originalBodyStyles: any = null;
-  private originalHtmlStyles: any = null;
 
   ngOnInit() {
     this.filteredOptions = this.options;
@@ -70,16 +64,6 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     private cdr: ChangeDetectorRef
   ) {
     this.setupResizeObserver();
-  }
-
-  private detectMobile(): boolean {
-    // More comprehensive mobile detection
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-    const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-    const isMobileSize = window.innerWidth <= 768;
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    return isMobileUA || (isMobileSize && isTouchDevice);
   }
 
   writeValue(value: any): void {
@@ -110,16 +94,8 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
       event.stopPropagation();
     }
     
-    // Prevent double-click issues
-    if (this.isOpen && event?.type === 'click') {
-      return;
-    }
-    
     this.isOpen = !this.isOpen;
     if (this.isOpen) {
-      // Store scroll position before opening
-      this.currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      
       this.searchText = '';
       this.filterOptions();
       this.lockBodyScroll();
@@ -133,50 +109,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
   onFocus() {
     if (!this.isOpen) {
-      // Store scroll position before opening
-      this.currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-      
       this.isOpen = true;
       this.filterOptions();
       this.highlightedIndex = -1;
       this.lockBodyScroll();
       this.setupIntersectionObserver();
-    }
-  }
-
-  onInputClick(event: MouseEvent) {
-    // Only open dropdown if not already open to prevent double-click issues
-    if (!this.isOpen) {
-      this.toggleDropdown(event);
-    }
-  }
-
-  // Method to prevent any unwanted scrolling
-  private preventScrollJump(): void {
-    if (this.isMobile) {
-      // Store current position with multiple fallbacks
-      const currentScroll = window.pageYOffset || 
-                           document.documentElement.scrollTop || 
-                           document.body.scrollTop || 
-                           0;
-      
-      // Use multiple requestAnimationFrame calls for better reliability
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          // Check if scroll position changed and restore if needed
-          const newScroll = window.pageYOffset || 
-                           document.documentElement.scrollTop || 
-                           document.body.scrollTop || 
-                           0;
-          
-          if (Math.abs(newScroll - currentScroll) > 5) {
-            // Try multiple methods to restore position
-            window.scrollTo(0, currentScroll);
-            document.documentElement.scrollTop = currentScroll;
-            document.body.scrollTop = currentScroll;
-          }
-        });
-      });
     }
   }
 
@@ -229,27 +166,19 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
       clearTimeout(this.searchTimeout);
     }
     
-    // Show searching state
-    this.isSearching = true;
-    
     // Debounce search for better performance
     this.searchTimeout = setTimeout(() => {
       this.searchText = value;
       this.filterOptions();
       this.isOpen = true;
-      this.isSearching = false;
       this.cdr.detectChanges();
     }, this.searchDebounceMs);
   }
 
   filterOptions() {
-    if (!this.enableSearch || this.searchText.length < this.searchMinLength) {
-      this.filteredOptions = this.options;
-    } else {
-      this.filteredOptions = this.options.filter(option =>
-        option[this.labelKey].toLowerCase().includes(this.searchText.toLowerCase())
-      );
-    }
+    this.filteredOptions = this.options.filter(option =>
+      option[this.labelKey].toLowerCase().includes(this.searchText.toLowerCase())
+    );
     this.highlightedIndex = this.filteredOptions.length > 0 ? 0 : -1;
   }
 
@@ -445,32 +374,10 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
   private focusSearchInput(): void {
     if (this.searchInput && this.isMobile) {
-      // Small delay to ensure dropdown is rendered and scroll is locked
+      // Small delay to ensure dropdown is rendered
       setTimeout(() => {
-        // Prevent any scrolling when focusing
-        const currentScroll = window.pageYOffset || 
-                             document.documentElement.scrollTop || 
-                             document.body.scrollTop || 
-                             0;
-        
         this.searchInput.nativeElement.focus();
-        
-        // Use requestAnimationFrame to ensure focus is complete
-        requestAnimationFrame(() => {
-          // Check if scroll position changed and restore if needed
-          const newScroll = window.pageYOffset || 
-                           document.documentElement.scrollTop || 
-                           document.body.scrollTop || 
-                           0;
-          
-          if (Math.abs(newScroll - currentScroll) > 10) {
-            // Try multiple methods to restore position
-            window.scrollTo(0, currentScroll);
-            document.documentElement.scrollTop = currentScroll;
-            document.body.scrollTop = currentScroll;
-          }
-        });
-      }, 150); // Increased delay for better reliability
+      }, 50);
     }
   }
 
@@ -510,151 +417,16 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
       this.resizeObserver.disconnect();
     }
     this.cleanupIntersectionObserver();
-    this.removeScrollPreventionListeners();
     this.unlockBodyScroll();
   }
 
   private lockBodyScroll(): void {
     if (this.isMobile) {
-      // Store current scroll position with multiple fallbacks
-      this.currentScrollPosition = window.pageYOffset || 
-                                   document.documentElement.scrollTop || 
-                                   document.body.scrollTop || 
-                                   0;
-      
-      // Add class to body and html for additional scroll prevention
-      document.body.classList.add('searchable-select-open');
-      document.documentElement.classList.add('searchable-select-open');
-      
-      // Apply comprehensive styles to prevent scrolling
-      const body = document.body;
-      const html = document.documentElement;
-      
-      // Store original styles for restoration
-      this.originalBodyStyles = {
-        position: body.style.position,
-        top: body.style.top,
-        width: body.style.width,
-        overflow: body.style.overflow,
-        height: body.style.height,
-        left: body.style.left,
-        right: body.style.right
-      };
-      
-      this.originalHtmlStyles = {
-        overflow: html.style.overflow,
-        height: html.style.height
-      };
-      
-      // Apply fixed positioning to body
-      body.style.position = 'fixed';
-      body.style.top = `-${this.currentScrollPosition}px`;
-      body.style.width = '100%';
-      body.style.height = '100%';
-      body.style.overflow = 'hidden';
-      body.style.left = '0';
-      body.style.right = '0';
-      
-      // Also apply to html element for better compatibility
-      html.style.overflow = 'hidden';
-      html.style.height = '100%';
-      
-      // Add touch event listeners to prevent scrolling
-      this.addScrollPreventionListeners();
-      
-      // Prevent any scroll jump after applying styles
-      this.preventScrollJump();
+      document.body.classList.add('no-scroll');
     }
   }
 
   private unlockBodyScroll(): void {
-    if (this.isMobile) {
-      // Remove class from body and html
-      document.body.classList.remove('searchable-select-open');
-      document.documentElement.classList.remove('searchable-select-open');
-      
-      // Remove touch event listeners
-      this.removeScrollPreventionListeners();
-      
-      // Restore original styles
-      const body = document.body;
-      const html = document.documentElement;
-      
-      if (this.originalBodyStyles) {
-        body.style.position = this.originalBodyStyles.position;
-        body.style.top = this.originalBodyStyles.top;
-        body.style.width = this.originalBodyStyles.width;
-        body.style.overflow = this.originalBodyStyles.overflow;
-        body.style.height = this.originalBodyStyles.height;
-        body.style.left = this.originalBodyStyles.left;
-        body.style.right = this.originalBodyStyles.right;
-      }
-      
-      if (this.originalHtmlStyles) {
-        html.style.overflow = this.originalHtmlStyles.overflow;
-        html.style.height = this.originalHtmlStyles.height;
-      }
-      
-      // Restore scroll position with multiple methods for better compatibility
-      setTimeout(() => {
-        window.scrollTo(0, this.currentScrollPosition);
-        document.documentElement.scrollTop = this.currentScrollPosition;
-        document.body.scrollTop = this.currentScrollPosition;
-      }, 0);
-    }
+    document.body.classList.remove('no-scroll');
   }
-
-  private addScrollPreventionListeners(): void {
-    if (this.isMobile) {
-      // Prevent touch scrolling
-      document.addEventListener('touchmove', this.preventTouchScroll, { passive: false });
-      document.addEventListener('touchstart', this.preventTouchScroll, { passive: false });
-      document.addEventListener('touchend', this.preventTouchScroll, { passive: false });
-      
-      // Prevent wheel scrolling
-      document.addEventListener('wheel', this.preventWheelScroll, { passive: false });
-      
-      // Prevent keyboard scrolling
-      document.addEventListener('keydown', this.preventKeyboardScroll, { passive: false });
-    }
-  }
-
-  private removeScrollPreventionListeners(): void {
-    if (this.isMobile) {
-      document.removeEventListener('touchmove', this.preventTouchScroll);
-      document.removeEventListener('touchstart', this.preventTouchScroll);
-      document.removeEventListener('touchend', this.preventTouchScroll);
-      document.removeEventListener('wheel', this.preventWheelScroll);
-      document.removeEventListener('keydown', this.preventKeyboardScroll);
-    }
-  }
-
-  private preventTouchScroll = (e: TouchEvent): void => {
-    // Allow scrolling within the dropdown
-    const target = e.target as HTMLElement;
-    if (target?.closest('.select-dropdown') || target?.closest('.options-container')) {
-      return;
-    }
-    e.preventDefault();
-  };
-
-  private preventWheelScroll = (e: WheelEvent): void => {
-    // Allow scrolling within the dropdown
-    const target = e.target as HTMLElement;
-    if (target?.closest('.select-dropdown') || target?.closest('.options-container')) {
-      return;
-    }
-    e.preventDefault();
-  };
-
-  private preventKeyboardScroll = (e: KeyboardEvent): void => {
-    // Allow arrow keys for dropdown navigation
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Enter' || e.key === 'Escape') {
-      return;
-    }
-    // Prevent other keyboard scrolling
-    if (e.key === 'PageUp' || e.key === 'PageDown' || e.key === 'Home' || e.key === 'End') {
-      e.preventDefault();
-    }
-  };
 } 
