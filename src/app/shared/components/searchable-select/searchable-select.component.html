@@ -1,37 +1,85 @@
-<div class="searchable-select" [class.active]="isOpen">
+<div class="searchable-select" 
+     [class.active]="isOpen"
+     [class.mobile]="isMobile"
+     [class.tablet]="isTablet"
+     [class.small-mobile]="isSmallMobile"
+     role="combobox"
+     [attr.aria-expanded]="isOpen"
+     [attr.aria-haspopup]="'listbox'"
+     [attr.aria-label]="placeholder">
   <div class="select-input">
-    <input 
-      type="text" 
-      class="search-input" 
-      [placeholder]="getSelectedLabel()"
-      [(ngModel)]="searchText"
-      (input)="onSearch($event)"
-      (focus)="onFocus()"
-      (keydown)="handleKeydown($event)"
-      autocomplete="off"
-      autocorrect="off"
-      spellcheck="false"
-      inputmode="search"
-      [style.width.px]="isOpen && focusWidthPx ? focusWidthPx : null"
-    >
-    <button *ngIf="allowClear && hasSelection()" class="clear-btn" type="button" (click)="clearSelection($event)" aria-label="Clear selection">
+    <div class="input-wrapper">
+      <i *ngIf="showSearchIcon && enableSearch" class="search-icon fas fa-search"></i>
+      <input 
+        #searchInput
+        type="text" 
+        class="search-input" 
+        [class.with-search-icon]="showSearchIcon && enableSearch"
+        [placeholder]="getSelectedLabel()"
+        [(ngModel)]="searchText"
+        (input)="onSearch($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur($event)"
+        (keydown)="handleKeydown($event)"
+        (click)="onInputClick($event)"
+        [readonly]="!enableSearch"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        inputmode="search"
+        [style.width.px]="isOpen && focusWidthPx ? focusWidthPx : null"
+        role="searchbox"
+        [attr.aria-autocomplete]="'list'"
+        [attr.aria-activedescendant]="highlightedIndex >= 0 ? 'option-' + highlightedIndex : null"
+      >
+      <div *ngIf="isSearching" class="searching-indicator">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+    </div>
+    <button *ngIf="allowClear && hasSelection()" 
+            class="clear-btn" 
+            type="button" 
+            (click)="clearSelection($event)" 
+            (touchstart)="clearSelection($event)"
+            aria-label="Clear selection">
       <i class="fas fa-times"></i>
     </button>
-    <i class="fas caret" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
+    <button class="dropdown-toggle" 
+            type="button"
+            (click)="toggleDropdown($event)"
+            (touchstart)="toggleDropdown($event)"
+            [attr.aria-expanded]="isOpen"
+            aria-label="Toggle dropdown">
+      <i class="fas caret" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
+    </button>
   </div>
   
-  <div class="select-dropdown" *ngIf="isOpen" (pointerdown)="onDropdownPointerDown()">
-    <button class="scroll-btn scroll-up" (click)="scrollOptions('up')">
+  <div #dropdown
+       class="select-dropdown" 
+       *ngIf="isOpen" 
+       (pointerdown)="onDropdownPointerDown()"
+       role="listbox"
+       [attr.aria-label]="'Options list'"
+       [style.max-height]="maxHeight">
+    <button class="scroll-btn scroll-up" 
+            (click)="scrollOptions('up')"
+            (touchstart)="scrollOptions('up')"
+            aria-label="Scroll up">
       <i class="fas fa-chevron-up"></i>
     </button>
     <div class="options-container">
       <div 
         class="option" 
         *ngFor="let option of filteredOptions; let i = index"
-        (click)="selectOption(option)"
-        (touchstart)="selectOption(option)"
+        [id]="'option-' + i"
+        (click)="selectOption(option, $event)"
+        (touchstart)="onOptionTouchStart($event)"
+        (touchend)="selectOption(option, $event)"
         [class.selected]="isSelected(option)"
         [class.highlighted]="i === highlightedIndex"
+        role="option"
+        [attr.aria-selected]="isSelected(option)"
+        [attr.tabindex]="i === highlightedIndex ? 0 : -1"
       >
         <div class="option-content">
           <div class="checkbox" *ngIf="multiple">
@@ -40,11 +88,15 @@
           <span>{{ option[labelKey] }}</span>
         </div>
       </div>
-      <div class="no-results" *ngIf="filteredOptions.length === 0">
-        No results found
+      <div class="no-results" *ngIf="filteredOptions.length === 0" role="status" aria-live="polite">
+        <i class="fas fa-search"></i>
+        <span>No results found</span>
       </div>
     </div>
-    <button class="scroll-btn scroll-down" (click)="scrollOptions('down')">
+    <button class="scroll-btn scroll-down" 
+            (click)="scrollOptions('down')"
+            (touchstart)="scrollOptions('down')"
+            aria-label="Scroll down">
       <i class="fas fa-chevron-down"></i>
     </button>
   </div>
