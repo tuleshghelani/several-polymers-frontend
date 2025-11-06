@@ -1,0 +1,162 @@
+<div class="attendance-container">
+  <!-- Search/Filter Section -->
+  <div class="search-section card">
+    <h2><i class="fas fa-filter"></i> Filter Attendance Records</h2>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="filter-grid">
+        <!-- Employee Dropdown -->
+        <div class="form-group">
+          <label for="employeeId">Employee</label>
+          <select id="employeeId" formControlName="employeeId" class="form-control">
+            <option value="">All Employees</option>
+            <option *ngFor="let emp of employees" [value]="emp.value">
+              {{ emp.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Shift -->
+        <div class="form-group">
+          <label for="shift">Shift</label>
+          <select id="shift" formControlName="shift" class="form-control">
+            <option *ngFor="let shift of shiftOptions" [value]="shift.value">
+              {{ shift.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Start Date -->
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input 
+            type="text" 
+            id="startDate"
+            formControlName="startDate" 
+            class="form-control" 
+            placeholder="DD-MM-YYYY"
+          >
+        </div>
+
+        <!-- End Date -->
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input 
+            type="text" 
+            id="endDate"
+            formControlName="endDate" 
+            class="form-control" 
+            placeholder="DD-MM-YYYY"
+          >
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-search"></i> Search
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="resetForm()">
+          <i class="fas fa-undo"></i> Reset
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Attendance Records Table -->
+  <div class="attendance-list card">
+    <div class="card-header">
+      <h2><i class="fas fa-clipboard-list"></i> Attendance Records</h2>
+      <div class="info-badge" *ngIf="totalElements > 0">
+        <span class="count">{{ totalElements }}</span> records found
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <div class="table-container">
+        <app-loader [show]="isLoading"></app-loader>
+        
+        <div class="table-responsive" [class.loading]="isLoading">
+          <table class="table attendance-table">
+            <thead>
+              <tr>
+                <th class="sticky-col">#</th>
+                <th>Employee Name</th>
+                <th>Mobile</th>
+                <th>Regular Hrs</th>
+                <th>Overtime Hrs</th>
+                <th>Regular Pay</th>
+                <th>Overtime Pay</th>
+                <th>Total Pay</th>
+                <th>Shift</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of attendanceRecords; let i = index" class="data-row">
+                <td class="sticky-col">{{ startIndex + i }}</td>
+                <td class="employee-name">
+                  <div class="employee-info">
+                    <span class="name">{{ record.employee.name }}</span>
+                    <span class="designation">{{ record.employee.designation }}</span>
+                  </div>
+                </td>
+                <td class="mobile-col">
+                  <div class="mobile-wrapper">
+                    <span class="mobile-number">{{ record.employee.mobileNumber }}</span>
+                    <button 
+                      class="btn-icon whatsapp" 
+                      title="Open WhatsApp" 
+                      (click)="openWhatsApp(record.employee.mobileNumber)"
+                    >
+                      <i class="fab fa-whatsapp"></i>
+                    </button>
+                  </div>
+                </td>
+                <td class="hours-col">
+                  <span class="hours">{{ formatHours(record.regularHours) }}</span>
+                </td>
+                <td class="hours-col">
+                  <span class="hours overtime">{{ formatHours(record.overtimeHours) }}</span>
+                </td>
+                <td class="pay-col">
+                  <span class="amount">{{ formatCurrency(record.regularPay) }}</span>
+                </td>
+                <td class="pay-col">
+                  <span class="amount overtime">{{ formatCurrency(record.overtimePay) }}</span>
+                </td>
+                <td class="pay-col total">
+                  <span class="amount total-pay">{{ formatCurrency(record.totalPay) }}</span>
+                </td>
+                <td class="shift-col">
+                  <span class="shift-badge" [ngClass]="getShiftClass(record.shift)">
+                    {{ getShiftLabel(record.shift) }}
+                  </span>
+                </td>
+                <td class="remarks-col">
+                  <span class="remarks" [title]="record.remarks">{{ record.remarks }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="!isLoading && attendanceRecords.length === 0">
+                <td colspan="12" class="text-center no-data">
+                  <i class="fas fa-inbox"></i>
+                  <p>No attendance records found</p>
+                  <small>Try adjusting your search filters</small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      *ngIf="totalPages > 0"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalElements]="totalElements"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
+  </div>
+</div>

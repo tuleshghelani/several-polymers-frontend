@@ -37,6 +37,7 @@ import { BatchListComponent } from './components/batch/batch-list/batch-list.com
 import { WithdrawListComponent } from './components/employee-withdraw/withdraw-list/withdraw-list.component';
 import { CreateAttendanceComponent } from './components/attendance/create-attendance/create-attendance.component';
 import { AttendanceDetailComponent } from './components/attendance/attendance-detail/attendance-detail.component';
+import { AllAttendanceComponent } from './components/attendance/all-attendance/all-attendance.component';
 import { AddEnquiryComponent } from './components/enquiry/add-enquiry/add-enquiry.component';
 import { EnquiryListComponent } from './components/enquiry/enquiry-list/enquiry-list.component';
 import { FollowupListComponent } from './components/followup/followup-list/followup-list.component';
@@ -262,6 +263,12 @@ const routes: Routes = [
   {
     path: 'attendance',
     component: AttendanceListComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
+  },
+  {
+    path: 'attendance/all',
+    component: AllAttendanceComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN', 'PRODUCT_MANAGER', 'HR'] }
   },

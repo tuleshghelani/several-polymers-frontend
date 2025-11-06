@@ -20,6 +20,10 @@ export class AttendanceService {
     return this.http.post<any>(`${this.apiUrl}/search`, params);
   }
 
+  listAttendance(params: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/list`, params);
+  }
+
   deleteAttendances(attendanceIds: number[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/delete`, { attendanceIds });
   }
