@@ -81,6 +81,8 @@
                 <th class="sticky-col">#</th>
                 <th>Employee Name</th>
                 <th>Mobile</th>
+                <th>Start Date & Time</th>
+                <th>End Date & Time</th>
                 <th>Regular Hrs</th>
                 <th>Overtime Hrs</th>
                 <th>Regular Pay</th>
@@ -110,6 +112,12 @@
                       <i class="fab fa-whatsapp"></i>
                     </button>
                   </div>
+                </td>
+                <td class="datetime-col">
+                  <span class="datetime">{{ formatDateTime(record.startDateTime) }}</span>
+                </td>
+                <td class="datetime-col">
+                  <span class="datetime">{{ formatDateTime(record.endDateTime) }}</span>
                 </td>
                 <td class="hours-col">
                   <span class="hours">{{ formatHours(record.regularHours) }}</span>
