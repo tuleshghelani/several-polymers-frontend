@@ -1,4 +1,4 @@
-﻿<header class="header">
+<header class="header">
   <nav class="nav-container">
     <div class="nav-top">
       <div class="logo">
@@ -25,57 +25,57 @@
           </a>
           <ul class="dropdown-menu" [class.show]="showMasterMenu">
             <li *ngIf="permissions.canViewCategory">
-              <a routerLink="/category" routerLinkActive="active">
+              <a routerLink="/category" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-tags"></i> Category
               </a>
             </li>
             <li *ngIf="permissions.canViewProduct">
-              <a routerLink="/product" routerLinkActive="active">
+              <a routerLink="/product" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-box"></i> Product
               </a>
             </li>
             <li *ngIf="permissions.canViewCustomer">
-              <a routerLink="/customer" routerLinkActive="active">
+              <a routerLink="/customer" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-users"></i> Customer
               </a>
             </li>
             <li *ngIf="permissions.canViewEmployee">
-              <a routerLink="/employee" routerLinkActive="active">
+              <a routerLink="/employee" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-user-tie"></i> Employee
               </a>
             </li>
             <li *ngIf="permissions.canViewMachine">
-              <a routerLink="/machine" routerLinkActive="active">
+              <a routerLink="/machine" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-cogs"></i> Machine
               </a>
             </li>
             <li *ngIf="permissions.canViewTransport">
-              <a routerLink="/transport-master" routerLinkActive="active">
+              <a routerLink="/transport-master" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-truck"></i> Transport
               </a>
             </li>
             <li *ngIf="permissions.canViewBrand">
-              <a routerLink="/brand" routerLinkActive="active">
+              <a routerLink="/brand" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-certificate"></i> Brand
               </a>
             </li>
             <li *ngIf="permissions.canViewUser">
-              <a routerLink="/user" routerLinkActive="active">
+              <a routerLink="/user" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-user-cog"></i> Users
               </a>
             </li>
             <li *ngIf="permissions.canViewEnquiry">
-              <a routerLink="/enquiry" routerLinkActive="active">
+              <a routerLink="/enquiry" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-question-circle"></i> Enquiry
               </a>
             </li>
             <li *ngIf="permissions.canViewFollowup">
-              <a routerLink="/followup" routerLinkActive="active">
+              <a routerLink="/followup" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-university"></i>Followup
               </a>
             </li>
             <li *ngIf="permissions.canViewPayment">
-              <a routerLink="/payment-history" routerLinkActive="active">
+              <a routerLink="/payment-history" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-money-bill-wave"></i> Payment
               </a>
             </li>
@@ -90,12 +90,12 @@
           </a>
           <ul class="dropdown-menu" [class.show]="showTransactionMenu">
             <li *ngIf="permissions.canViewPurchase">
-              <a routerLink="/purchase" routerLinkActive="active">
+              <a routerLink="/purchase" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-shopping-cart"></i> Purchase
               </a>
             </li>
             <li *ngIf="permissions.canViewSale">
-              <a routerLink="/sale" routerLinkActive="active">
+              <a routerLink="/sale" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-hand-holding-usd"></i> Sale
               </a>
             </li>            
@@ -110,12 +110,12 @@
           </a>
           <ul class="dropdown-menu" [class.show]="showDispatchQuotationMenu">            
             <li *ngIf="permissions.canViewQuotation">
-              <a routerLink="/quotation" routerLinkActive="active" fullPath>
+              <a routerLink="/quotation" routerLinkActive="active" fullPath (click)="closeAllMenus()">
                 <i class="fas fa-hand-holding-usd"></i> Quotation
               </a>
             </li> 
             <li *ngIf="permissions.canViewDispatchQuotation">
-              <a routerLink="/quotation/dispatch-list" routerLinkActive="active" fullPath>
+              <a routerLink="/quotation/dispatch-list" routerLinkActive="active" fullPath (click)="closeAllMenus()">
                 <i class="fas fa-shopping-cart"></i> Dispatch Quotation
               </a>
             </li>           
@@ -130,17 +130,17 @@
           </a>
           <ul class="dropdown-menu" [class.show]="showEmployeeMenu">
             <li *ngIf="permissions.canViewEmployeeWithdraw">
-              <a routerLink="/attendance" routerLinkActive="active">
+              <a routerLink="/attendance" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-clipboard-list"></i> Attendance
               </a>
             </li>
             <li *ngIf="permissions.canViewEmployeeWithdraw">
-              <a routerLink="/attendance/all" routerLinkActive="active">
+              <a routerLink="/attendance/all" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-clipboard-list"></i> All Attendance
               </a>
             </li>
             <li *ngIf="permissions.canViewEmployeeWithdraw">
-              <a routerLink="/employee-withdraw" routerLinkActive="active">
+              <a routerLink="/employee-withdraw" routerLinkActive="active" (click)="closeAllMenus()">
                 <i class="fas fa-clipboard-list"></i> Employee Withdraw
               </a>
             </li>
@@ -149,12 +149,12 @@
         
         <!-- Employee Order (standalone) -->
         <li *ngIf="permissions.canViewEmployeeOrder"> 
-          <a routerLink="/employee-order" routerLinkActive="active"> 
+          <a routerLink="/employee-order" routerLinkActive="active" (click)="closeAllMenus()"> 
             <i class="fas fa-clipboard-list"></i> Operator
           </a>
         </li>
         <li *ngIf="permissions.canViewBatch"> 
-          <a routerLink="/batch" routerLinkActive="active">
+          <a routerLink="/batch" routerLinkActive="active" (click)="closeAllMenus()">
             <i class="fas fa-clipboard-list"></i> Batch
           </a>
         </li>

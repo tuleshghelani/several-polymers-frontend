@@ -143,15 +143,44 @@
   @media (max-width: 1024px) {
     .nav-container {
       .nav-links {
-        gap: 0.25rem;
+        gap: 0.5rem;
 
-        li > a {
-          padding: 0.5rem;
-          font-size: 0.9rem;
+        li {
+          > a {
+            padding: 0.65rem 0.85rem;
+            font-size: 0.9rem;
+          }
+
+          &.dropdown {
+            .dropdown-menu {
+              min-width: 200px;
+              
+              li a {
+                padding: 0.65rem 0.85rem;
+                font-size: 0.9rem;
+              }
+            }
+          }
         }
+      }
+    }
+  }
 
-        .dropdown-menu {
-          min-width: 180px;
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .nav-container {
+      .nav-links {
+        li {
+          &.dropdown {
+            > a {
+              i {
+                font-size: 0.9rem;
+              }
+
+              i.fa-chevron-down {
+                font-size: 0.75rem;
+              }
+            }
+          }
         }
       }
     }
@@ -209,41 +238,128 @@
             > a {
               justify-content: space-between;
               background-color: rgba(255, 255, 255, 0.1);
-              margin-bottom: 2px;
+              margin-bottom: 0;
+              border-radius: 6px;
+              font-weight: 500;
+              position: relative;
+              overflow: hidden;
+
+              &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 3px;
+                background: var(--primary);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+              }
+
+              &.active::before {
+                opacity: 1;
+              }
 
               i.fa-chevron-down {
                 transform: rotate(0);
-                transition: transform 0.3s;
+                transition: transform 0.3s ease;
+                font-size: 0.85rem;
               }
 
               &.active i.fa-chevron-down {
                 transform: rotate(180deg);
               }
+
+              &:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+              }
             }
 
             .dropdown-menu {
               position: static;
-              background: transparent;
+              background: rgba(0, 0, 0, 0.15);
               box-shadow: none;
               opacity: 1;
               visibility: visible;
               transform: none;
-              padding-left: 1rem;
+              padding: 0.5rem 0 0.5rem 0.5rem;
               display: none;
+              margin-top: 0.5rem;
+              margin-bottom: 0.5rem;
+              border-radius: 6px;
+              border-left: 3px solid rgba(255, 255, 255, 0.2);
+              backdrop-filter: blur(10px);
 
               &.show {
                 display: block;
+                animation: slideDown 0.3s ease;
               }
 
-              li a {
-                color: white;
-                padding: 0.75rem 1rem;
-                background-color: rgba(255, 255, 255, 0.05);
-                margin-bottom: 2px;
+              li {
+                margin-bottom: 0.25rem;
 
-                &:hover, &.active {
-                  background-color: var(--primary);
+                &:last-child {
+                  margin-bottom: 0;
+                }
+
+                a {
                   color: white;
+                  padding: 0.75rem 1rem;
+                  background-color: rgba(255, 255, 255, 0.08);
+                  margin-bottom: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 0.75rem;
+                  border-radius: 4px;
+                  font-size: 0.95rem;
+                  font-weight: 400;
+                  transition: all 0.3s ease;
+                  position: relative;
+                  overflow: hidden;
+
+                  i {
+                    font-size: 0.9rem;
+                    min-width: 1.2rem;
+                    opacity: 0.9;
+                    transition: all 0.3s ease;
+                  }
+
+                  &::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 0;
+                    background: var(--primary);
+                    transition: width 0.3s ease;
+                  }
+
+                  &:hover {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    transform: scale(1.02);
+
+                    i {
+                      opacity: 1;
+                      transform: scale(1.1);
+                    }
+                  }
+
+                  &.active {
+                    background-color: var(--primary);
+                    color: white;
+                    font-weight: 500;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+                    i {
+                      opacity: 1;
+                    }
+
+                    &::before {
+                      width: 3px;
+                    }
+                  }
                 }
               }
             }
@@ -251,8 +367,71 @@
 
           > a {
             background-color: rgba(255, 255, 255, 0.1);
-            margin-bottom: 2px;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+
+            i {
+              font-size: 1rem;
+              min-width: 1.2rem;
+              opacity: 0.9;
+              transition: all 0.3s ease;
+            }
+
+            &::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 0;
+              width: 0;
+              background: var(--primary);
+              transition: width 0.3s ease;
+            }
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.15);
+              transform: scale(1.02);
+
+              i {
+                opacity: 1;
+                transform: scale(1.1);
+              }
+            }
+
+            &.active {
+              background-color: var(--primary);
+              color: white;
+              font-weight: 500;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+              i {
+                opacity: 1;
+              }
+
+              &::before {
+                width: 3px;
+              }
+            }
           }
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
 

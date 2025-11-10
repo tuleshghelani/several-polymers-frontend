@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { RoleService } from '../../../services/role.service';
@@ -223,5 +223,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   hasEmployeeMenuItems(): boolean {
     return this.permissions.canViewEmployeeWithdraw || false;
+  }
+
+  closeAllMenus(): void {
+    this.showMasterMenu = false;
+    this.showTransactionMenu = false;
+    this.showDispatchQuotationMenu = false;
+    this.showEmployeeMenu = false;
+    this.isMobileMenuOpen = false;
   }
 }
