@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener, OnInit, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-searchable-select',
@@ -19,7 +20,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
     FormsModule
   ]
 })
-export class SearchableSelectComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class SearchableSelectComponent implements ControlValueAccessor, OnDestroy {
   @Input() options: any[] = [];
   @Input() labelKey: string = 'name';
   @Input() valueKey: string = 'id';
@@ -27,11 +28,14 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   @Input() defaultOption: { label: string; value: any } | null = null;
   @Input() searchPlaceholder: string = 'Search...';
   @Input() multiple = false;
+  // New inputs
   @Input() allowClear = true;
   @Input() focusWidthPx?: number; // Optional width applied on focus (in pixels)
   @Input() maxHeight: string = '200px'; // Maximum height for dropdown
   @Input() virtualScroll = false; // Enable virtual scrolling for large datasets
   @Input() searchDebounceMs = 300; // Debounce search input
+
+  @Output() selectionChange = new EventEmitter<any>();
 
   @ViewChild('searchInput', { static: false }) searchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('dropdown', { static: false }) dropdown!: ElementRef<HTMLDivElement>;
@@ -42,265 +46,104 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   selectedValues: any[] = [];
   filteredOptions: any[] = [];
   highlightedIndex: number = -1;
+  isMobileDevice: boolean = false;
   
   onChange: any = () => {};
-  onTouch: any = () => {};
+  onTouch: any = ()=> {};
 
-  isMobile = window.innerWidth <= 768;
-  isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
-  isSmallMobile = window.innerWidth <= 480;
-  private currentScrollPosition = 0;
-  isKeyboardScrolling = false;
-  private searchTimeout: any;
-  private resizeObserver?: ResizeObserver;
-  private intersectionObserver?: IntersectionObserver;
-
-  ngOnInit() {
-    this.filteredOptions = this.options;
-  }
+  private searchDebounceTimer: any;
 
   constructor(
     private elementRef: ElementRef,
-    private cdr: ChangeDetectorRef
+    private sanitizer: DomSanitizer
   ) {
-    this.setupResizeObserver();
+    this.isMobileDevice = this.detectMobileDevice();
   }
 
-  writeValue(value: any): void {
-    if (this.multiple) {
-      this.selectedValues = value || [];
-    } else {
-      this.selectedValue = value;
-      if (value) {
-        const selectedOption = this.options.find(opt => opt[this.valueKey] === value);
-        if (selectedOption) {
-          this.searchText = selectedOption[this.labelKey];
-        }
-      }
-    }
+  // Detect mobile and tablet devices
+  private detectMobileDevice(): boolean {
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(userAgent.toLowerCase());
+    const isSmallScreen = window.innerWidth <= 1024; // Includes tablets
+    return isMobile || isSmallScreen;
   }
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouch = fn;
-  }
-
-  toggleDropdown(event?: MouseEvent | TouchEvent) {
-    if (event) {
+  // Handle touch start on select input for mobile/tablet
+  onTouchStart(event: TouchEvent): void {
+    if (this.isMobileDevice) {
       event.preventDefault();
       event.stopPropagation();
+      this.toggleDropdownMobile();
     }
-    
+  }
+
+  // Handle click on select input for mobile/tablet
+  onSelectClick(event: MouseEvent): void {
+    if (this.isMobileDevice) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toggleDropdownMobile();
+    }
+  }
+
+  // Toggle dropdown specifically for mobile/tablet
+  private toggleDropdownMobile(): void {
     this.isOpen = !this.isOpen;
     if (this.isOpen) {
-      this.searchText = '';
       this.filterOptions();
-      this.lockBodyScroll();
-      this.focusSearchInput();
-      this.setupIntersectionObserver();
+      // Prevent body scroll when dropdown is open on mobile
+      document.body.style.overflow = 'hidden';
     } else {
-      this.unlockBodyScroll();
-      this.cleanupIntersectionObserver();
+      document.body.style.overflow = '';
     }
   }
 
-  onFocus() {
-    if (!this.isOpen) {
-      this.isOpen = true;
-      this.filterOptions();
-      this.highlightedIndex = -1;
-      this.lockBodyScroll();
-      this.setupIntersectionObserver();
+  // Close dropdown (mobile-specific)
+  closeDropdown(): void {
+    this.isOpen = false;
+    document.body.style.overflow = '';
+    if (!this.multiple) {
+      const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+      this.searchText = selected ? selected[this.labelKey] : '';
     }
   }
 
-  onBlur(event: FocusEvent) {
-    const target = event.relatedTarget as HTMLElement;
-    if (target?.classList.contains('scroll-btn') || 
-        target?.classList.contains('option') ||
-        target?.closest('.select-dropdown') ||
-        this.isKeyboardScrolling) {
-      event.preventDefault();
-      return;
-    }
-
-    // Use longer timeout for mobile to prevent premature closing
-    const timeout = this.isMobile ? 200 : 100;
-    setTimeout(() => {
-      this.isOpen = false;
-      this.highlightedIndex = -1;
-      
-      if (!this.multiple) {
-        const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
-        this.searchText = selected ? selected[this.labelKey] : '';
-      }
-      this.unlockBodyScroll();
-      this.cleanupIntersectionObserver();
-    }, timeout);
+  ngOnInit() {
+    this.options = this.options.map(item => {
+      return {
+          ...item,
+          name: this.formatText(item.name)
+      };
+    });
+    this.filteredOptions = this.options;
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!this.elementRef.nativeElement.contains(target)) {
-      this.closeDropdown();
-    }
-  }
-
-  @HostListener('document:touchstart', ['$event'])
-  onDocumentTouchStart(event: TouchEvent): void {
-    const target = event.target as HTMLElement;
-    if (!this.elementRef.nativeElement.contains(target)) {
-      this.closeDropdown();
-    }
-  }
-
-  onSearch(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
+  ngOnDestroy(): void {
+    // Restore body scroll
+    document.body.style.overflow = '';
     
-    // Clear existing timeout
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
+    // Clean up references to prevent memory leaks
+    this.options = [];
+    this.filteredOptions = [];
+    this.selectedValues = [];
+    this.onChange = null;
+    this.onTouch = null;
     
-    // Debounce search for better performance
-    this.searchTimeout = setTimeout(() => {
-      this.searchText = value;
-      this.filterOptions();
-      this.isOpen = true;
-      this.cdr.detectChanges();
-    }, this.searchDebounceMs);
-  }
-
-  filterOptions() {
-    this.filteredOptions = this.options.filter(option =>
-      option[this.labelKey].toLowerCase().includes(this.searchText.toLowerCase())
-    );
-    this.highlightedIndex = this.filteredOptions.length > 0 ? 0 : -1;
-  }
-
-  selectOption(option: any, event?: MouseEvent | TouchEvent) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
+    // Clear debounce timer
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
     }
-    
-    if (this.multiple) {
-      const value = option[this.valueKey];
-      const index = this.selectedValues.indexOf(value);
-      
-      if (index === -1) {
-        this.selectedValues = [...this.selectedValues, value];
-      } else {
-        this.selectedValues = this.selectedValues.filter(v => v !== value);
-      }
-      
-      this.onChange(this.selectedValues);
-    } else {
-      this.selectedValue = option[this.valueKey];
-      this.searchText = option[this.labelKey];
-      this.onChange(this.selectedValue);
-      this.closeDropdown();
-    }
-    this.onTouch();
   }
-
-  isSelected(option: any): boolean {
-    const value = option[this.valueKey];
-    return this.multiple 
-      ? this.selectedValues.includes(value)
-      : this.selectedValue === value;
-  }
-
+  
   hasSelection(): boolean {
     return this.multiple ? this.selectedValues.length > 0 : !!this.selectedValue;
   }
-
-  clearSelection(event?: MouseEvent | TouchEvent): void {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-    if (this.multiple) {
-      this.selectedValues = [];
-      this.onChange(this.selectedValues);
-    } else {
-      this.selectedValue = '';
-      this.searchText = '';
-      this.onChange(this.selectedValue);
-    }
-    this.onTouch();
+  
+  onDropdownPointerDown() {
+    // Prevent input blur from closing dropdown prematurely on mobile
   }
 
-  getSelectedLabel(): string {
-    if (this.multiple) {
-      return this.selectedValues.length 
-        ? `${this.selectedValues.length} selected`
-        : this.placeholder;
-    }
-    
-    if (!this.selectedValue && this.defaultOption) {
-      return this.defaultOption.label;
-    }
-    const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
-    return selected ? selected[this.labelKey] : this.placeholder;
-  }
-
-  handleKeydown(event: KeyboardEvent): void {
-    if (!this.isOpen) {
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-        this.isOpen = true;
-        this.highlightedIndex = 0;
-        event.preventDefault();
-      }
-      return;
-    }
-
-    const container = document.querySelector('.options-container');
-    if (!container) return;
-
-    const scrollStep = 160; // Height of 4 options (40px each)
-
-    switch (event.key) {
-      case 'ArrowDown':
-      case 'ArrowUp':
-        this.isKeyboardScrolling = true;
-        event.preventDefault();
-        event.stopPropagation();
-        
-        this.highlightedIndex = Math.min(
-          this.highlightedIndex + (event.key === 'ArrowDown' ? 4 : -4), 
-          this.filteredOptions.length - 1
-        );
-        
-        container.scrollBy({
-          top: event.key === 'ArrowDown' ? scrollStep : -scrollStep,
-          behavior: 'smooth'
-        });
-        
-        setTimeout(() => {
-          this.isKeyboardScrolling = false;
-        }, 100);
-        break;
-
-      case 'Enter':
-        if (this.highlightedIndex >= 0 && this.filteredOptions[this.highlightedIndex]) {
-          this.selectOption(this.filteredOptions[this.highlightedIndex]);
-          event.preventDefault();
-        }
-        break;
-
-      case 'Escape':
-        this.isOpen = false;
-        this.highlightedIndex = -1;
-        event.preventDefault();
-        break;
-    }
-  }
-
+  
   scrollOptions(direction: 'up' | 'down', event?: MouseEvent | TouchEvent): void {
     if (event) {
       event.preventDefault();
@@ -330,6 +173,322 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     }
   }
 
+  writeValue(value: any): void {
+    if (this.multiple) {
+      this.selectedValues = value || [];
+    } else {
+      this.selectedValue = value;
+      if (value) {
+        const selectedOption = this.options.find(opt => opt[this.valueKey] === value);
+        if (selectedOption) {
+          this.searchText = selectedOption[this.labelKey];
+        }
+      }
+    }
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouch = fn;
+  }
+
+  toggleDropdown(event?: Event) {
+    event?.stopPropagation();
+    this.isOpen = !this.isOpen;
+    if (this.isOpen) {
+      this.searchText = '';
+      this.filterOptions();
+      
+      // Focus the search input when dropdown opens
+      setTimeout(() => {
+        if (this.searchInput) {
+          this.searchInput.nativeElement.focus();
+        }
+      }, 0);
+    }
+  }
+
+  onFocus() {
+    // Skip focus behavior on mobile/tablet devices
+    if (this.isMobileDevice) {
+      return;
+    }
+    
+    this.isOpen = true;
+    this.filterOptions();
+    this.highlightedIndex = -1;
+    
+    // Apply custom width on focus if specified
+    if (this.focusWidthPx) {
+      // Ensure we're setting the width on the correct element
+      const element = this.elementRef.nativeElement as HTMLElement;
+      
+      // Instead of absolute positioning, we'll expand the parent container
+      // Find the parent container and expand it
+      const parentContainer = element.closest('.select-group') as HTMLElement;
+      if (parentContainer) {
+        // Store original width to restore later
+        const originalMinWidth = parentContainer.style.minWidth;
+        const originalWidth = parentContainer.style.width;
+        
+        // Set data attributes to store original values
+        parentContainer.setAttribute('data-original-min-width', originalMinWidth || '');
+        parentContainer.setAttribute('data-original-width', originalWidth || '');
+        
+        // Expand the parent container
+        parentContainer.style.minWidth = `${this.focusWidthPx}px`;
+        parentContainer.style.width = `${this.focusWidthPx}px`;
+        parentContainer.style.transition = 'all 0.3s ease';
+        
+        // Add a class for additional CSS styling
+        parentContainer.classList.add('expanded');
+      }
+      
+      // Also apply to the component itself
+      element.style.width = `${this.focusWidthPx}px`;
+      element.style.minWidth = `${this.focusWidthPx}px`;
+      element.style.maxWidth = `${this.focusWidthPx}px`;
+      
+      // Add a class for additional CSS styling
+      element.classList.add('custom-width');
+      
+      // Also apply to the inner searchable-select div
+      const innerDiv = element.querySelector('.searchable-select') as HTMLElement;
+      if (innerDiv) {
+        innerDiv.style.width = `${this.focusWidthPx}px`;
+        innerDiv.style.minWidth = `${this.focusWidthPx}px`;
+        innerDiv.style.maxWidth = `${this.focusWidthPx}px`;
+      }
+    }
+  }
+
+  onBlur() {
+    // Skip blur behavior on mobile/tablet devices
+    if (this.isMobileDevice) {
+      return;
+    }
+    
+    setTimeout(() => {
+      if (!this.multiple) {
+        this.isOpen = false;
+        this.highlightedIndex = -1;
+        const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+        this.searchText = selected ? selected[this.labelKey] : '';
+        
+        // Reset width on blur
+        if (this.focusWidthPx) {
+          const element = this.elementRef.nativeElement as HTMLElement;
+          
+          // Reset the parent container
+          const parentContainer = element.closest('.select-group') as HTMLElement;
+          if (parentContainer) {
+            // Restore original width values
+            const originalMinWidth = parentContainer.getAttribute('data-original-min-width') || '';
+            const originalWidth = parentContainer.getAttribute('data-original-width') || '';
+            
+            parentContainer.style.minWidth = originalMinWidth;
+            parentContainer.style.width = originalWidth;
+            
+            // Remove the custom class
+            parentContainer.classList.remove('expanded');
+          }
+          
+          // Reset styles on the component itself
+          element.style.width = '';
+          element.style.minWidth = '';
+          element.style.maxWidth = '';
+          
+          // Remove the custom class
+          element.classList.remove('custom-width');
+          
+          // Also reset the inner div
+          const innerDiv = element.querySelector('.searchable-select') as HTMLElement;
+          if (innerDiv) {
+            innerDiv.style.width = '';
+            innerDiv.style.minWidth = '';
+            innerDiv.style.maxWidth = '';
+          }
+        }
+      }
+    }, 200);
+  }
+
+  onSearch(event: any) {
+    // Disable search on mobile/tablet - they should use native selection
+    if (this.isMobileDevice) {
+      return;
+    }
+    
+    const value = event.target.innerText;
+    
+    // If multiple selection and has selected values, don't update search text
+    if (this.multiple && this.selectedValues.length > 0 && !this.isOpen) {
+      this.searchText = this.getDisplayText();
+      return;
+    }
+    
+    this.searchText = value;
+    
+    // Implement search debouncing
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    
+    this.searchDebounceTimer = setTimeout(() => {
+      this.filterOptions();
+      this.isOpen = true;
+    }, this.searchDebounceMs);
+  }
+
+  filterOptions() {
+    this.filteredOptions = this.options.filter(option =>
+      option[this.labelKey].toLowerCase().includes(this.searchText.toLowerCase())
+    );
+    
+    if(!this.filteredOptions.length){
+      this.filteredOptions = this.options;
+    };
+    this.highlightedIndex = this.filteredOptions.length > 0 ? 0 : -1;
+  }
+
+  selectOption(option: any, event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    
+    if (this.multiple) {
+      const value = option[this.valueKey];
+      const index = this.selectedValues.indexOf(value);
+      
+      if (index === -1) {
+        this.selectedValues = [...this.selectedValues, value];
+      } else {
+        this.selectedValues = this.selectedValues.filter(v => v !== value);
+      }
+      
+      this.onChange(this.selectedValues);
+    } else {
+      this.selectedValue = option[this.valueKey];
+      this.searchText = option[this.labelKey];
+      this.onChange(this.selectedValue);
+      this.isOpen = false;
+      
+      // Restore body scroll on mobile after selection
+      if (this.isMobileDevice) {
+        document.body.style.overflow = '';
+      }
+    }
+    this.onTouch();
+    this.selectionChange.emit({ value: this.selectedValue });
+  }
+
+  // Clear selection
+  clearSelection(event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    if (this.multiple) {
+      this.selectedValues = [];
+      this.onChange([]);
+    } else {
+      this.selectedValue = null;
+      this.searchText = '';
+      this.onChange(null);
+    }
+    
+    // Close dropdown and restore body scroll on mobile
+    if (this.isMobileDevice) {
+      this.isOpen = false;
+      document.body.style.overflow = '';
+    }
+    
+    this.onTouch();
+    this.selectionChange.emit({ value: this.multiple ? [] : null });
+  }
+
+  isSelected(option: any): boolean {
+    const value = option[this.valueKey];
+    return this.multiple 
+      ? this.selectedValues.includes(value)
+      : this.selectedValue === value;
+  }
+
+  getSelectedLabel(): string {
+    if (this.multiple) {
+      return this.selectedValues.length 
+        ? `${this.selectedValues.length} selected`
+        : this.placeholder;
+    }
+    
+    if (!this.selectedValue && this.defaultOption) {
+      return this.defaultOption.label;
+    }
+    const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+    return selected ? selected[this.labelKey] : this.placeholder;
+  }
+
+  handleKeydown(event: KeyboardEvent): void {
+    if (!this.isOpen) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        this.isOpen = true;
+        this.highlightedIndex = 0;
+        event.preventDefault();
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        this.highlightedIndex = Math.min(
+          this.highlightedIndex + 1, 
+          this.filteredOptions.length - 1
+        );
+        event.preventDefault();
+        this.scrollToHighlighted();
+        break;
+
+      case 'ArrowUp':
+        this.highlightedIndex = Math.max(this.highlightedIndex - 1, 0);
+        event.preventDefault();
+        this.scrollToHighlighted();
+        break;
+
+      case 'Enter':
+        if (this.highlightedIndex >= 0 && this.filteredOptions[this.highlightedIndex]) {
+          this.selectOption(this.filteredOptions[this.highlightedIndex]);
+          (event.target as HTMLElement).blur();
+          event.preventDefault();
+        }
+        break;
+
+      case 'Escape':
+        this.isOpen = false;
+        this.highlightedIndex = -1;
+        event.preventDefault();
+        break;
+    }
+  }
+
+  private scrollToHighlighted(): void {
+    setTimeout(() => {
+      const container = document.querySelector('.options-container');
+      const highlighted = document.querySelector('.option.highlighted');
+      
+      if (container && highlighted) {
+        const containerRect = container.getBoundingClientRect();
+        const highlightedRect = highlighted.getBoundingClientRect();
+
+        if (highlightedRect.bottom > containerRect.bottom) {
+          container.scrollTop += highlightedRect.bottom - containerRect.bottom;
+        } else if (highlightedRect.top < containerRect.top) {
+          container.scrollTop -= containerRect.top - highlightedRect.top;
+        }
+      }
+    });
+  }
+
   ngOnChanges(changes: any): void {
     if (changes.options && !changes.options.firstChange) {
       if (!this.multiple && this.selectedValue) {
@@ -341,92 +500,61 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     }
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.isMobile = window.innerWidth <= 768;
-    this.isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
-    this.isSmallMobile = window.innerWidth <= 480;
-  }
-
-  onDropdownPointerDown() {
-    // Prevent input blur from closing dropdown prematurely on mobile
-  }
-
-  onOptionTouchStart(event: TouchEvent) {
-    // Prevent default touch behavior that might interfere with selection
-    event.preventDefault();
-  }
-
-  ngOnDestroy() {
-    this.cleanup();
-  }
-
-  private closeDropdown(): void {
-    this.isOpen = false;
-    this.highlightedIndex = -1;
-    if (!this.multiple) {
-      const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
-      this.searchText = selected ? selected[this.labelKey] : '';
-    }
-    this.unlockBodyScroll();
-    this.cleanupIntersectionObserver();
-  }
-
-  private focusSearchInput(): void {
-    if (this.searchInput && this.isMobile) {
-      // Small delay to ensure dropdown is rendered
-      setTimeout(() => {
-        this.searchInput.nativeElement.focus();
-      }, 50);
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isOpen = false;
+      
+      // Restore body scroll on mobile
+      if (this.isMobileDevice) {
+        document.body.style.overflow = '';
+      }
+      
+      if (!this.multiple) {
+        const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+        this.searchText = selected ? selected[this.labelKey] : '';
+        
+        // Reset width when closing dropdown
+        if (this.focusWidthPx) {
+          this.elementRef.nativeElement.style.width = '';
+        }
+      }
     }
   }
 
-  private setupResizeObserver(): void {
-    if (typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => {
-        this.cdr.detectChanges();
-      });
-    }
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-  private setupIntersectionObserver(): void {
-    if (this.dropdown && typeof IntersectionObserver !== 'undefined') {
-      this.intersectionObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting && this.isOpen) {
-            this.closeDropdown();
-          }
-        });
-      });
-      this.intersectionObserver.observe(this.dropdown.nativeElement);
+  getDisplayText(): string {
+    if (this.multiple) {
+      const selectedCount = this.selectedValues.length;
+      if (selectedCount === 0) return this.placeholder;
+      
+      const selectedOptions = this.options.filter(opt => 
+        this.selectedValues.includes(opt[this.valueKey])
+      );
+      
+      if (selectedCount === 1) {
+        return selectedOptions[0][this.labelKey];
+      }
+      
+      return `${selectedCount} items selected`;
     }
+    
+    if (!this.selectedValue && this.defaultOption) {
+      return this.defaultOption.label;
+    }
+    
+    const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
+    return selected ? selected[this.labelKey] : this.placeholder;
   }
 
-  private cleanupIntersectionObserver(): void {
-    if (this.intersectionObserver) {
-      this.intersectionObserver.disconnect();
-      this.intersectionObserver = undefined;
-    }
+  formatText(input: string): string {
+    if (!input) return '';
+    let text = input.replace(/&nbsp;/g, ' ');
+    text = text.replace(/<(?!\/?b\b)[^>]*>/gi, '');
+    text = text.replace(/\s{2,}/g, ' ').trim();
+    return text;
   }
-
-  private cleanup(): void {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
-    this.cleanupIntersectionObserver();
-    this.unlockBodyScroll();
-  }
-
-  private lockBodyScroll(): void {
-    if (this.isMobile) {
-      document.body.classList.add('no-scroll');
-    }
-  }
-
-  private unlockBodyScroll(): void {
-    document.body.classList.remove('no-scroll');
-  }
-} 
+}
