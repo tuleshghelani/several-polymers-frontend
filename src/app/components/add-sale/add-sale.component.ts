@@ -193,7 +193,7 @@ export class AddSaleComponent implements OnInit, OnDestroy {
         if (this.isPopulating) return;
         const selectedProduct = this.products.find(p => p.id === productId);
         if (!selectedProduct) return;
-        const taxPercentage = selectedProduct.tax_percentage !== undefined ? selectedProduct.tax_percentage : 0;
+        const taxPercentage = selectedProduct.taxPercentage !== undefined ? selectedProduct.taxPercentage : 0;
         const currentUnitPrice = group.get('unitPrice')?.value;
         group.patchValue({
           taxPercentage: taxPercentage,
