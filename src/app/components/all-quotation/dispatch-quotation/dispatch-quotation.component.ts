@@ -213,7 +213,7 @@ export class DispatchQuotationComponent implements OnInit, OnDestroy {
           group.patchValue({
             productType: selectedProduct.type,
             productName: selectedProduct.name,
-            taxPercentage: selectedProduct.taxPercentage ?? 0,
+            taxPercentage: selectedProduct.tax_percentage ?? 0,
             quantity: selectedProduct.quantity || 1
           }, { emitEvent: false });
           // Use product's sale_amount as unit price for consistency

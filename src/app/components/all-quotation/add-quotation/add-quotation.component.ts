@@ -290,7 +290,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         console.log('selectedProduct >>>', selectedProduct);
         
         if (selectedProduct) {
-          console.log(`Product tax percentage: ${selectedProduct.taxPercentage !== undefined ? selectedProduct.taxPercentage : 'not specified, using default 18'}%`);
+          console.log(`Product tax percentage: ${selectedProduct.tax_percentage !== undefined ? selectedProduct.tax_percentage : 'not specified, using default 18'}%`);
           this.fetchProductPrice(index, selectedProduct);
         }
       });
@@ -318,6 +318,10 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
 
   onQuantityEdit(index: number) {
     this.markQuantityManual(index);
+    this.calculateItemPrice(index);
+  }
+
+  onUnitPriceEdit(index: number) {
     this.calculateItemPrice(index);
   }
 
@@ -656,8 +660,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
     
     const itemGroup = this.itemsFormArray.at(index);
     
-    const taxPercentage = selectedProduct.taxPercentage !== undefined ? 
-                        selectedProduct.taxPercentage : 0;
+    const taxPercentage = selectedProduct.tax_percentage !== undefined ? 
+                        selectedProduct.tax_percentage : 0;
     
     console.log(`Setting tax percentage for ${selectedProduct.name}: ${taxPercentage}%`);
     

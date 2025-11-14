@@ -231,7 +231,7 @@
                       </div>
                     </div>
                   </td>
-  
+
                   <!-- Common fields -->
                   <td>
                     <div class="input-group">
@@ -255,7 +255,9 @@
                   <td>
                     <div class="input-group">
                       <input type="number" formControlName="unitPrice" class="form-control"
-                        [class.is-invalid]="isItemFieldInvalid(i, 'unitPrice')" min="0.01" step="0.01">
+                        [class.is-invalid]="isItemFieldInvalid(i, 'unitPrice')" min="0.01" step="0.01"
+                        (input)="onUnitPriceEdit(i)">
+
                       <!-- <span class="input-group-text" *ngIf="isLoadingPrices && loadingPriceIndex === i">
                         <i class="fas fa-spinner fa-spin"></i>
                       </span> -->
