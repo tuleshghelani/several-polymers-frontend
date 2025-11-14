@@ -39,10 +39,26 @@
   <!-- Dropdown with mobile header -->
   <div class="select-dropdown" *ngIf="isOpen" [style.max-height]="maxHeight">
     <div class="mobile-header" *ngIf="isMobileDevice">
-      <h4>{{ searchPlaceholder || placeholder }}</h4>
-      <button type="button" class="close-btn" (click)="closeDropdown()">
-        <i class="fas fa-times"></i>
-      </button>
+      <div class="mobile-header-top">
+        <h4>{{ searchPlaceholder || placeholder }}</h4>
+        <button type="button" class="close-btn" (click)="closeDropdown()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="mobile-search-wrapper">
+        <input
+          #mobileSearchInput
+          type="search"
+          class="mobile-search-input"
+          [placeholder]="searchPlaceholder || placeholder"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+          inputmode="search"
+          (input)="onMobileSearch($event)"
+          (keydown.enter)="$event.preventDefault()"
+        />
+      </div>
     </div>
     
     <div class="options-container" [class.virtual-scroll]="virtualScroll">

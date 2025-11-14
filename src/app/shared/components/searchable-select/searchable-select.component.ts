@@ -38,6 +38,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
   @Output() selectionChange = new EventEmitter<any>();
 
   @ViewChild('searchInput', { static: false }) searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('mobileSearchInput', { static: false }) mobileSearchInput!: ElementRef<HTMLInputElement>;
   @ViewChild('dropdown', { static: false }) dropdown!: ElementRef<HTMLDivElement>;
 
   searchText: string = '';
@@ -70,9 +71,16 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
 
   // Handle touch start on select input for mobile/tablet
   onTouchStart(event: TouchEvent): void {
-    if (this.isMobileDevice) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (!this.isMobileDevice) {
+      return;
+    }
+
+    // Use touchstart as the primary trigger on mobile and
+    // prevent the follow-up synthetic click from causing a second toggle.
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.isOpen) {
       this.toggleDropdownMobile();
     }
   }
@@ -80,9 +88,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
   // Handle click on select input for mobile/tablet
   onSelectClick(event: MouseEvent): void {
     if (this.isMobileDevice) {
+      // On mobile, touchstart already handled the toggle.
+      // Swallow the synthetic click to avoid closing immediately.
       event.preventDefault();
       event.stopPropagation();
-      this.toggleDropdownMobile();
+      return;
     }
   }
 
@@ -93,6 +103,13 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
       this.filterOptions();
       // Prevent body scroll when dropdown is open on mobile
       document.body.style.overflow = 'hidden';
+
+      // Focus the dedicated mobile search input when available
+      setTimeout(() => {
+        if (this.mobileSearchInput) {
+          this.mobileSearchInput.nativeElement.focus();
+        }
+      }, 0);
     } else {
       document.body.style.overflow = '';
     }
@@ -340,6 +357,24 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
     this.searchDebounceTimer = setTimeout(() => {
       this.filterOptions();
       this.isOpen = true;
+    }, this.searchDebounceMs);
+  }
+
+  onMobileSearch(event: any) {
+    if (!this.isMobileDevice) {
+      return;
+    }
+
+    const target = event.target as HTMLInputElement | null;
+    const value = target?.value ?? '';
+    this.searchText = value;
+
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    this.searchDebounceTimer = setTimeout(() => {
+      this.filterOptions();
     }, this.searchDebounceMs);
   }
 
