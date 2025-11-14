@@ -9,8 +9,10 @@
 }
 
 .form-control {
-  height: 20px;
-  padding: 0.375rem 0.5rem;
+  height: 40px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.25;
 }
 
 .back-btn {
@@ -56,8 +58,8 @@
 
   .form-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 0.75rem 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem 1.25rem;
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
@@ -278,11 +280,12 @@
 
     .form-control {
       min-width: 80px;
+      height: 40px;
     }
 
     &:first-child {
       .form-control {
-        min-width: 200px;
+        min-width: 320px;
       }
     }
   }
@@ -290,13 +293,13 @@
   // Set compact, consistent widths for inputs per column
   td:nth-child(2) { // Quantity
     .form-control {
-      width: 100px;
+      width: 120px;
     }
   }
 
   td:nth-child(3) { // Purchase Rate
     .form-control {
-      width: 140px;
+      width: 110px;
     }
   }
 
@@ -323,6 +326,18 @@
   @media (max-width: 768px) {
     td, th {
       padding: 0.5rem;
+    }
+
+    td:first-child .form-control {
+      // min-width: 250px;
+      width: 250px;
+    }
+
+    td:nth-child(2) .form-control,
+    td:nth-child(3) .form-control,
+    td:nth-child(4) .form-control,
+    td:nth-child(5) .form-control {
+      width: 100%;
     }
   }
 }
