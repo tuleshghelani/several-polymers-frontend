@@ -75,6 +75,13 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
       return;
     }
 
+    // If the user tapped the clear (remove) icon, allow that handler
+    // to run normally and do not toggle the mobile dropdown here.
+    const target = event.target as HTMLElement | null;
+    if (target && target.closest('.clear-icon')) {
+      return;
+    }
+
     // Use touchstart as the primary trigger on mobile and
     // prevent the follow-up synthetic click from causing a second toggle.
     event.preventDefault();
