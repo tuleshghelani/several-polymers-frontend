@@ -104,7 +104,8 @@ input, select {
 
 .panes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  // Desktop: Mixer 35% and Production 65%
+  grid-template-columns: 35% 65%;
   gap: 16px;
 }
 
@@ -120,8 +121,29 @@ input, select {
 
 .item { background: rgba(174, 198, 207, 0.08); border: 1px dashed var(--supporting); border-radius: 10px; padding: 10px; }
 
-.item-grid { display: grid; grid-template-columns: 2fr 1fr 40px; gap: 8px; align-items: center; }
-.right .item-grid { grid-template-columns: 2fr 1fr 1fr auto 40px; gap: 8px; align-items: center; }
+.item-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 0.6fr) 40px;
+  gap: 8px;
+  align-items: center;
+
+  // Prevent long content from forcing grid overflow
+  > * { min-width: 0; }
+  input { width: 100%; }
+  app-searchable-select { width: 100%; }
+}
+
+// Desktop: make product wider; keep numeric fields compact
+.right .item-grid {
+  grid-template-columns:
+    minmax(0, 2.6fr)
+    minmax(110px, 0.9fr)
+    minmax(100px, 0.8fr)
+    minmax(84px, 0.6fr)
+    40px;
+  gap: 8px;
+  align-items: center;
+}
 
 .icon { 
   background: transparent; border: none; cursor: pointer; font-size: 18px;
@@ -133,7 +155,7 @@ input, select {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 100px;
+  min-width: 84px;
 }
 
 .checkbox-label {
@@ -227,6 +249,11 @@ input, select {
   .right .item-grid { 
     grid-template-columns: 1fr 1fr; 
     gap: 12px;
+
+    // Give Product more horizontal space on tablet
+    app-searchable-select {
+      grid-column: 1 / -1;
+    }
     
     .checkbox-container {
       grid-column: 1 / -1;
@@ -237,6 +264,26 @@ input, select {
 }
 
 @media (max-width: 768px) {
+  // Mobile responsive design for mixer items
+  .left .item-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+
+    .icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
   // Mobile responsive design for production items
   .right .item-grid {
     grid-template-columns: 1fr;

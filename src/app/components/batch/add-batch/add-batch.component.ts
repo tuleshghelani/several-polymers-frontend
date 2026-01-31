@@ -269,7 +269,11 @@ export class AddBatchComponent implements OnInit, OnDestroy {
     return +(kg / 250).toFixed(3);
   }
 
-  submit(): void {
+  submit(event?: Event): void {
+    // Defensive: prevent any native form submission navigation (e.g., Enter key)
+    event?.preventDefault();
+    event?.stopPropagation();
+
     this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
